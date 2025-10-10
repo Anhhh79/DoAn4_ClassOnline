@@ -1,0 +1,69 @@
+﻿/* Gradient nền tím - hồng */
+.banner-gradient {
+    background: linear-gradient(135deg, #6a11cb 0%, #ff4ecd 100%);
+    color: #fff;
+}
+
+    /* Chữ trong banner */
+    .banner-gradient h1,
+    .banner-gradient h2 {
+        font-weight: 700;
+        text-shadow: 1px 1px 8px rgba(0,0,0,0.2);
+    }
+
+    .banner-gradient p {
+        opacity: 0.9;
+    }
+
+    /* Nút CTA */
+    .banner-gradient .btn {
+        border: 2px solid #fff;
+        color: #fff;
+        transition: 0.3s;
+    }
+
+        .banner-gradient .btn:hover {
+            background: #fff;
+            color: #6a11cb;
+        }
+
+/* Mũi tên điều hướng */
+.carousel-control-prev,
+.carousel-control-next {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    top: 50%;
+    transform: translateY(-50%);
+    transition: background 0.3s;
+}
+
+    .carousel-control-prev:hover,
+    .carousel-control-next:hover {
+        background: rgba(255, 255, 255, 0.9);
+    }
+
+
+/* Card hover */
+.custom-card {
+    transition: 0.3s ease;
+    border-radius: 1rem;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.12); /* bóng nhẹ */
+}
+
+
+    .custom-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .custom-card .icon i {
+        transition: 0.3s ease;
+    }
+
+    .custom-card:hover .icon i {
+        transform: scale(1.2);
+    }
+/* Card mặc định */
+
