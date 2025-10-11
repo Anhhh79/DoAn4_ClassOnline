@@ -1,121 +1,30 @@
 ﻿@{
     ViewData["Title"] = "Trang chủ";
+
+    // Dữ liệu mẫu
+    var khoaList = new List<dynamic>
+    {
+        new { MaKhoa = "CNTT", TenKhoa = "Khoa Công nghệ thông tin", Icon = "bi-laptop" },
+        new { MaKhoa = "DDT", TenKhoa = "Khoa Điện - Điện tử", Icon = "bi-lightning-charge" },
+        new { MaKhoa = "CK", TenKhoa = "Khoa Kỹ thuật cơ khí", Icon = "bi-gear-wide-connected" },
+        new { MaKhoa = "XD", TenKhoa = "Khoa Kỹ thuật xây dựng", Icon = "bi-building" },
+        new { MaKhoa = "KHXH", TenKhoa = "Khoa Khoa học xã hội", Icon = "bi-book" }
+    };
 }
 
-<!-- Carousel -->
-<div id="heroCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
-
-    <!-- Indicators -->
-    <div class="carousel-indicators">
-        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
-        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
-        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
-    </div>
-
-    <!-- Slides -->
-    <div class="carousel-inner rounded-4 shadow-lg" style="max-height: 300px; overflow: hidden;">
-
-        <!-- Slide 1 -->
-        <div class="carousel-item active banner-gradient text-white">
-            <div class="d-flex flex-column flex-lg-row align-items-center p-5">
-                <div class="col-lg-6">
-                    <h2 class="fw-bold mb-3">Học HTML & CSS cho người mới 👨‍💻</h2>
-                    <p class="lead mb-4">Thực hành dự án thực tế, hàng trăm bài tập kèm hướng dẫn chi tiết.</p>
-                    <a href="#" class="btn btn-warning fw-bold shadow-sm rounded-pill px-4">Học thử miễn phí</a>
-                </div>
-                <div class="col-lg-6 text-center">
-                    <img src="https://dummyimage.com/480x240/ffffff/000000&text=HTML+CSS"
-                         class="img-fluid rounded-4 shadow" alt="HTML CSS">
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 2 -->
-        <div class="carousel-item bg-dark text-white">
-            <div class="d-flex flex-column flex-lg-row align-items-center p-5">
-                <div class="col-lg-6">
-                    <h2 class="fw-bold mb-3">JavaScript cơ bản đến nâng cao ⚡</h2>
-                    <p class="lead mb-4">Hiểu rõ nguyên lý hoạt động của JS, xây dựng ứng dụng web mượt mà.</p>
-                    <a href="#" class="btn btn-success fw-bold shadow-sm rounded-pill px-4">Bắt đầu ngay</a>
-                </div>
-                <div class="col-lg-6 text-center">
-                    <img src="https://dummyimage.com/480x240/000000/ffffff&text=JavaScript"
-                         class="img-fluid rounded-4 shadow" alt="JavaScript">
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 3 -->
-        <div class="carousel-item bg-primary text-white">
-            <div class="d-flex flex-column flex-lg-row align-items-center p-5">
-                <div class="col-lg-6">
-                    <h2 class="fw-bold mb-3">Khóa học ReactJS 🚀</h2>
-                    <p class="lead mb-4">Làm chủ framework hot nhất hiện nay, xây dựng SPA hiện đại.</p>
-                    <a href="#" class="btn btn-light fw-bold shadow-sm rounded-pill px-4">Đăng ký ngay</a>
-                </div>
-                <div class="col-lg-6 text-center">
-                    <img src="https://dummyimage.com/480x240/ffffff/000000&text=ReactJS"
-                         class="img-fluid rounded-4 shadow" alt="ReactJS">
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Controls -->
-    <button class="carousel-control-prev custom-control" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon"></span>
-    </button>
-    <button class="carousel-control-next custom-control" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon"></span>
-    </button>
-</div>
-
 <!-- Section chức năng -->
-<div class="container py-5">
-    <h4 class="fw-bold mb-4">Các chức năng chính</h4>
-    <div class="row row-cols-2 row-cols-md-5 g-4">
-
-        <!-- Card 1 -->
-        <div class="col">
-            <div class="card custom-card text-center p-4 h-100 border-0 rounded-4 bg-body-tertiary">
-                <div class="icon mb-3"><i class="bi bi-file-earmark-text fs-1"></i></div>
-                <h6 class="fw-bold mb-0">Bài tập</h6>
+<div class="container p-4">
+    <div class="row row-cols-2 row-cols-md-4 g-4">
+        @foreach (var khoa in khoaList)
+        {
+            <div class="col">
+                <a asp-controller="Home" asp-action="chiTietKhoa" asp-route-maKhoa="@khoa.MaKhoa" class="text-decoration-none">
+                    <div class="card custom-card text-center p-4 h-100 border-0 rounded-4 bg-body-tertiary hover-card">
+                        <div class="icon mb-3 text-primary"><i class="bi @khoa.Icon fs-1"></i></div>
+                        <h6 class="fw-bold mb-0 text-dark">@khoa.TenKhoa</h6>
+                    </div>
+                </a>
             </div>
-        </div>
-
-        <!-- Card 2 -->
-        <div class="col">
-            <div class="card custom-card text-center p-4 h-100 border-0 rounded-4 bg-body-tertiary">
-                <div class="icon mb-3"><i class="bi bi-folder fs-1"></i></div>
-                <h6 class="fw-bold mb-0">Đề thi</h6>
-            </div>
-        </div>
-
-        <!-- Card 3 -->
-        <div class="col">
-            <div class="card custom-card text-center p-4 h-100 border-0 rounded-4 bg-body-tertiary">
-                <div class="icon mb-3"><i class="bi bi-layers fs-1"></i></div>
-                <h6 class="fw-bold mb-0">Quản lý lớp</h6>
-            </div>
-        </div>
-
-        <!-- Card 4 -->
-        <div class="col">
-            <div class="card custom-card text-center p-4 h-100 border-0 rounded-4 bg-body-tertiary">
-                <div class="icon mb-3"><i class="bi bi-people fs-1"></i></div>
-                <h6 class="fw-bold mb-0">Quản lý giáo viên</h6>
-            </div>
-        </div>
-
-        <!-- Card 5 -->
-        <div class="col">
-            <div class="card custom-card text-center p-4 h-100 border-0 rounded-4 bg-body-tertiary">
-                <div class="icon mb-3"><i class="bi bi-book fs-1"></i></div>
-                <h6 class="fw-bold mb-0">Kho nội dung</h6>
-            </div>
-        </div>
+        }
     </div>
 </div>
-
-
-
