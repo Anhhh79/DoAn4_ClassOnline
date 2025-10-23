@@ -1,74 +1,96 @@
-﻿<!-- Section chức năng -->
-<div class="container">
-    <div class="d-flex">
-        <h4 class="fw-bold mb-4">Phát triển ứng dụng IOT - Nguyễn Đình Tứ - Thông báo</h4>
-    </div>
-    <div class="row d-flex flex-nowrap g-4">
-        <a href="abc" style="text-decoration: none;">
-            <div class="card custom-card p-3 h-100 border-0 rounded-4 bg-body-tertiary">
-                <div class="row align-items-center">
-                    <!-- Cột hình ảnh -->
-                    <div class="col-auto">
-                        <img src="/assets/image/notification-bell.png" style="width:30px" alt="" />
-                    </div>
+﻿<div class="row g-3 mt-4 p-3 shadow rounded-4 bg-white">
+    <h5 class="fw-bold mb-3">
+        <i class="bi bi-bell me-2 text-danger"></i> Các thông báo chính
+    </h5>
 
-                    <!-- Cột nội dung + ngày -->
-                    <div class="col d-flex justify-content-between align-items-end">
-                        <div>
-                            <h6 class="fw-bold mb-1">Tiêu đề</h6>
-                            <p class="mb-1">Nội dung mô tả hoặc thông tin thêm...</p>
-                        </div>
-                        <small class="text-muted">20/10/2025</small>
+    <!-- Thông báo 1 -->
+    <div class="col-12">
+        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
+            <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
+               data-bs-toggle="collapse" href="#collapseThongBao1" role="button" aria-expanded="false" aria-controls="collapseThongBao1">
+
+                <div class="d-flex flex-column flex-md-row justify-content-between w-100">
+                    <div>
+                        <strong>Thông báo 1:</strong> Lịch học tuần này thay đổi sang thứ 4 và thứ 6.
+                    </div>
+                    <div class="text-muted small ms-md-3 mt-2 mt-md-0 me-2">
+                        <span class="text-muted">
+                            <i class="bi bi-clock me-1"></i> 23/10/2025 - 08:30
+                        </span>
                     </div>
                 </div>
+                <i class="bi bi-chevron-down ms-2"></i>
+            </a>
+        </div>
+        <div class="collapse" id="collapseThongBao1">
+            <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
+                <p>
+                    <strong>Chi tiết:</strong> Lịch học môn IoT tuần này được dời lại do giảng viên bận công tác.
+                    Thời gian học mới là Thứ 4 (14h00 - 16h00) và Thứ 6 (9h00 - 11h00) tại phòng 101.
+                </p>
             </div>
-        </a>
+        </div>
     </div>
 
-    <div class="row d-flex flex-nowrap g-4 mt-1">
-        <a asp-area="Student" asp-controller="Detailed_Notification" asp-action="Index" style="text-decoration: none;">
-            <div class="card custom-card p-3 h-100 border-0 rounded-4 bg-body-tertiary">
-                <div class="row align-items-center">
-                    <!-- Cột hình ảnh -->
-                    <div class="col-auto">
-                        <img src="/assets/image/notification-bell.png" style="width:30px" alt="" />
-                    </div>
+    <!-- Thông báo 2 -->
+    <div class="col-12">
+        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
+            <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
+               data-bs-toggle="collapse" href="#collapseThongBao2" role="button" aria-expanded="false" aria-controls="collapseThongBao2">
 
-                    <!-- Cột nội dung + ngày -->
-                    <div class="col d-flex justify-content-between align-items-end">
-                        <div>
-                            <h6 class="fw-bold mb-1">Lịch học 20/10/2025</h6>
-                            <p class="mb-1">Nội dung mô tả hoặc thông tin thêm...</p>
-                        </div>
-                        <small class="text-muted">20/10/2025</small>
+                <div class="d-flex flex-column flex-md-row justify-content-between w-100">
+                    <div>
+                        <strong>Thông báo 2:</strong> Hạn nộp bài tập lớn là ngày 10/11/2025.
+                    </div>
+                    <div class="text-muted small ms-md-3 mt-2 mt-md-0">
+                        <span class="text-muted">
+                            <i class="bi bi-clock me-1"></i> 23/10/2025 - 08:30
+                        </span>
                     </div>
                 </div>
+
+                <i class="bi bi-chevron-down ms-2"></i>
+            </a>
+        </div>
+
+        <div class="collapse" id="collapseThongBao2">
+            <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
+                <p>
+                    <strong>Chi tiết:</strong> Sinh viên nộp bài qua hệ thống LMS trước 23:59 ngày 10/11/2025.
+                    Nộp trễ sẽ không được chấm điểm.
+                </p>
             </div>
-        </a>
+        </div>
     </div>
+    <!-- Thông báo 3 -->
+    <div class="col-12">
+        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
+            <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
+               data-bs-toggle="collapse" href="#collapseThongBao3" role="button" aria-expanded="false" aria-controls="collapseThongBao3">
 
-    <div class="row d-flex flex-nowrap g-4 mt-1">
-        <a href="abc" style="text-decoration: none;">
-            <div class="card custom-card p-3 h-100 border-0 rounded-4 bg-body-tertiary">
-                <div class="row align-items-center">
-                    <!-- Cột hình ảnh -->
-                    <div class="col-auto">
-                        <img src="/assets/image/notification-bell.png" style="width:30px" alt="" />
+                <div class="d-flex flex-column flex-md-row justify-content-between w-100">
+                    <div>
+                        <strong>Thông báo 3:</strong> Buổi ôn tập giữa kỳ tổ chức vào thứ 7 tuần này.
                     </div>
-
-                    <!-- Cột nội dung + ngày -->
-                    <div class="col d-flex justify-content-between align-items-end">
-                        <div>
-                            <h6 class="fw-bold mb-1">Tiêu đề</h6>
-                            <p class="mb-1">Nội dung mô tả hoặc thông tin thêm...</p>
-                        </div>
-                        <small class="text-muted">20/10/2025</small>
+                    <div class="text-muted small ms-md-3 mt-2 mt-md-0">
+                        <span class="text-muted">
+                            <i class="bi bi-clock me-1"></i> 23/10/2025 - 08:30
+                        </span>
                     </div>
                 </div>
+
+                <i class="bi bi-chevron-down ms-2"></i>
+            </a>
+        </div>
+
+        <div class="collapse" id="collapseThongBao3">
+            <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
+                <p>
+                    <strong>Chi tiết:</strong> Buổi ôn tập diễn ra lúc 8h00 tại phòng A201.
+                    Sinh viên nên mang laptop và tài liệu ôn tập.
+                </p>
             </div>
-        </a>
+        </div>
     </div>
-
-
 
 </div>

@@ -1,33 +1,4 @@
 ﻿<!-- Section chức năng -->
-<style>
-        .draggable-item {
-      background-color: #fff;
-
-      border-radius: 12px;
-      padding: 20px;
-      text-align: left;
-          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-      cursor: grab;
-    }
-
-        .draggable-item:hover {
-      transform: translateY(-3px);
-
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-    }
-
-       .sortable-chosen {
-      background-color: #f0f8ff !important;
-
-    }
-
-    .sortable-ghost {
-           opacity: 0.6;
-    }
-
-</style>
 <div class="container">
     <h4 class="fw-bold mb-4">Phát triển ứng dụng IOT - Nguyễn Đình Tứ</h4>
     <div class="row row-cols-2 row-cols-md-5 g-4">
@@ -35,7 +6,7 @@
         
         <!-- Card 2 -->
         <div class="col">
-            <a asp-area="Student" asp-controller="Notification" asp-action="Index" style="text-decoration: none;">
+            <a id="btnThongBao" style="text-decoration: none;">
                 <div class="card custom-card text-center p-2 h-95 border-0 rounded-4 bg-body-tertiary">
                     <div class="icon mb-2 position-relative" style="display: inline-block;">
                         <i class="bi bi-bell fs-1"></i>
@@ -53,7 +24,7 @@
 
         <!-- Card 3 -->
         <div class="col">
-            <a asp-area="Student" asp-controller="Document" asp-action="Index" style="text-decoration: none;">
+            <a id="btnTaiLieu" style="text-decoration: none;">
                 <div class="card custom-card text-center p-2 h-95 border-0 rounded-4 bg-body-tertiary">
                     <div class="icon mb-2"><i class="bi bi-file-earmark-text fs-1"></i></div>
                     <h6 class="fw-bold mb-2">Tài liệu</h6>
@@ -88,67 +59,7 @@
         </div>
     </div>
 
-    <div class="row g-3 mt-4 p-3 shadow rounded-4 bg-white">
-        <h5 class="fw-bold mb-3">
-            <i class="bi bi-chat-left-text me-2 text-danger"></i> Các thông báo chính
-        </h5>
 
-        <!-- Thông báo 1 -->
-        <div class="col-12">
-            <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
-                <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
-                   data-bs-toggle="collapse" href="#collapseThongBao1" role="button" aria-expanded="false" aria-controls="collapseThongBao1">
-                    <strong>Thông báo 1:</strong> Lịch học tuần này thay đổi sang thứ 4 và thứ 6.
-                    <i class="bi bi-chevron-down"></i>
-                </a>
-            </div>
-            <div class="collapse" id="collapseThongBao1">
-                <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
-                    <p>
-                        <strong>Chi tiết:</strong> Lịch học môn IoT tuần này được dời lại do giảng viên bận công tác.
-                        Thời gian học mới là Thứ 4 (14h00 - 16h00) và Thứ 6 (9h00 - 11h00) tại phòng 101.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Thông báo 2 -->
-        <div class="col-12">
-            <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
-                <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
-                   data-bs-toggle="collapse" href="#collapseThongBao2" role="button" aria-expanded="false" aria-controls="collapseThongBao2">
-                    <strong>Thông báo 2:</strong> Hạn nộp bài tập lớn là ngày 10/11/2025.
-                    <i class="bi bi-chevron-down"></i>
-                </a>
-            </div>
-            <div class="collapse" id="collapseThongBao2">
-                <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
-                    <p>
-                        <strong>Chi tiết:</strong> Sinh viên nộp bài qua hệ thống LMS trước 23:59 ngày 10/11/2025.
-                        Nộp trễ sẽ không được chấm điểm.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Thông báo 3 -->
-        <div class="col-12">
-            <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
-                <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
-                   data-bs-toggle="collapse" href="#collapseThongBao3" role="button" aria-expanded="false" aria-controls="collapseThongBao3">
-                    <strong>Thông báo 3:</strong> Buổi ôn tập giữa kỳ tổ chức vào thứ 7 tuần này.
-                    <i class="bi bi-chevron-down"></i>
-                </a>
-            </div>
-            <div class="collapse" id="collapseThongBao3">
-                <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
-                    <p><strong>Chi tiết:</strong> Buổi ôn tập diễn ra lúc 8h00 tại phòng A201. Sinh viên nên mang laptop và tài liệu ôn tập.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-
-
+    <!-- Khu vực load nội dung -->
+    <div id="noiDungContainer" class="mt-4"></div>
 </div>
