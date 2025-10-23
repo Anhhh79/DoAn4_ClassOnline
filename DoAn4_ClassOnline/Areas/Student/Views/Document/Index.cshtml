@@ -1,50 +1,261 @@
-﻿<!-- Section chức năng -->
-<div class="container">
-    <h4 class="fw-bold mb-4">Phát triển ứng dụng IOT - Nguyễn Đình Tứ - Tài liệu</h4>
-    <div class="row row-cols-2 row-cols-md-5 g-4">
+﻿<div class="row g-3 mt-4 p-3 shadow rounded-4 bg-white">
+    <h5 class="fw-bold mb-3">
+        <i class="bi bi-file-earmark-text me-2 text-primary"></i> Tài liệu học tập
+    </h5>
 
-        <!-- Card 1 -->
-        <div class="col">
-            <a asp-area="Student" asp-controller="HocOnline" asp-action="Index" style=" text-decoration: none;">
-                <div class="card custom-card text-center p-4 h-100 border-0 rounded-4 bg-body-tertiary">
-                    <div class="icon mb-3"><i class="bi bi-file-earmark-text fs-1"></i></div>
-                    <h6 class="fw-bold mb-0">Chương 1</h6>
+    <!-- Tài liệu 1 -->
+    <div class="col-12">
+        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
+            <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
+               data-bs-toggle="collapse" href="#collapseTaiLieu1" role="button" aria-expanded="false" aria-controls="collapseTaiLieu1">
+
+                <div class="d-flex flex-column flex-md-row justify-content-between w-100">
+                    <div>
+                        <strong>Tài liệu 1:</strong> Giáo trình Internet of Things (IoT) – Chương 1
+                    </div>
+                    <div class="text-muted small ms-md-3 mt-2 mt-md-0">
+                        <span class="text-muted">
+                            <i class="bi bi-clock me-1"></i> 23/10/2025 - 08:30
+                        </span>
+                    </div>
                 </div>
+
+                <i class="bi bi-chevron-down ms-2"></i>
             </a>
         </div>
-        <!-- Card 2 -->
-        <div class="col">
-            <a asp-area="Student" asp-controller="Detailed_Document" asp-action="Index" style="text-decoration: none;">
-                <div class="card custom-card text-center p-4 h-100 border-0 rounded-4 bg-body-tertiary">
-                    <div class="icon mb-3"><i class="bi bi-file-earmark-text fs-1"></i></div>
-                    <h6 class="fw-bold mb-0">Chương 2</h6>
+
+        <div class="collapse" id="collapseTaiLieu1">
+            <div class="p-3 border rounded-3 mb-3" style="background-color: rgba(243, 246, 248);">
+                <p>
+                    Tài liệu giới thiệu tổng quan về <strong>IoT</strong>, bao gồm kiến trúc hệ thống, các giao thức phổ biến
+                    và ví dụ thực tế giúp sinh viên hiểu rõ hơn về cách ứng dụng IoT trong đời sống.
+                </p>
+
+                <hr>
+
+                <!-- Danh sách tài liệu -->
+                <div class="row gy-2">
+                    <!-- Word -->
+                    <div class="col-12">
+                        <a href="/uploads/TaiLieu_IoT.docx" download
+                           class="d-flex justify-content-between align-items-center text-decoration-none border rounded-3 p-3 bg-white shadow-sm hover-shadow-sm" style="color: blue;">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-file-earmark-word  fs-4 me-3"></i>
+                                <div>
+                                    <strong>Tài liệu Word:</strong> Giới thiệu IoT
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-download me-1"></i> Tải xuống
+                            </button>
+                        </a>
+                    </div>
+
+                    <!-- Excel -->
+                    <div class="col-12">
+                        <a href="/uploads/DuLieu_CamBien.xlsx" download
+                           class="d-flex justify-content-between align-items-center text-decoration-none border rounded-3 p-3 bg-white shadow-sm hover-shadow-sm" style="color: green;">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-file-earmark-excel  fs-4 me-3"></i>
+                                <div>
+                                    <strong>Tài liệu Excel:</strong> Dữ liệu cảm biến IoT
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-download me-1"></i> Tải xuống
+                            </button>
+                        </a>
+                    </div>
+
+                    <!-- PDF -->
+                    <div class="col-12">
+                        <a href="/uploads/HuongDan_CaiDat.pdf" download
+                           class="d-flex justify-content-between align-items-center text-decoration-none border rounded-3 p-3 bg-white shadow-sm hover-shadow-sm" style="color: red;">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-file-earmark-pdf  fs-4 me-3"></i>
+                                <div>
+                                    <strong>Tài liệu PDF:</strong> Hướng dẫn cài đặt môi trường IoT
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-download me-1"></i> Tải xuống
+                            </button>
+                        </a>
+                    </div>
                 </div>
-            </a>
-        </div>
-
-
-        <!-- Card 3 -->
-        <div class="col">
-            <div class="card custom-card text-center p-4 h-100 border-0 rounded-4 bg-body-tertiary">
-                <div class="icon mb-3"><i class="bi bi-file-earmark-text fs-1"></i></div>
-                <h6 class="fw-bold mb-0">Chương 3</h6>
             </div>
         </div>
 
-        <!-- Card 4 -->
-        <div class="col">
-            <div class="card custom-card text-center p-4 h-100 border-0 rounded-4 bg-body-tertiary">
-                <div class="icon mb-3"><i class="bi bi-file-earmark-text fs-1"></i></div>
-                <h6 class="fw-bold mb-0">Chương 4</h6>
-            </div>
-        </div>
-
-        <!-- Card 5 -->
-        <div class="col">
-            <div class="card custom-card text-center p-4 h-100 border-0 rounded-4 bg-body-tertiary">
-                <div class="icon mb-3"><i class="bi bi-file-earmark-text fs-1"></i></div>
-                <h6 class="fw-bold mb-0">Chương 5</h6>
-            </div>
-        </div>
     </div>
+
+    <!-- Tài liệu 2 -->
+    <div class="col-12">
+        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
+            <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
+               data-bs-toggle="collapse" href="#collapseTaiLieu1" role="button" aria-expanded="false" aria-controls="collapseTaiLieu1">
+
+                <div class="d-flex flex-column flex-md-row justify-content-between w-100">
+                    <div>
+                        <strong>Tài liệu 2</strong> Giáo trình Internet of Things (IoT) – Chương 2
+                    </div>
+                    <div class="text-muted small ms-md-3 mt-2 mt-md-0">
+                        <span class="text-muted">
+                            <i class="bi bi-clock me-1"></i> 23/10/2025 - 08:30
+                        </span>
+                    </div>
+                </div>
+
+                <i class="bi bi-chevron-down ms-2"></i>
+            </a>
+        </div>
+
+        <div class="collapse" id="collapseTaiLieu1">
+            <div class="p-3 border rounded-3 mb-3" style="background-color: rgba(243, 246, 248);">
+                <p>
+                    Tài liệu giới thiệu tổng quan về <strong>IoT</strong>, bao gồm kiến trúc hệ thống, các giao thức phổ biến
+                    và ví dụ thực tế giúp sinh viên hiểu rõ hơn về cách ứng dụng IoT trong đời sống.
+                </p>
+
+                <hr>
+
+                <!-- Danh sách tài liệu -->
+                <div class="row gy-2">
+                    <!-- Word -->
+                    <div class="col-12">
+                        <a href="/uploads/TaiLieu_IoT.docx" download
+                           class="d-flex justify-content-between align-items-center text-decoration-none border rounded-3 p-3 bg-white shadow-sm hover-shadow-sm" style="color: blue;">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-file-earmark-word  fs-4 me-3"></i>
+                                <div>
+                                    <strong>Tài liệu Word:</strong> Giới thiệu IoT
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-download me-1"></i> Tải xuống
+                            </button>
+                        </a>
+                    </div>
+
+                    <!-- Excel -->
+                    <div class="col-12">
+                        <a href="/uploads/DuLieu_CamBien.xlsx" download
+                           class="d-flex justify-content-between align-items-center text-decoration-none border rounded-3 p-3 bg-white shadow-sm hover-shadow-sm" style="color: green;">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-file-earmark-excel  fs-4 me-3"></i>
+                                <div>
+                                    <strong>Tài liệu Excel:</strong> Dữ liệu cảm biến IoT
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-download me-1"></i> Tải xuống
+                            </button>
+                        </a>
+                    </div>
+
+                    <!-- PDF -->
+                    <div class="col-12">
+                        <a href="/uploads/HuongDan_CaiDat.pdf" download
+                           class="d-flex justify-content-between align-items-center text-decoration-none border rounded-3 p-3 bg-white shadow-sm hover-shadow-sm" style="color: red;">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-file-earmark-pdf  fs-4 me-3"></i>
+                                <div>
+                                    <strong>Tài liệu PDF:</strong> Hướng dẫn cài đặt môi trường IoT
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-download me-1"></i> Tải xuống
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Tài liệu 3 -->
+    <div class="col-12">
+        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
+            <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
+               data-bs-toggle="collapse" href="#collapseTaiLieu1" role="button" aria-expanded="false" aria-controls="collapseTaiLieu1">
+
+                <div class="d-flex flex-column flex-md-row justify-content-between w-100">
+                    <div>
+                        <strong>Tài liệu 3:</strong> Giáo trình Internet of Things (IoT) – Chương 3
+                    </div>
+                    <div class="text-muted small ms-md-3 mt-2 mt-md-0">
+                        <span class="text-muted">
+                            <i class="bi bi-clock me-1"></i> 23/10/2025 - 08:30
+                        </span>
+                    </div>
+                </div>
+
+                <i class="bi bi-chevron-down ms-2"></i>
+            </a>
+        </div>
+
+        <div class="collapse" id="collapseTaiLieu1">
+            <div class="p-3 border rounded-3 mb-3" style="background-color: rgba(243, 246, 248);">
+                <p>
+                    Tài liệu giới thiệu tổng quan về <strong>IoT</strong>, bao gồm kiến trúc hệ thống, các giao thức phổ biến
+                    và ví dụ thực tế giúp sinh viên hiểu rõ hơn về cách ứng dụng IoT trong đời sống.
+                </p>
+
+                <hr>
+
+                <!-- Danh sách tài liệu -->
+                <div class="row gy-2">
+                    <!-- Word -->
+                    <div class="col-12">
+                        <a href="/uploads/TaiLieu_IoT.docx" download
+                           class="d-flex justify-content-between align-items-center text-decoration-none border rounded-3 p-3 bg-white shadow-sm hover-shadow-sm" style="color: blue;">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-file-earmark-word  fs-4 me-3"></i>
+                                <div>
+                                    <strong>Tài liệu Word:</strong> Giới thiệu IoT
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-download me-1"></i> Tải xuống
+                            </button>
+                        </a>
+                    </div>
+
+                    <!-- Excel -->
+                    <div class="col-12">
+                        <a href="/uploads/DuLieu_CamBien.xlsx" download
+                           class="d-flex justify-content-between align-items-center text-decoration-none border rounded-3 p-3 bg-white shadow-sm hover-shadow-sm" style="color: green;">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-file-earmark-excel  fs-4 me-3"></i>
+                                <div>
+                                    <strong>Tài liệu Excel:</strong> Dữ liệu cảm biến IoT
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-download me-1"></i> Tải xuống
+                            </button>
+                        </a>
+                    </div>
+
+                    <!-- PDF -->
+                    <div class="col-12">
+                        <a href="/uploads/HuongDan_CaiDat.pdf" download
+                           class="d-flex justify-content-between align-items-center text-decoration-none border rounded-3 p-3 bg-white shadow-sm hover-shadow-sm" style="color: red;">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-file-earmark-pdf  fs-4 me-3"></i>
+                                <div>
+                                    <strong>Tài liệu PDF:</strong> Hướng dẫn cài đặt môi trường IoT
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-download me-1"></i> Tải xuống
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </div>

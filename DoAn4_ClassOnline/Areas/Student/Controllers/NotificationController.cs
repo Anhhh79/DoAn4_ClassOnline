@@ -7,7 +7,7 @@ namespace DoAn4_ClassOnline.Areas.Student.Controllers
 	{
 		public IActionResult Index()
 		{
-			return View();
+			return PartialView(); // Trả về partial view (chỉ phần nội dung, không layout)
 		}
 	}
 }
