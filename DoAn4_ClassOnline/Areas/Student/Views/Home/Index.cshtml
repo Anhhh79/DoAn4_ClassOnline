@@ -1,6 +1,47 @@
-﻿
+﻿@{
+    ViewData["Title"] = "Trang chủ";
+
+    // Dữ liệu mẫu
+    var khoaList = new List<dynamic>
+    {
+        new { MaKhoa = "CNTT", TenKhoa = "Khoa Công nghệ thông tin", Icon = "bi-laptop" },
+        new { MaKhoa = "DDT", TenKhoa = "Khoa Điện - Điện tử", Icon = "bi-lightning-charge" },
+        new { MaKhoa = "CK", TenKhoa = "Khoa Kỹ thuật cơ khí", Icon = "bi-gear-wide-connected" },
+        new { MaKhoa = "XD", TenKhoa = "Khoa Kỹ thuật xây dựng", Icon = "bi-building" },
+        new { MaKhoa = "KHXH", TenKhoa = "Khoa Khoa học xã hội", Icon = "bi-book" }
+    };
+}
+
+    <!-- Slides -->
+<div class="container p-4">
+    <div class="row row-cols-2 row-cols-md-4 g-4">
+        @foreach (var khoa in khoaList)
+        {
+            <div class="col">
+                <a asp-controller="Home" asp-action="chiTietKhoa" asp-route-maKhoa="@khoa.MaKhoa" class="text-decoration-none">
+                    <div class="card custom-card text-center p-4 h-100 border-0 rounded-4 bg-body-tertiary hover-card">
+                        <div class="icon mb-3 text-primary"><i class="bi @khoa.Icon fs-1"></i></div>
+                        <h6 class="fw-bold mb-0 text-dark">@khoa.TenKhoa</h6>
+                    </div>
+                </a>
+            </div>
+        }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <button class="carousel-control-prev custom-control" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next custom-control" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+    </button>
+</div>
+
 <!-- Section chức năng -->
-<div class="container">
+<div class="container py-5">
     <h4 class="fw-bold mb-4">Các chức năng chính</h4>
     <div class="row row-cols-2 row-cols-md-5 g-4">
 
@@ -45,6 +86,3 @@
         </div>
     </div>
 </div>
-
-
-

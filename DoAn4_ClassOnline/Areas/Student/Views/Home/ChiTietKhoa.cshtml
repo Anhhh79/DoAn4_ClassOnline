@@ -1,0 +1,81 @@
+﻿@{
+    ViewData["Title"] = "Chi tiết khoa";
+
+    var tenKhoa = ViewBag.TenKhoa as string;
+
+    var khoaHocList = new List<dynamic>
+    {
+        new { MaKhoaHoc = "CNTT101", TenKhoaHoc = "Lập trình C#", HinhAnh = "/images/csharp.jpg", HocKy = "HK1", TenGiaoVien = "Nguyễn Văn A", NamHoc = "2024 - 2025" },
+        new { MaKhoaHoc = "CNTT102", TenKhoaHoc = "Cơ sở dữ liệu", HinhAnh = "/images/database.jpg", HocKy = "HK1", TenGiaoVien = "Trần Thị B", NamHoc = "2024 - 2025" },
+        new { MaKhoaHoc = "CNTT201", TenKhoaHoc = "Lập trình Web", HinhAnh = "/images/web.jpg", HocKy = "HK2", TenGiaoVien = "Phạm Văn C", NamHoc = "2024 - 2025" },
+        new { MaKhoaHoc = "CNTT202", TenKhoaHoc = "Mạng máy tính", HinhAnh = "/images/network.jpg", HocKy = "HK2", TenGiaoVien = "Lê Thị D", NamHoc = "2024 - 2025" },
+        new { MaKhoaHoc = "CNTT301", TenKhoaHoc = "Trí tuệ nhân tạo cơ bản", HinhAnh = "/images/ai.jpg", HocKy = "HK3", TenGiaoVien = "Nguyễn Văn E", NamHoc = "2024 - 2025" }
+    };
+
+    // Lấy danh sách học kỳ duy nhất từ dữ liệu khóa học
+    var hocKys = khoaHocList
+        .Select(kh => new { kh.HocKy, kh.NamHoc })
+        .Distinct()
+        .ToList();
+}
+
+<!-- Nút quay lại -->
+<button type="button" class="btn boder-0" onclick="history.back()">
+    <i class="bi bi-chevron-left"></i> Quay lại
+</button>
+
+<div class="container">
+    <!-- Tiêu đề -->
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-primary">@tenKhoa</h2>
+
+        <!-- Dropdown chọn học kỳ -->
+        <div class="d-flex justify-content-center mt-3">
+            <select id="selectHocKy" class="form-select w-auto rounded-pill shadow-sm fw-semibold">
+                <option selected disabled>-- Chọn học kỳ --</option>
+                @foreach (var hk in hocKys)
+                {
+                    <option value="@hk.HocKy">@hk.HocKy, @hk.NamHoc</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <!-- Danh sách khóa học -->
+    <div id="danhSachKhoaHoc" class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var kh in khoaHocList)
+        {
+            <div class="col khoaHocItem d-none" data-hocky="@kh.HocKy">
+                <div class="card border-0 shadow-lg rounded-4 h-100 hover-card">
+                    <img src="@kh.HinhAnh" class="card-img-top rounded-top-4"
+                         alt="@kh.TenKhoaHoc" style="height: 180px; object-fit: cover;">
+                    <div class="card-body text-center p-3">
+                        <h5 class="fw-semibold text-dark">@kh.TenKhoaHoc</h5>
+                        <p class="text-secondary small mb-1">
+                            <i class="bi bi-person"></i> GV: @kh.TenGiaoVien
+                        </p>
+                        <p class="text-secondary small">
+                            <i class="bi bi-calendar"></i> @kh.NamHoc
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 text-center pb-3">
+                        <a href="#" class="btn btn-outline-primary rounded-pill px-4">Xem chi tiết</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Script hiển thị khóa học theo học kỳ -->
+<script>
+    document.getElementById("selectHocKy").addEventListener("change", function () {
+        const selected = this.value;
+        document.querySelectorAll(".khoaHocItem").forEach(card => {
+            if (card.getAttribute("data-hocky") === selected)
+                card.classList.remove("d-none");
+            else
+                card.classList.add("d-none");
+        });
+    });
+</script>
