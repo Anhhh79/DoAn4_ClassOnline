@@ -18,3 +18,9 @@ document.getElementById("btnTaiLieu").addEventListener("click", function (e) {
     e.preventDefault();
     loadNoiDung('/Student/Document/Index');
 });
+
+// Khi bấm Nộp bài
+document.getElementById("btnNopBai").addEventListener("click", function (e) {
+    e.preventDefault();
+    loadNoiDung('/Student/NopBai/Index');
+});

@@ -1,0 +1,156 @@
+﻿<div class="row g-3 mt-4 p-3 shadow rounded-4 bg-white">
+    <h5 class="fw-bold mb-3">
+        <i class="bi bi-upload me-2 text-primary"></i> Nộp bài tập
+    </h5>
+
+    <!-- Bài tập 1 -->
+    <div class="col-12">
+        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
+            <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
+               data-bs-toggle="collapse" href="#collapseBaiTap1" role="button" aria-expanded="false" aria-controls="collapseBaiTap1">
+
+                <div class="d-flex flex-column flex-md-row justify-content-between w-100">
+                    <div>
+                        <strong>Bài tập 1:</strong> Thiết kế hệ thống giám sát nhiệt độ IoT
+                    </div>
+                    <div class="text-muted small ms-md-3 mt-2 mt-md-0">
+                        <i class="bi bi-clock me-1"></i> Hạn nộp: 10/11/2025 - 23:59
+                    </div>
+                </div>
+
+                <i class="bi bi-chevron-down ms-2"></i>
+            </a>
+        </div>  
+
+        <!-- Nội dung sổ xuống -->
+        <div class="collapse" id="collapseBaiTap1">
+            <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
+                <p><strong>Trạng thái:</strong> <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Đã nộp</span></p>
+                <div>
+                    <span><strong>Điểm:</strong> 8.5 / 10</span>
+                    <span class="ms-2"><a href="#" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye me-1"></i> Xem bài đã nộp</a></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bài tập 2 -->
+    <div class="col-12">
+        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
+            <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
+               data-bs-toggle="collapse" href="#collapseBaiTap2" role="button" aria-expanded="false" aria-controls="collapseBaiTap2">
+
+                <div class="d-flex flex-column flex-md-row justify-content-between w-100">
+                    <div>
+                        <strong>Bài tập 2:</strong> Xây dựng dashboard hiển thị dữ liệu cảm biến
+                    </div>
+                    <div class="text-muted small ms-md-3 mt-2 mt-md-0">
+                        <i class="bi bi-clock me-1"></i> Hạn nộp: 20/11/2025 - 23:59
+                    </div>
+                </div>
+
+                <i class="bi bi-chevron-down ms-2"></i>
+            </a>
+        </div>
+
+        <div class="collapse" id="collapseBaiTap2">
+            <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
+                <p><strong>Trạng thái:</strong> <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split me-1"></i> Chưa nộp</span></p>
+                <form class="mt-2">
+                    <div class="input-group input-group-sm">
+                        <input type="file" class="form-control" accept=".zip,.rar,.pdf,.docx">
+                        <button class="btn btn-success  " type="submit">
+                            <i class="bi bi-upload me-1"></i> Nộp bài
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bài tập 3 -->
+    <div class="col-12">
+        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
+            <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
+               data-bs-toggle="collapse" href="#collapseBaiTap3" role="button" aria-expanded="false" aria-controls="collapseBaiTap3">
+
+                <div class="d-flex flex-column flex-md-row justify-content-between w-100">
+                    <div>
+                        <strong>Bài tập 3:</strong> Viết báo cáo tổng kết dự án IoT nhóm
+                    </div>
+                    <div class="text-muted small ms-md-3 mt-2 mt-md-0">
+                        <i class="bi bi-clock me-1"></i> Hạn nộp: 01/12/2025 - 23:59
+                    </div>
+                </div>
+
+                <i class="bi bi-chevron-down ms-2"></i>
+            </a>
+        </div>
+
+        <div class="collapse" id="collapseBaiTap3">
+            <div class="p-3 border rounded-3 mb-3" style="background-color: rgba(243, 246, 248);">
+
+                <!-- Thông tin bài đã nộp -->
+                <div id="daNopSection">
+                    <p>
+                        <strong>Trạng thái:</strong>
+                        <span class="badge bg-secondary">
+                            <i class="bi bi-check-circle me-1"></i> Đã nộp - Chờ chấm
+                        </span>
+                    </p>
+                    <div class="mb-2">
+                        <span><strong>Điểm:</strong> -- / 10</span>
+                        <span class="ms-2">
+                            <a href="#" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye me-1"></i> Xem bài đã nộp
+                            </a>
+                        </span>
+                        <span class="ms-2">
+                            <button class="btn btn-sm btn-outline-danger" id="btnHuyBai">
+                                <i class="bi bi-x-circle me-1"></i> Hủy bài nộp
+                            </button>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Form nộp lại -->
+                <div id="nopLaiSection" style="display: none;">
+                    <p>
+                        <strong>Trạng thái:</strong>
+                        <span class="badge bg-warning text-dark">
+                            <i class="bi bi-hourglass-split me-1"></i> Chưa nộp
+                        </span>
+                    </p>
+
+                    <form id="formNopBai" class="mt-2">
+                        <div class="input-group input-group-sm">
+                            <input type="file" class="form-control" accept=".zip,.rar,.pdf,.docx" required>
+                            <button class="btn btn-primary" type="submit">
+                                <i class="bi bi-upload me-1"></i> Nộp lại
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript xử lý nút hủy và nộp lại -->
+    <script>
+        document.getElementById("btnHuyBai").addEventListener("click", function () {
+            // Ẩn phần "Đã nộp", hiện phần "Nộp lại"
+            document.getElementById("daNopSection").style.display = "none";
+            document.getElementById("nopLaiSection").style.display = "block";
+        });
+
+        document.getElementById("formNopBai").addEventListener("submit", function (e) {
+            e.preventDefault();
+            alert("✅ Nộp lại bài thành công!");
+            // Sau khi nộp lại có thể đổi trạng thái
+            document.getElementById("nopLaiSection").style.display = "none";
+            document.getElementById("daNopSection").style.display = "block";
+        });
+    </script>
+
+</div>
