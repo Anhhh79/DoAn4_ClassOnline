@@ -1,0 +1,22 @@
+﻿.course-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .course-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+    }
+
+.view-list-btn {
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: not-allowed; /* vì đang disabled */
+}
+
+    .view-list-btn:hover {
+        background-color: #e9ecef; /* xám nhạt hơn */
+        color: #000; /* đổi màu chữ nếu muốn */
+    }
+
+.image-cuser {
+    cursor: pointer;
+}
