@@ -1,0 +1,59 @@
+﻿<!-- Section chức năng -->
+<div class="container">
+    <h4 class="fw-bold mb-4">Phát triển ứng dụng IOT - Nguyễn Đình Tứ</h4>
+    <div class="row row-cols-2 row-cols-md-5 g-4">
+
+        <!-- Card 1 -->
+            <div class="col">
+                <a asp-area="Student" asp-controller="HocOnline" asp-action="Index" style =" text-decoration: none;" >
+                    <div class="card custom-card text-center p-4 h-100 border-0 rounded-4 bg-body-tertiary">
+                        <div class="icon mb-3"><i class="bi bi-laptop fs-1"></i></div>
+                        <h6 class="fw-bold mb-0">Học online</h6>
+                    </div>
+                </a>
+            </div>
+        <!-- Card 2 -->
+        <div class="col">
+            <a asp-area="Student" asp-controller="Notification" asp-action="Index" style="text-decoration: none;">
+                <div class="card custom-card text-center p-4 h-100 border-0 rounded-4 bg-body-tertiary">
+                    <div class="icon mb-3 position-relative" style="display: inline-block;">
+                        <i class="bi bi-bell fs-1"></i>
+
+                        <!-- Badge số lượng thông báo -->
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            5
+                        </span>
+                    </div>
+                    <h6 class="fw-bold mb-0">Thông báo</h6>
+                </div>
+            </a>
+        </div>
+
+
+        <!-- Card 3 -->
+        <div class="col">
+            <a asp-area="Student" asp-controller="Document" asp-action="Index" style="text-decoration: none;">
+                <div class="card custom-card text-center p-4 h-100 border-0 rounded-4 bg-body-tertiary">
+                    <div class="icon mb-3"><i class="bi bi-file-earmark-text fs-1"></i></div>
+                    <h6 class="fw-bold mb-0">Tài liệu</h6>
+                </div>
+            </a>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="col">
+            <div class="card custom-card text-center p-4 h-100 border-0 rounded-4 bg-body-tertiary">
+                <div class="icon mb-3"><i class="bi bi-card-checklist fs-1"></i></div>
+                <h6 class="fw-bold mb-0">Trắc nghiệm</h6>
+            </div>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="col">
+            <div class="card custom-card text-center p-4 h-100 border-0 rounded-4 bg-body-tertiary">
+                <div class="icon mb-3"><i class="bi bi-file-arrow-up fs-1"></i></div>
+                <h6 class="fw-bold mb-0">Nộp bài tập</h6>
+            </div>
+        </div>
+    </div>
+</div>
