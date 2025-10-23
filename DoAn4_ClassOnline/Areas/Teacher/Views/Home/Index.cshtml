@@ -11,5 +11,38 @@
                    <option value="3">KH3, 2024 - 2025</option>
             </select>
         </div>
-</div>
+        <!-- Card Khóa học -->
+        <div class="col-12 col-md-3">
+            <div class="card shadow border-0 rounded-4 overflow-hidden h-100">
+
+                <!-- Ảnh banner -->
+                <a asp-area="Teacher" asp-controller="Course" asp-action="Index">
+                    <div class="card-header p-0 border-0 bg-white image-cuser">
+                        <img src="~/assets/image/tải xuống.jpg  "
+                             class="w-100"
+                             alt="Banner"
+                             style="height: 100px; object-fit: cover;">
+                    </div>
+                </a>
+                <!-- Nội dung khóa học -->
+                <div class="card-body text-start">
+                    <h6 class="fw-bold mb-1">Phát triển ứng dụng IOT - Nguyễn Đình Tứ</h6>
+                    <span class="mb-1">Khoa Công Nghệ Thông Tin</span>
+                    <br />
+                    <span class="mb-1">HK1 / 2025 - 2026</span>
+
+                    <div class="d-flex justify-content-between text-secondary small mb-3 mt-2">
+                        <span>0 SV đã tham gia</span>
+                        <span>Tất cả mọi người</span>
+                    </div>
+                    <div class="text-start">
+                        <button class="btn btn-light w-100 border rounded-3 view-list-btn">
+                            Xem danh sách sinh viên
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </div>
