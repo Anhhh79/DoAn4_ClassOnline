@@ -9,5 +9,15 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
         {
             return View();
         }
+
+        public IActionResult ThongBao()
+        {
+            return PartialView("_ThongBaoPartial");
+        }
+
+        public IActionResult TaiLieu()
+        {
+            return PartialView("_TaiLieuPartial");
+        }
     }
 }
