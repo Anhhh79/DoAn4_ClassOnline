@@ -29,5 +29,9 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
         {
             return View("_DanhSachNopBaiPartial");
         }
-    }
+		public IActionResult TracNghiem()
+		{
+			return PartialView("_TracNghiemPartial");
+		}
+	}
 }

@@ -36,6 +36,14 @@
             loadNoiDung_Tc('/Teacher/Course/BaiTap');
         });
     }
+    // Khi bấm trắc nghiệm
+    const btnTracNghiem = document.getElementById("btnTracNghiem");
+    if (btnBaiTap) {
+        btnTracNghiem.addEventListener("click", function (e) {
+            e.preventDefault();
+            loadNoiDung_Tc('/Teacher/Course/TracNghiem');
+        });
+    }
 
 });
 

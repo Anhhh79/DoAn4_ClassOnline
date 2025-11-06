@@ -24,3 +24,8 @@ document.getElementById("btnNopBai").addEventListener("click", function (e) {
     e.preventDefault();
     loadNoiDung('/Student/NopBai/Index');
 });
+// Khi bấm vào trắc nghiệm
+document.getElementById("btnTracNghiem").addEventListener("click", function (e) {
+    e.preventDefault();
+    loadNoiDung('/Student/TracNghiem/Index');
+});

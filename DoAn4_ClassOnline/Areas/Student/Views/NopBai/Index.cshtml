@@ -25,12 +25,29 @@
         <!-- Nội dung sổ xuống -->
         <div class="collapse" id="collapseBaiTap1">
             <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
-                <p><strong>Trạng thái:</strong> <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Đã nộp</span></p>
+                <p>
+                    <strong>Trạng thái:</strong>
+                    <span class="badge bg-success">
+                        <i class="bi bi-check-circle me-1"></i> Đã nộp
+                    </span>
+                </p>
+
                 <div>
-                    <span><strong>Điểm:</strong> 8.5 / 10</span>
-                    <span class="ms-2"><a href="#" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye me-1"></i> Xem bài đã nộp</a></span>
+                    <p class="mb-1">
+                        <strong>Tệp đã nộp:</strong>
+                        <a href="/uploads/PTTK_FOOTBALL_3TL.docx" download="PTTK_FOOTBALL_3TL.docx"
+                           class="text-decoration-underline text-dark ms-1">
+                            <i class="bi bi-file-earmark-word me-1 text-primary"></i>
+                            PTTK FOOTBALL 3TL.docx
+                        </a>
+                    </p>
+
+                    <p class="mb-0">
+                        <strong>Điểm:</strong> 8.5 / 10
+                    </p>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -57,9 +74,9 @@
             <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
                 <p><strong>Trạng thái:</strong> <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split me-1"></i> Chưa nộp</span></p>
                 <form class="mt-2">
-                    <div class="input-group input-group-sm">
-                        <input type="file" class="form-control" accept=".zip,.rar,.pdf,.docx">
-                        <button class="btn btn-success  " type="submit">
+                    <div class="input-group input-group-sm" style="width:300px;" >
+                        <input type="file" class="form-control"  accept=".zip,.rar,.pdf,.docx">
+                        <button class="btn btn-success  " style="color:white;" type="submit">
                             <i class="bi bi-upload me-1"></i> Nộp bài
                         </button>
                     </div>
@@ -67,7 +84,6 @@
             </div>
         </div>
     </div>
-
     <!-- Bài tập 3 -->
     <div class="col-12">
         <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
@@ -90,7 +106,7 @@
         <div class="collapse" id="collapseBaiTap3">
             <div class="p-3 border rounded-3 mb-3" style="background-color: rgba(243, 246, 248);">
 
-                <!-- Thông tin bài đã nộp -->
+                <!-- ĐÃ NỘP -->
                 <div id="daNopSection">
                     <p>
                         <strong>Trạng thái:</strong>
@@ -98,59 +114,31 @@
                             <i class="bi bi-check-circle me-1"></i> Đã nộp - Chờ chấm
                         </span>
                     </p>
-                    <div class="mb-2">
-                        <span><strong>Điểm:</strong> -- / 10</span>
-                        <span class="ms-2">
-                            <a href="#" class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-eye me-1"></i> Xem bài đã nộp
-                            </a>
-                        </span>
-                        <span class="ms-2">
-                            <button class="btn btn-sm btn-outline-danger" id="btnHuyBai">
-                                <i class="bi bi-x-circle me-1"></i> Hủy bài nộp
-                            </button>
-                        </span>
-                    </div>
-                </div>
 
-                <!-- Form nộp lại -->
-                <div id="nopLaiSection" style="display: none;">
-                    <p>
-                        <strong>Trạng thái:</strong>
-                        <span class="badge bg-warning text-dark">
-                            <i class="bi bi-hourglass-split me-1"></i> Chưa nộp
-                        </span>
+                    <p class="mb-2"><strong>Điểm:</strong> -- / 10</p>
+
+                    <p class="mb-1">
+                        <strong>Tệp đã nộp:</strong>
+                        <a id="fileDaNop" href="/uploads/PTTK_FOOTBALL_3TL.docx" download="PTTK_FOOTBALL_3TL.docx"
+                           class="text-decoration-underline text-dark ms-1">
+                            <i class="bi bi-file-earmark-word me-1 text-primary"></i>
+                            PTTK FOOTBALL 3TL.docx
+                        </a>
                     </p>
 
-                    <form id="formNopBai" class="mt-2">
-                        <div class="input-group input-group-sm">
-                            <input type="file" class="form-control" accept=".zip,.rar,.pdf,.docx" required>
-                            <button class="btn btn-primary" type="submit">
-                                <i class="bi bi-upload me-1"></i> Nộp lại
+                    <div class="d-flex flex-wrap gap-2">
+                        <div class="input-group input-group-sm" style="width:300px;">
+                            <input type="file" class="form-control" accept=".zip,.rar,.pdf,.docx">
+                            <button class="btn btn-success " style="color:white;" type="submit">
+                                <i class="bi bi-upload me-1"></i> Nộp bài
                             </button>
                         </div>
-                    </form>
+                        <button class="btn btn-sm btn-outline-danger" id="btnHuyBai">
+                            <i class="bi bi-x-circle me-1"></i> Hủy bài nộp
+                        </button>
+                    </div>
                 </div>
-
             </div>
         </div>
     </div>
-
-    <!-- JavaScript xử lý nút hủy và nộp lại -->
-    <script>
-        document.getElementById("btnHuyBai").addEventListener("click", function () {
-            // Ẩn phần "Đã nộp", hiện phần "Nộp lại"
-            document.getElementById("daNopSection").style.display = "none";
-            document.getElementById("nopLaiSection").style.display = "block";
-        });
-
-        document.getElementById("formNopBai").addEventListener("submit", function (e) {
-            e.preventDefault();
-            alert("✅ Nộp lại bài thành công!");
-            // Sau khi nộp lại có thể đổi trạng thái
-            document.getElementById("nopLaiSection").style.display = "none";
-            document.getElementById("daNopSection").style.display = "block";
-        });
-    </script>
-
 </div>
