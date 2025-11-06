@@ -1,31 +1,46 @@
-﻿function loadNoiDung(url) {
-    fetch(url)
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById("noiDungContainer").innerHTML = html;
-        })
-        .catch(err => console.error("Lỗi tải nội dung:", err));
-}
+﻿document.addEventListener("DOMContentLoaded", () => {
 
-// Khi bấm Thông báo
-document.getElementById("btnThongBao").addEventListener("click", function (e) {
-    e.preventDefault();
-    loadNoiDung('/Student/Notification/Index');
-});
+    function loadNoiDung(url) {
+        fetch(url)
+            .then(res => res.text())
+            .then(html => {
+                const container = document.getElementById("noiDungContainer");
+                if (container) container.innerHTML = html;
+            })
+            .catch(err => console.error("Lỗi tải nội dung:", err));
+    }
 
-// Khi bấm Tài liệu
-document.getElementById("btnTaiLieu").addEventListener("click", function (e) {
-    e.preventDefault();
-    loadNoiDung('/Student/Document/Index');
-});
+    const btnThongBao = document.getElementById("btnThongBao");
+    const btnTaiLieu = document.getElementById("btnTaiLieu");
+    const btnNopBai = document.getElementById("btnNopBai");
+    const btnTracNghiem = document.getElementById("btnTracNghiem");
 
-// Khi bấm Nộp bài
-document.getElementById("btnNopBai").addEventListener("click", function (e) {
-    e.preventDefault();
-    loadNoiDung('/Student/NopBai/Index');
-});
-// Khi bấm vào trắc nghiệm
-document.getElementById("btnTracNghiem").addEventListener("click", function (e) {
-    e.preventDefault();
-    loadNoiDung('/Student/TracNghiem/Index');
+    if (btnThongBao) {
+        btnThongBao.addEventListener("click", (e) => {
+            e.preventDefault();
+            loadNoiDung('/Student/Notification/Index');
+        });
+    }
+
+    if (btnTaiLieu) {
+        btnTaiLieu.addEventListener("click", (e) => {
+            e.preventDefault();
+            loadNoiDung('/Student/Document/Index');
+        });
+    }
+
+    if (btnNopBai) {
+        btnNopBai.addEventListener("click", (e) => {
+            e.preventDefault();
+            loadNoiDung('/Student/NopBai/Index');
+        });
+    }
+
+    if (btnTracNghiem) {
+        btnTracNghiem.addEventListener("click", (e) => {
+            e.preventDefault();
+            loadNoiDung('/Student/TracNghiem/Index');
+        });
+    }
+
 });
