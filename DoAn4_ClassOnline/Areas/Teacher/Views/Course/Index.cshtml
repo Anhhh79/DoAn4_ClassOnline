@@ -2,9 +2,9 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <!-- Nút quay lại -->
-        <button type="button" class="btn border-0" onclick="history.back()">
+        <a class="btn border-0" asp-controller="Home" asp-action="Index">
             <i class="bi bi-chevron-left"></i> Quay lại
-        </button>
+        </a>
 
         <!-- Tiêu đề -->
         <h3 class="fw-bold text-center flex-grow-1 mb-0">
@@ -56,26 +56,53 @@
 
         <!-- Card 5 -->
         <div class="col">
+            <a id="btnBaiTap" style="text-decoration: none;">
             <div class="card custom-card text-center p-2 h-95 border-0 rounded-4 bg-body-tertiary">
                 <div class="icon mb-2"><i class="bi bi-file-arrow-up fs-1"></i></div>
-                <h6 class="fw-bold mb-2">Nộp bài tập</h6>
+                <h6 class="fw-bold mb-2">Bài tập</h6>
             </div>
+            </a>
         </div>
 
         <!-- Card 1 -->
         <div class="col">
-            <a asp-area="Student" asp-controller="HocOnline" asp-action="Index" style=" text-decoration: none;">
+            <div>
                 <div class="card custom-card text-center p-2 h-95 border-0 rounded-4 bg-body-tertiary">
                     <div class="icon mb-2"><img src="/assets/image/meet.png" style="width:50px" alt="" /></div>
-                    <button class="btn btn-success text-white px-4 rounded-pill" style="background-color:#0055ff">
-                        <i class="bi bi-camera-video me-1"></i> Tham gia
-                    </button>
+                    <a class="btn btn-success text-white px-4 rounded-pill" style="background-color:#0055ff" data-bs-toggle="modal"
+                       data-bs-target="#joinMeetModal">
+                        <i class="bi bi-camera-video me-1"></i> Tạo phòng 
+                    </a>
                 </div>
-            </a>
+            </div>
         </div>
     </div>
+    <!-- Modal nhập link Meet -->
+    <div class="modal fade" id="joinMeetModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content rounded-4">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tạo phòng học Google Meet</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body mb-2">
+                    <label class="form-label">Nhập link Google Meet:</label>
+                    <input type="text" id="meetLink" class="form-control" placeholder="https://meet.google.com/...">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary text-light" onclick="startMeeting()">
+                        Bắt đầu
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 
     <!-- Khu vực load nội dung -->
     <div id="noiDungContainer" class="mt-4"></div>
 </div>
+
+

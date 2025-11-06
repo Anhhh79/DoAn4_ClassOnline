@@ -1,0 +1,349 @@
+﻿<style>
+    /* Tinh chỉnh nhỏ cho giao diện */
+    .page-header {
+        gap: 12px;
+    }
+
+    .info-card i.fs-3 {
+        line-height: 1;
+    }
+
+    .filter-card .form-control,
+    .filter-card .form-select {
+        height: 40px;
+    }
+
+    .table-avatar img {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+    }
+
+    .action-btns .btn {
+        min-width: 40px;
+    }
+
+    .no-data {
+        padding: 36px 0;
+        text-align: center;
+        color: #6c757d;
+    }
+</style>
+
+<div class="container">
+    <!-- Header -->
+    <div class="d-flex page-header justify-content-between align-items-center mb-4">
+        <!-- Nút quay lại --> <a class="btn border-0" asp-controller="Course" asp-action="Index"> <i class="bi bi-chevron-left"></i> Quay lại </a>
+
+        <h3 class="fw-bold text-center mb-0 flex-grow-1">Danh sách nộp bài tập</h3>
+
+        <!-- Placeholder to balance -->
+        <div style="width:96px;"></div>
+    </div>
+
+    <!-- Info card -->
+    <div class="card border-0 shadow-sm mb-3 info-card">
+        <div class="card-body d-flex align-items-center gap-3 rounded-3" style="background-color:rgba(243,246,248);">
+            <div class="bg-secondary text-white rounded-3 d-flex align-items-center justify-content-center" style="width:56px; height:56px;">
+                <i class="bi bi-journal-text fs-3"></i>
+            </div>
+            <div>
+                <div class="fw-semibold">Bài tập: Lập trình sử lý dữ liệu cảm biến </div>
+                <div class="text-muted small">Hạn nộp: <strong>25/10/2025 – 23:59</strong></div>
+            </div>
+
+            <div class="ms-auto d-flex gap-2 align-items-center filter-stats">
+
+                <!-- Đã nộp -->
+                <span class="status-chip btn btn-outline-success ubmitted boder" disabled>
+                    <i class="bi bi-check-circle-fill me-1"></i>
+                    Đã nộp:
+                    <strong class="ms-1">12</strong>
+                </span>
+
+                <!-- Chưa nộp -->
+                <span class="status-chip not-submitted btn btn-outline-danger">
+                    <i class="bi bi-x-circle-fill me-1"></i>
+                    Chưa nộp:
+                    <strong class="ms-1">23</strong>
+                </span>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Filter / Search -->
+    <div class="my-4">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" placeholder="Tìm kiếm sinh viên theo tên hoặc MSSV...">
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <select class="form-select">
+                        <option value="all">Tất cả trạng thái</option>
+                        <option value="submitted">Đã nộp</option>
+                        <option value="not-submitted">Chưa nộp</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4 text-md-end">
+                    <div class="d-inline-flex gap-2">
+                        <button class="btn btn-outline-primary btn-sm">Xuất CSV</button>
+                        <button class="btn btn-outline-secondary btn-sm">Tải tất cả</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Table -->
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-0">
+            <div class="table-responsive" style="max-height: 360px; overflow-y: auto; display: block;">
+                <table class="table table-hover align-middle mb-0 text-light">
+                    <thead style="position: sticky; top: 0; z-index: 10;">
+                        <tr>
+                            <th style="width:60px;">STT</th>
+                            <th>Sinh viên</th>
+                            <th style="width:140px;">Trạng thái</th>
+                            <th style="width:160px;">Thời gian nộp</th>
+                            <th>Tệp đính kèm</th>
+                            <th style="width:120px;">Điểm</th>
+                            <th class="text-center" style="width:150px;">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Sample: submitted -->
+                        <tr>
+                            <td class="align-middle">1</td>
+                            <td class="align-middle">
+                                <div class="d-flex align-items-center">
+                                    <img src="~/assets/image/tải xuống.jpg"
+                                         class="rounded-circle me-3"
+                                         alt="avatar"
+                                         style="width: 40px; height: 40px; object-fit: cover;">
+
+                                    <div>
+                                        <div class="fw-semibold">Nguyễn Văn A</div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td class="align-middle">
+                                <span ><i class="bi bi-check-circle me-1"></i>Đã nộp</span>
+                            </td>
+
+                            <td class="align-middle">10/11/2025 – 14:35</td>
+
+                        
+
+                            <td class="align-middle">
+                                <a href="#" class="text-decoration-none"><i class="bi bi-paperclip me-1"></i>bai_lam.pdf</a>
+                            </td>
+
+                            <td class="align-middle"><span class="text-secondary fw-bold">8.5 / 10</span></td>
+                            <td class="align-middle text-center action-btns">
+                                <button class="btn btn-outline-primary btn-sm me-1" title="Xem">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-outline-success btn-sm" title="Chấm / Sửa điểm">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Sample: not submitted -->
+                        <tr>
+                            <td>2</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <img src="~/assets/image/tải xuống.jpg"
+                                         class="rounded-circle me-3"
+                                         alt="avatar"
+                                         style="width: 40px; height: 40px; object-fit: cover;">
+                                    <div>
+                                        <div class="fw-semibold">Trần Thị B</div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td><span><i class="bi bi-x-circle me-1"></i>Chưa nộp</span></td>
+
+                            <td class="text-muted">—</td>
+                            <td class="text-muted">—</td>
+                            <td class="text-muted">—</td>
+
+                            <td class="text-center">
+                                <button class="btn btn-outline-secondary btn-sm" disabled title="Chưa có file">
+                                    <i class="bi bi-slash-circle"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="align-middle">1</td>
+                            <td class="align-middle">
+                                <div class="d-flex align-items-center">
+                                    <img src="~/assets/image/tải xuống.jpg"
+                                         class="rounded-circle me-3"
+                                         alt="avatar"
+                                         style="width: 40px; height: 40px; object-fit: cover;">
+
+                                    <div>
+                                        <div class="fw-semibold">Nguyễn Văn A</div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td class="align-middle">
+                                <span><i class="bi bi-check-circle me-1"></i>Đã nộp</span>
+                            </td>
+
+                            <td class="align-middle">10/11/2025 – 14:35</td>
+
+
+
+                            <td class="align-middle">
+                                <a href="#" class="text-decoration-none"><i class="bi bi-paperclip me-1"></i>bai_lam.pdf</a>
+                            </td>
+
+                            <td class="text-muted">—</td>
+                            <td class="align-middle text-center action-btns">
+                                <button class="btn btn-outline-primary btn-sm me-1" title="Xem">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-outline-success btn-sm" title="Chấm / Sửa điểm">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="align-middle">3</td>
+                            <td class="align-middle">
+                                <div class="d-flex align-items-center">
+                                    <img src="~/assets/image/tải xuống.jpg"
+                                         class="rounded-circle me-3"
+                                         alt="avatar"
+                                         style="width: 40px; height: 40px; object-fit: cover;">
+
+                                    <div>
+                                        <div class="fw-semibold">Nguyễn Văn A</div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td class="align-middle">
+                                <span ><i class="bi bi-check-circle me-1"></i>Đã nộp</span>
+                            </td>
+
+                            <td class="align-middle">10/11/2025 – 14:35</td>
+
+                        
+
+                            <td class="align-middle">
+                                <a href="#" class="text-decoration-none"><i class="bi bi-paperclip me-1"></i>bai_lam.pdf</a>
+                            </td>
+
+                            <td class="align-middle"><span class="text-secondary fw-bold">8.5 / 10</span></td>
+                            <td class="align-middle text-center action-btns">
+                                <button class="btn btn-outline-primary btn-sm me-1" title="Xem">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-outline-success btn-sm" title="Chấm / Sửa điểm">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="align-middle">4</td>
+                            <td class="align-middle">
+                                <div class="d-flex align-items-center">
+                                    <img src="~/assets/image/tải xuống.jpg"
+                                         class="rounded-circle me-3"
+                                         alt="avatar"
+                                         style="width: 40px; height: 40px; object-fit: cover;">
+
+                                    <div>
+                                        <div class="fw-semibold">Nguyễn Văn A</div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td class="align-middle">
+                                <span><i class="bi bi-check-circle me-1"></i>Đã nộp</span>
+                            </td>
+
+                            <td class="align-middle">10/11/2025 – 14:35</td>
+
+
+
+                            <td class="align-middle">
+                                <a href="#" class="text-decoration-none"><i class="bi bi-paperclip me-1"></i>bai_lam.pdf</a>
+                            </td>
+
+                            <td class="align-middle"><span class="text-secondary fw-bold">8.5 / 10</span></td>
+                            <td class="align-middle text-center action-btns">
+                                <button class="btn btn-outline-primary btn-sm me-1" title="Xem">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-outline-success btn-sm" title="Chấm / Sửa điểm">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="align-middle">5</td>
+                            <td class="align-middle">
+                                <div class="d-flex align-items-center">
+                                    <img src="~/assets/image/tải xuống.jpg"
+                                         class="rounded-circle me-3"
+                                         alt="avatar"
+                                         style="width: 40px; height: 40px; object-fit: cover;">
+
+                                    <div>
+                                        <div class="fw-semibold">Nguyễn Văn A</div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td class="align-middle">
+                                <span><i class="bi bi-check-circle me-1"></i>Đã nộp</span>
+                            </td>
+
+                            <td class="align-middle">10/11/2025 – 14:35</td>
+
+
+
+                            <td class="align-middle">
+                                <a href="#" class="text-decoration-none"><i class="bi bi-paperclip me-1"></i>bai_lam.pdf</a>
+                            </td>
+
+                            <td class="align-middle"><span class="text-secondary fw-bold">8.5 / 10</span></td>
+                            <td class="align-middle text-center action-btns">
+                                <button class="btn btn-outline-primary btn-sm me-1" title="Xem">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-outline-success btn-sm" title="Chấm / Sửa điểm">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Nếu không có dữ liệu -->
+                        <!--
+                        <tr>
+                          <td colspan="7">
+                            <div class="no-data">Chưa có học sinh nộp bài nào.</div>
+                          </td>
+                        </tr>
+                        -->
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
