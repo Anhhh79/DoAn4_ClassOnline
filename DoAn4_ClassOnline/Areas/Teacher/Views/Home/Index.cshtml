@@ -1,48 +1,174 @@
 ﻿<div class="container">
     <!-- Tiêu đề -->
     <div class="text-center mb-5">
-        <h2 class="fw-bold text-primary">Các khóa học</h2>
+        <h2 class="fw-bold">Các khóa học</h2>
         <!-- Dropdown chọn học kỳ -->
         <div class="d-flex justify-content-center mt-3">
             <select id="selectHocKy" class="form-select w-auto rounded-pill shadow-sm fw-semibold">
-                <option selected disabled>-- Chọn học kỳ --</option>
-                   <option value="1">KH1, 2024 - 2025</option>
-                   <option value="2">KH2, 2024 - 2025</option>
-                   <option value="3">KH3, 2024 - 2025</option>
+                    <option value="0">-- Tất cả khóa học --</option>
+                   <option value="1">KH1 / 2024 - 2025</option>
+                   <option value="2">KH2 / 2024 - 2025</option>
+                   <option value="3">KH3 / 2024 - 2025</option>
             </select>
         </div>
         <!-- Card Khóa học -->
-        <div class="col-12 col-md-3">
-            <div class="card shadow border-0 rounded-4 overflow-hidden h-100">
+        <div class="row g-4 mt-2">
+            <div class="col-12 col-md-3">
+                <div class="card shadow border-0 rounded-4 overflow-hidden h-100">
 
-                <!-- Ảnh banner -->
-                <a asp-area="Teacher" asp-controller="Course" asp-action="Index">
-                    <div class="card-header p-0 border-0 bg-white image-cuser">
-                        <img src="~/assets/image/tải xuống.jpg  "
-                             class="w-100"
-                             alt="Banner"
-                             style="height: 100px; object-fit: cover;">
-                    </div>
-                </a>
-                <!-- Nội dung khóa học -->
-                <div class="card-body text-start">
-                    <h6 class="fw-bold mb-1">Phát triển ứng dụng IOT - Nguyễn Đình Tứ</h6>
-                    <span class="mb-1">Khoa Công Nghệ Thông Tin</span>
-                    <br />
-                    <span class="mb-1">HK1 / 2025 - 2026</span>
+                    <!-- Ảnh banner -->
+                    <a asp-area="Teacher" asp-controller="Course" asp-action="Index">
+                        <div class="card-header p-0 border-0 bg-white image-cuser">
+                            <img src="~/assets/image/tải xuống.jpg  "
+                                 class="w-100"
+                                 alt="Banner"
+                                 style="height: 130px; object-fit: cover;">
+                        </div>
+                    </a>
+                    <!-- Nội dung khóa học -->
+                    <div class="card-body text-start">
+                        <h6 class="fw-bold mb-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">Phát triển ứng dụng IOT - Nguyễn Đình Tứ</h6>
+                        <span class="mb-1" style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">Khoa Công Nghệ Thông Tin</span>
+                        <span class="mb-1">HK1 / 2025 - 2026</span>
 
-                    <div class="d-flex justify-content-between text-secondary small mb-3 mt-2">
-                        <span>0 SV đã tham gia</span>
-                        <span>Tất cả mọi người</span>
+                        <div class="d-flex justify-content-between text-secondary small mb-3 mt-2">
+                            <span>24 SV đã tham gia</span>
+                            <span>Tất cả mọi người</span>
+                        </div>
+                        <div class="text-start">
+                            <a class="btn btn-light w-100 border rounded-3" asp-area="Teacher" asp-controller="Home" asp-action="DanhSach">
+                                Xem danh sách sinh viên
+                            </a>
+                        </div>
                     </div>
-                    <div class="text-start">
-                        <button class="btn btn-light w-100 border rounded-3 view-list-btn">
-                            Xem danh sách sinh viên
-                        </button>
-                    </div>
+
                 </div>
-
             </div>
-        </div>
+            <div class="col-12 col-md-3">
+                <div class="card shadow border-0 rounded-4 overflow-hidden h-100">
+
+                    <!-- Ảnh banner -->
+                    <a asp-area="Teacher" asp-controller="Course" asp-action="Index">
+                        <div class="card-header p-0 border-0 bg-white image-cuser">
+                            <img src="~/assets/image/tải xuống.jpg  "
+                                 class="w-100"
+                                 alt="Banner"
+                                 style="height: 130px; object-fit: cover;">
+                        </div>
+                    </a>
+                    <!-- Nội dung khóa học -->
+                    <div class="card-body text-start">
+                        <h6 class="fw-bold mb-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">Phát triển ứng dụng IOT - Nguyễn Đình Tứ</h6>
+                        <span class="mb-1" style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">Khoa Công Nghệ Thông Tin</span>
+                        <span class="mb-1">HK1 / 2025 - 2026</span>
+
+                        <div class="d-flex justify-content-between text-secondary small mb-3 mt-2">
+                            <span>24 SV đã tham gia</span>
+                            <span>Tất cả mọi người</span>
+                        </div>
+                        <div class="text-start">
+                            <a class="btn btn-light w-100 border rounded-3" asp-area="Teacher" asp-controller="Home" asp-action="DanhSach">
+                                Xem danh sách sinh viên
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="card shadow border-0 rounded-4 overflow-hidden h-100">
+
+                    <!-- Ảnh banner -->
+                    <a asp-area="Teacher" asp-controller="Course" asp-action="Index">
+                        <div class="card-header p-0 border-0 bg-white image-cuser">
+                            <img src="~/assets/image/tải xuống.jpg  "
+                                 class="w-100"
+                                 alt="Banner"
+                                 style="height: 130px; object-fit: cover;">
+                        </div>
+                    </a>
+                    <!-- Nội dung khóa học -->
+                    <div class="card-body text-start">
+                        <h6 class="fw-bold mb-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">Phát triển ứng dụng IOT - Nguyễn Đình Tứ</h6>
+                        <span class="mb-1" style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">Khoa Công Nghệ Thông Tin</span>
+                        <span class="mb-1">HK1 / 2025 - 2026</span>
+
+                        <div class="d-flex justify-content-between text-secondary small mb-3 mt-2">
+                            <span>24 SV đã tham gia</span>
+                            <span>Tất cả mọi người</span>
+                        </div>
+                        <div class="text-start">
+                            <a class="btn btn-light w-100 border rounded-3" asp-area="Teacher" asp-controller="Home" asp-action="DanhSach">
+                                Xem danh sách sinh viên
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+             <div class="col-12 col-md-3">
+                <div class="card shadow border-0 rounded-4 overflow-hidden h-100">
+
+                    <!-- Ảnh banner -->
+                    <a asp-area="Teacher" asp-controller="Course" asp-action="Index">
+                        <div class="card-header p-0 border-0 bg-white image-cuser">
+                            <img src="~/assets/image/tải xuống.jpg  "
+                                 class="w-100"
+                                 alt="Banner"
+                                 style="height: 130px; object-fit: cover;">
+                        </div>
+                    </a>
+                    <!-- Nội dung khóa học -->
+                    <div class="card-body text-start">
+                        <h6 class="fw-bold mb-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">Phát triển ứng dụng IOT - Nguyễn Đình Tứ</h6>
+                        <span class="mb-1" style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">Khoa Công Nghệ Thông Tin</span>
+                        <span class="mb-1">HK1 / 2025 - 2026</span>
+
+                        <div class="d-flex justify-content-between text-secondary small mb-3 mt-2">
+                            <span>24 SV đã tham gia</span>
+                            <span>Tất cả mọi người</span>
+                        </div>
+                        <div class="text-start">
+                            <a class="btn btn-light w-100 border rounded-3" asp-area="Teacher" asp-controller="Home" asp-action="DanhSach">
+                                Xem danh sách sinh viên
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="card shadow border-0 rounded-4 overflow-hidden h-100">
+
+                    <!-- Ảnh banner -->
+                    <a asp-area="Teacher" asp-controller="Course" asp-action="Index">
+                        <div class="card-header p-0 border-0 bg-white image-cuser">
+                            <img src="~/assets/image/tải xuống.jpg  "
+                                 class="w-100"
+                                 alt="Banner"
+                                 style="height: 130px; object-fit: cover;">
+                        </div>
+                    </a>
+                    <!-- Nội dung khóa học -->
+                    <div class="card-body text-start">
+                        <h6 class="fw-bold mb-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">Phát triển ứng dụng IOT - Nguyễn Đình Tứ</h6>
+                        <span class="mb-1" style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">Khoa Công Nghệ Thông Tin</span>
+                        <span class="mb-1">HK1 / 2025 - 2026</span>
+
+                        <div class="d-flex justify-content-between text-secondary small mb-3 mt-2">
+                            <span>24 SV đã tham gia</span>
+                            <span>Tất cả mọi người</span>
+                        </div>
+                        <div class="text-start">
+                            <a class="btn btn-light w-100 border rounded-3" asp-area="Teacher" asp-controller="Home" asp-action="DanhSach">
+                                Xem danh sách sinh viên
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+         </div>
+        
     </div>
 </div>

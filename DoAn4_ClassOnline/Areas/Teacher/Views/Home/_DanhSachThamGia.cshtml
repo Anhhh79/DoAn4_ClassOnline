@@ -1,0 +1,350 @@
+﻿
+<div class="container">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a class="btn" asp-controller="Home" asp-action="Index">
+            <i class="bi bi-chevron-left"></i> Quay lại
+        </a>
+
+        <div class="text-center flex-grow-1">
+            <h4 class="fw-bold mb-0">Danh sách sinh viên tham gia</h4>
+            <div class="text-muted small">Khóa học: Phát triển ứng dụng IoT</div>
+        </div>
+
+        <div style="width: 108px;"></div>
+    </div>
+
+
+    <!-- Bộ lọc & Tìm kiếm -->
+    <div class="d-flex align-items-center mb-3">
+        <!-- Search -->
+        <div class="input-group w-25 me-3">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" placeholder="Tìm theo tên hoặc MSSV...">
+        </div>
+
+        <!-- Bộ lọc -->
+        <div class="d-flex">
+            <select id="filterKhoa" class="form-select" style="width: 200px;">
+                <option value="">-- Chọn khoa --</option>
+                <option value="CNTT">Công nghệ thông tin</option>
+                <option value="QTKD">Quản trị kinh doanh</option>
+                <option value="CK">Cơ khí</option>
+                <option value="XDDD">Xây dựng</option>
+            </select>
+        </div>
+    </div>
+
+
+    <!-- Table list -->
+    <div class="table-responsive shadow-sm rounded-4" style="max-height: 480px; overflow-y: auto;">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light sticky-top">
+                <tr>
+                    <th style="width: 60px;">STT</th>
+                    <th>Sinh viên</th>
+                    <th style="width: 300px;">Khoa</th>
+                    <th style="width: 140px;">Khóa</th>
+                    <th style="width: 140px;">MSSV</th>
+                    <th style="width: 160px;">Truy cập</th>
+                    <th class="text-center" style="width: 140px;">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Sinh viên -->
+                <tr>
+                    <td>1</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="~/assets/image/tải xuống.jpg"
+                                 class="rounded-circle me-3"
+                                 style="width: 45px; height: 45px; object-fit: cover;">
+                            <div>
+                                <div class="fw-semibold">Nguyễn Văn A</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class ="fw-semibold">Điện tử viễn thông</td>
+                    <td class="fw-semibold">2021</td>
+                    <td class="fw-semibold">B2012001</td>
+                    <td>2 ngày trước</td>
+
+                    <td class="text-center">
+                        <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#studentInfoModal" title="Xem hồ sơ">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" title="Xóa khỏi khóa học">
+                            <i class="bi bi-person-x"></i>
+                        </button>
+                    </td>
+                </tr>
+
+                <!-- Ví dụ chưa xác nhận -->
+                <tr>
+                    <td>2</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="~/assets/image/tải xuống.jpg"
+                                 class="rounded-circle me-3"
+                                 style="width: 45px; height: 45px; object-fit: cover;">
+                            <div>
+                                <div class="fw-semibold">Trần Thị B</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="fw-semibold">Điện tử viễn thông</td>
+                    <td class="fw-semibold">2021</td>
+                    <td class="fw-semibold">B2112008</td>
+                    <td>5 tiếng trước</td>
+
+                    <td class="text-center">
+                        <button class="btn btn-outline-secondary btn-sm" title="Xem hồ sơ">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" title="Xóa khỏi khóa học">
+                            <i class="bi bi-person-x"></i>
+                        </button>
+                    </td>
+                </tr>
+                 <tr>
+                    <td>2</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="~/assets/image/tải xuống.jpg"
+                                 class="rounded-circle me-3"
+                                 style="width: 45px; height: 45px; object-fit: cover;">
+                            <div>
+                                <div class="fw-semibold">Trần Thị B</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="fw-semibold">Điện tử viễn thông</td>
+                    <td class="fw-semibold">2021</td>
+                    <td class="fw-semibold">B2112008</td>
+                    <td>5 tiếng trước</td>
+
+                    <td class="text-center">
+                        <button class="btn btn-outline-secondary btn-sm" title="Xem hồ sơ">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" title="Xóa khỏi khóa học">
+                            <i class="bi bi-person-x"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="~/assets/image/tải xuống.jpg"
+                                 class="rounded-circle me-3"
+                                 style="width: 45px; height: 45px; object-fit: cover;">
+                            <div>
+                                <div class="fw-semibold">Trần Thị B</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="fw-semibold">Điện tử viễn thông</td>
+                    <td class="fw-semibold">2021</td>
+                    <td class="fw-semibold">B2112008</td>
+                    <td>5 tiếng trước</td>
+
+                    <td class="text-center">
+                        <button class="btn btn-outline-secondary btn-sm" title="Xem hồ sơ">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" title="Xóa khỏi khóa học">
+                            <i class="bi bi-person-x"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="~/assets/image/tải xuống.jpg"
+                                 class="rounded-circle me-3"
+                                 style="width: 45px; height: 45px; object-fit: cover;">
+                            <div>
+                                <div class="fw-semibold">Trần Thị B</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="fw-semibold">Điện tử viễn thông</td>
+                    <td class="fw-semibold">2021</td>
+                    <td class="fw-semibold">B2112008</td>
+                    <td>5 tiếng trước</td>
+
+                    <td class="text-center">
+                        <button class="btn btn-outline-secondary btn-sm" title="Xem hồ sơ">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" title="Xóa khỏi khóa học">
+                            <i class="bi bi-person-x"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="~/assets/image/tải xuống.jpg"
+                                 class="rounded-circle me-3"
+                                 style="width: 45px; height: 45px; object-fit: cover;">
+                            <div>
+                                <div class="fw-semibold">Trần Thị B</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="fw-semibold">Điện tử viễn thông</td>
+                    <td class="fw-semibold">2021</td>
+                    <td class="fw-semibold">B2112008</td>
+                    <td>5 tiếng trước</td>
+
+                    <td class="text-center">
+                        <button class="btn btn-outline-secondary btn-sm" title="Xem hồ sơ">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" title="Xóa khỏi khóa học">
+                            <i class="bi bi-person-x"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="~/assets/image/tải xuống.jpg"
+                                 class="rounded-circle me-3"
+                                 style="width: 45px; height: 45px; object-fit: cover;">
+                            <div>
+                                <div class="fw-semibold">Trần Thị B</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="fw-semibold">Điện tử viễn thông</td>
+                    <td class="fw-semibold">2021</td>
+                    <td class="fw-semibold">B2112008</td>
+                    <td>5 tiếng trước</td>
+
+                    <td class="text-center">
+                        <button class="btn btn-outline-secondary btn-sm" title="Xem hồ sơ">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" title="Xóa khỏi khóa học">
+                            <i class="bi bi-person-x"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="~/assets/image/tải xuống.jpg"
+                                 class="rounded-circle me-3"
+                                 style="width: 45px; height: 45px; object-fit: cover;">
+                            <div>
+                                <div class="fw-semibold">Trần Thị B</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="fw-semibold">Điện tử viễn thông</td>
+                    <td class="fw-semibold">2021</td>
+                    <td class="fw-semibold">B2112008</td>
+                    <td>5 tiếng trước</td>
+
+                    <td class="text-center">
+                        <button class="btn btn-outline-secondary btn-sm" title="Xem hồ sơ">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" title="Xóa khỏi khóa học">
+                            <i class="bi bi-person-x"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="~/assets/image/tải xuống.jpg"
+                                 class="rounded-circle me-3"
+                                 style="width: 45px; height: 45px; object-fit: cover;">
+                            <div>
+                                <div class="fw-semibold">Trần Thị B</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="fw-semibold">Điện tử viễn thông</td>
+                    <td class="fw-semibold">2021</td>
+                    <td class="fw-semibold">B2112008</td>
+                    <td>5 tiếng trước</td>
+
+                    <td class="text-center">
+                        <button class="btn btn-outline-secondary btn-sm" title="Xem hồ sơ">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" title="Xóa khỏi khóa học">
+                            <i class="bi bi-person-x"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- ✅ Modal Thông tin sinh viên -->
+<div class="modal fade" id="studentInfoModal" tabindex="-1" aria-labelledby="studentInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="studentInfoModalLabel">Thông tin sinh viên</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body p-4">
+                <div class="row g-3">
+
+                    <!-- Avatar + Tên + MSSV -->
+                    <div class="col-md-4 text-center">
+                        <img src="~/assets/image/tải xuống.jpg"
+                             class="rounded-circle border shadow-sm mb-3"
+                             style="width:140px;height:140px;object-fit:cover;">
+                        <h5 class="fw-bold" id="modalFullName">Nguyễn Văn A</h5>
+                        <small class="text-muted d-block" id="modalMSSV" title="MSSV">CNTT2211026</small>
+                    </div>
+
+                    <!-- Info -->
+                    <div class="col-md-8">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Giới tính</dt>
+                            <dd class="col-sm-8" id="modalGender">Nam</dd>
+
+                            <dt class="col-sm-4">Ngày sinh</dt>
+                            <dd class="col-sm-8" id="modalDOB">01/01/2003</dd>
+
+                            <dt class="col-sm-4">Email</dt>
+                            <dd class="col-sm-8" id="modalEmail">vana@example.com</dd>
+
+                            <dt class="col-sm-4">Số điện thoại</dt>
+                            <dd class="col-sm-8" id="modalPhone">0123 456 789</dd>
+
+                            <dt class="col-sm-4">Khoa</dt>
+                            <dd class="col-sm-8" id="modalFaculty">Công nghệ thông tin</dd>
+
+                            <dt class="col-sm-4">Khóa</dt>
+                            <dd class="col-sm-8" id="modalCourse">K17</dd>
+                        </dl>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
