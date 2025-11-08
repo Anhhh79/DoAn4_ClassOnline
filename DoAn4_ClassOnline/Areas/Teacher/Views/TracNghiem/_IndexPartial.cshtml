@@ -1,0 +1,57 @@
+﻿<div class="row g-3 mt-4 p-3 shadow rounded-4 bg-white">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-3">
+            <i class="bi bi-ui-checks-grid me-2 text-primary"></i> Quản lý bài trắc nghiệm
+        </h5>
+        <button type="button" class="btn btn-success btn-sm text-light" data-bs-toggle="modal" data-bs-target="#addBaiTapModal">
+            <i class="bi bi-plus-lg me-1"></i> Tạo trắc nghiệm
+        </button>
+    </div>
+    <!-- ====== BÀI TRẮC NGHIỆM 1 ====== -->
+    <div class="col-12">
+        <div class="border px-3 rounded-3 mb-2 bg-body-tertiary d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+            <!-- Tên bài -->
+            <a asp-area="Teacher"
+               asp-controller="TracNghiem"
+               asp-action="TaoBaiTracNghiem"
+               class="text-decoration-none py-3 text-dark d-flex align-items-center flex-grow-1">
+                <strong class="me-1">Bài 1:</strong> Trắc nghiệm IoT cơ bản
+            </a>
+
+            <!-- Hạn nộp -->
+            <div class="text-muted small d-flex align-items-center me-4">
+                <i class="bi bi-clock me-1"></i> Hạn: 12/11/2025 - 23:59
+            </div>
+
+            <!-- Nút hành động -->
+            <div>
+                <button class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-trash"></i> Xóa
+                </button>
+            </div>
+        </div>
+        <!-- ====== BÀI TRẮC NGHIỆM 2 ====== -->
+        <div class="col-12">
+            <div class="border rounded-3 p-3 mb-2 bg-body-tertiary d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <a class="text-decoration-none text-dark d-flex align-items-center flex-grow-1"
+                   data-bs-toggle="collapse"
+                   href="#collapseTN2">
+                    <strong class="me-1">Bài 2:</strong> Trắc nghiệm cảm biến IoT
+                </a>
+
+                <div class="text-muted small d-flex align-items-center me-4">
+                    <i class="bi bi-clock me-1"></i> Hạn: 20/11/2025 - 22:00
+                </div>
+
+                <div>
+                    <button class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-trash"></i> Xóa
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

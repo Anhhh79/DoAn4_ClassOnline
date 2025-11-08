@@ -41,7 +41,7 @@
     if (btnTracNghiem) {
         btnTracNghiem.addEventListener("click", function (e) {
             e.preventDefault();
-            loadNoiDung_Tc('/Teacher/Course/TracNghiem');
+            loadNoiDung_Tc('/Teacher/TracNghiem/Index');
         });
     }
 
