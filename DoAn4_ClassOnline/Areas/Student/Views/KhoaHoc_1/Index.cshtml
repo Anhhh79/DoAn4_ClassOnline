@@ -1,4 +1,7 @@
-﻿<!-- Section chức năng -->
+﻿@{
+    ViewData["Title"] = "Chi tiết khóa học";
+}
+<!-- Section chức năng -->
 <div class="container">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -68,12 +71,14 @@
 
         <!-- Card 1 -->
         <div class="col">
-            <a asp-area="Student" asp-controller="HocOnline" asp-action="Index" style=" text-decoration: none;">
+            <div>
                 <div class="card custom-card text-center p-2 h-95 border-0 rounded-4 bg-body-tertiary">
                     <div class="icon mb-2"><img src="/assets/image/meet.png" style="width:50px" alt="" /></div>
-                    <h6 class="fw-bold mb-3 mt-1">Học online</h6>
+                    <a class="btn btn-success text-white px-4 rounded-pill" style="background-color:#0055ff">
+                        <i class="bi bi-camera-video me-1"></i> Tham gia
+                    </a>
                 </div>
-            </a>
+            </div>
         </div>
     </div>
 
