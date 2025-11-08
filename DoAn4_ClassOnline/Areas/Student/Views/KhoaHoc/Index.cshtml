@@ -1,40 +1,56 @@
-﻿<!-- Section chức năng -->
+﻿@{
+    ViewData["Title"] = "Khóa học";
+}
+
+<!-- Section chức năng -->
 <div class="container">
-    <h4 class="fw-bold mb-4">Các khóa học của tôi</h4>
-    <div class="row g-4">
-
+    <!-- Tiêu đề -->
+    <div class="text-center mb-5">
+        <h2 class="fw-bold mb-2">Các khóa học đã tham gia</h2>
+        <!-- Dropdown chọn học kỳ -->
+        <div class="d-flex justify-content-center">
+            <select id="selectHocKy" class="form-select w-auto rounded-pill shadow-sm fw-semibold">
+                <option value="0">-- Tất cả khóa học --</option>
+                <option value="1">KH1 / 2024 - 2025</option>
+                <option value="2">KH2 / 2024 - 2025</option>
+                <option value="3">KH3 / 2024 - 2025</option>
+            </select>
+        </div>
         <!-- Card Khóa học -->
-        <div class="col-12 col-md-3">
-            <div class="card shadow border-0 rounded-4 overflow-hidden h-100">
+        <div class="row g-4 mt-2">
+            <div class="col-12 col-md-3">
+                <div class="card shadow border-0 rounded-4 overflow-hidden h-100">
 
-                <!-- Ảnh banner -->
-                <a asp-area="Student" asp-controller="KhoaHoc_1" asp-action="Index">
-                    <div class="card-header p-0 border-0 bg-white image-cuser">
-                        <img src="~/assets/image/tải xuống.jpg  "
-                             class="w-100"
-                             alt="Banner"
-                             style="height: 100px; object-fit: cover;">
-                    </div>
-                </a>
-                <!-- Nội dung khóa học -->
-                <div class="card-body text-start">
-                    <h6 class="fw-bold mb-1">Phát triển ứng dụng IOT - Nguyễn Đình Tứ</h6>
-                    <span class="mb-1">Khoa Công Nghệ Thông Tin</span>
-                    <br />
-                    <span class="mb-1">HK1 / 2025 - 2026</span>
+                    <!-- Ảnh banner -->
+                    <a asp-area="Student" asp-controller="KhoaHoc_1" asp-action="Index">
+                        <div class="card-header p-0 border-0 bg-white image-cuser">
+                            <img src="~/assets/image/tải xuống.jpg  "
+                                 class="w-100"
+                                 alt="Banner"
+                                 style="height: 130px; object-fit: cover;">
+                        </div>
+                    </a>
+                    <!-- Nội dung khóa học -->
+                    <div class="card-body text-start">
+                        <h6 class="fw-bold mb-2" style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;" title="">Phát triển ứng dụng IOT</h6>
+                        <span class="" style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">Giảng viên: Nguyễn Đình Tứ</span>
+                        <span class="" style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">Khoa Công nghệ thông tin</span>
+                        <span class="">HK1 / 2025 - 2026</span>
 
-                    <div class="d-flex justify-content-between text-secondary small mb-3 mt-2">
-                        <span>0 SV đã tham gia</span>
-                        <span>Tất cả mọi người</span>
+                        <div class="d-flex justify-content-between text-secondary small mb-3 mt-2">
+                            <span>24 SV đã tham gia</span>
+                            <span>Tất cả mọi người</span>
+                        </div>
+                        <div class="text-start">
+                            <a class="btn btn-light w-100 border rounded-3">
+                                Xem danh sách sinh viên
+                            </a>
+                        </div>
                     </div>
-                    <div class="text-start">
-                        <button class="btn btn-light w-100 border rounded-3 view-list-btn">
-                            Xem danh sách sinh viên
-                        </button>
-                    </div>
+
                 </div>
-               
             </div>
         </div>
+
     </div>
 </div>
