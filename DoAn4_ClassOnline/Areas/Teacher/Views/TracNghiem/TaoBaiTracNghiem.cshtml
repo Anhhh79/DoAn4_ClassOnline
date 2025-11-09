@@ -67,7 +67,11 @@
                 <div class="mt-3">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="text-muted">Giao cho</span>
-                        <a class="text-primary text-decoration-none small">Sửa</a>
+                        <!-- Nút Sửa -->
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal">
+                            <i class="bi bi-pencil"></i> Sửa
+                        </button>
+                        
                     </div>
                     <div class="border rounded-4 p-2 text-center bg-body-tertiary">
                         Tất cả mọi người
@@ -77,7 +81,13 @@
                 <div class="mt-3">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="text-muted">Nội dung</span>
-                        <a class="text-primary text-decoration-none small">Sửa</a>
+                        <div>
+                            <a class="text-primary text-decoration-none small me-3">Sửa</a>
+                            <!-- Nút Xem chi tiết -->
+                            <a class="text-success text-decoration-none small" data-bs-toggle="modal" data-bs-target="#detailModal">
+                                Xem chi tiết
+                            </a>
+                        </div>
                     </div>
                     <div class="border rounded-4 p-2 text-center bg-body-tertiary">
                         Trắc nghiệm 10 câu
@@ -277,7 +287,190 @@
             </div>
         </div>
 
+        <!-- Modal: Sửa -->
+        <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content rounded-4 shadow">
 
+                    <!-- Header -->
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold" id="editModalLabel">Chỉnh sửa giao bài</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                    </div>
 
+                    <!-- Body -->
+                    <div class="modal-body">
+
+                        <div class="col-12">
+                            <label class="form-label d-flex justify-content-between align-items-center mb-2">
+                                <span>Giao cho</span>
+                            </label>
+
+                            <!-- HEADER -->
+                            <div class="student-header mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <!-- Search -->
+                                    <div class="input-group w-50">
+                                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                        <input type="search" class="form-control form-control-sm"
+                                               placeholder="Tìm theo tên học sinh...">
+                                    </div>
+
+                                    <!-- Check all -->
+                                    <div class="form-check ms-2">
+                                        <input class="form-check-input" type="checkbox" id="checkAllStudentsStatic">
+                                        <label class="form-check-label small" for="checkAllStudentsStatic">
+                                            Chọn tất cả
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Danh sách có thể cuộn -->
+                            <div class="student-list-container border rounded-3 p-2" style="max-height: 300px; overflow-y: auto;">
+
+                                <!-- Item -->
+                                <div class="student-item d-flex align-items-center gap-3 py-2 px-2 mb-1">
+                                    <div style="width:40px; height:40px; border-radius:8px; overflow:hidden;">
+                                        <img src="~/assets/image/tải xuống.jpg" alt="Avatar"
+                                             style="width:100%; height:100%; object-fit:cover;">
+                                    </div>
+                                    <div class="flex-grow-1 fw-semibold">Nguyễn Văn A</div>
+                                    <div class="form-check"><input class="form-check-input student-checkbox" type="checkbox" value="101"></div>
+                                </div>
+
+                                <div class="student-item d-flex align-items-center gap-3 py-2 px-2 mb-1">
+                                    <div style="width:40px; height:40px; border-radius:8px; overflow:hidden;">
+                                        <img src="~/assets/image/tải xuống.jpg" alt="Avatar"
+                                             style="width:100%; height:100%; object-fit:cover;">
+                                    </div>
+                                    <div class="flex-grow-1 fw-semibold">Trần Thị B</div>
+                                    <div class="form-check"><input class="form-check-input student-checkbox" type="checkbox" value="102"></div>
+                                </div>
+
+                                <div class="student-item d-flex align-items-center gap-3 py-2 px-2 mb-1">
+                                    <div style="width:40px; height:40px; border-radius:8px; overflow:hidden;">
+                                        <img src="~/assets/image/tải xuống.jpg" alt="Avatar"
+                                             style="width:100%; height:100%; object-fit:cover;">
+                                    </div>
+                                    <div class="flex-grow-1 fw-semibold">Lê Văn C</div>
+                                    <div class="form-check"><input class="form-check-input student-checkbox" type="checkbox" value="103"></div>
+                                </div>
+
+                                <div class="student-item d-flex align-items-center gap-3 py-2 px-2 mb-1">
+                                    <div style="width:40px; height:40px; border-radius:8px; overflow:hidden;">
+                                        <img src="~/assets/image/tải xuống.jpg" alt="Avatar"
+                                             style="width:100%; height:100%; object-fit:cover;">
+                                    </div>
+                                    <div class="flex-grow-1 fw-semibold">Phạm Thị D</div>
+                                    <div class="form-check"><input class="form-check-input student-checkbox" type="checkbox" value="104"></div>
+                                </div>
+
+                                <div class="student-item d-flex align-items-center gap-3 py-2 px-2 mb-1">
+                                    <div style="width:40px; height:40px; border-radius:8px; overflow:hidden;">
+                                        <img src="~/assets/image/tải xuống.jpg" alt="Avatar"
+                                             style="width:100%; height:100%; object-fit:cover;">
+                                    </div>
+                                    <div class="flex-grow-1 fw-semibold">Hoàng Văn E</div>
+                                    <div class="form-check"><input class="form-check-input student-checkbox" type="checkbox" value="105"></div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="button" class="btn btn-primary">Lưu thay đổi</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Xem chi tiết -->
+        <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content rounded-4 shadow">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold">Chi tiết bài trắc nghiệm</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                    </div>
+
+                    <!-- Modal body có scroll -->
+                    <div class="modal-body bg-white" style="max-height: 75vh; overflow-y: auto;">
+
+                        <!-- Câu hỏi 1 -->
+                        <div class="mb-4">
+                            <div class="fw-bold">Câu 1 <span class="text-muted small">ID: 43777953</span></div>
+                            <div class="fw-semibold mt-1 mb-2">Shell là gì trong Linux?</div>
+                            <div>A. Một chương trình thuộc kernel</div>
+                            <div>B. Một loại trình duyệt</div>
+                            <div>C. Một bộ thông dịch lệnh (Đáp án đúng)</div>
+                            <div>D. Một phần mềm đồ họa</div>
+                            <div class="text-success mt-2 fw-semibold">Đáp án: C</div>
+                            <hr>
+                        </div>
+
+                        <!-- Câu hỏi 2 -->
+                        <div class="mb-4">
+                            <div class="fw-bold">Câu 2 <span class="text-muted small">ID: 43777954</span></div>
+                            <div class="fw-semibold mt-1 mb-2">Lệnh nào dùng để xem shell hiện tại đang dùng?</div>
+                            <div>A. cat /etc/shells</div>
+                            <div>B. echo $SHELL (Đáp án đúng)</div>
+                            <div>C. whoami</div>
+                            <div>D. pwd</div>
+                            <div class="text-success mt-2 fw-semibold">Đáp án: B</div>
+                            <hr>
+                        </div>
+
+                        <!-- Câu hỏi 2 -->
+                        <div class="mb-4">
+                            <div class="fw-bold">Câu 2 <span class="text-muted small">ID: 43777954</span></div>
+                            <div class="fw-semibold mt-1 mb-2">Lệnh nào dùng để xem shell hiện tại đang dùng?</div>
+                            <div>A. cat /etc/shells</div>
+                            <div>B. echo $SHELL (Đáp án đúng)</div>
+                            <div>C. whoami</div>
+                            <div>D. pwd</div>
+                            <div class="text-success mt-2 fw-semibold">Đáp án: B</div>
+                            <hr>
+                        </div>
+
+                        <!-- Câu hỏi 2 -->
+                        <div class="mb-4">
+                            <div class="fw-bold">Câu 2 <span class="text-muted small">ID: 43777954</span></div>
+                            <div class="fw-semibold mt-1 mb-2">Lệnh nào dùng để xem shell hiện tại đang dùng?</div>
+                            <div>A. cat /etc/shells</div>
+                            <div>B. echo $SHELL (Đáp án đúng)</div>
+                            <div>C. whoami</div>
+                            <div>D. pwd</div>
+                            <div class="text-success mt-2 fw-semibold">Đáp án: B</div>
+                            <hr>
+                        </div>
+
+                        <!-- Câu hỏi 2 -->
+                        <div class="mb-4">
+                            <div class="fw-bold">Câu 2 <span class="text-muted small">ID: 43777954</span></div>
+                            <div class="fw-semibold mt-1 mb-2">Lệnh nào dùng để xem shell hiện tại đang dùng?</div>
+                            <div>A. cat /etc/shells</div>
+                            <div>B. echo $SHELL (Đáp án đúng)</div>
+                            <div>C. whoami</div>
+                            <div>D. pwd</div>
+                            <div class="text-success mt-2 fw-semibold">Đáp án: B</div>
+                            <hr>
+                        </div>
+
+                        <!-- Thêm nhiều câu hỏi tại đây -->
+                        <!-- ... -->
+
+                    </div>
+
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
