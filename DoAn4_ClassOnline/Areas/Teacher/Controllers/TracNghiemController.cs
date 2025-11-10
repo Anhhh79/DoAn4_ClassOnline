@@ -13,5 +13,16 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
 		{
 			return View();
 		}
-	}
+
+        public IActionResult ThemBaiTracNghiem()
+        {
+            return View();
+        }
+
+        public IActionResult ChinhSuaTracNghiem()
+        {
+            return View();
+        }
+
+    }
 }
