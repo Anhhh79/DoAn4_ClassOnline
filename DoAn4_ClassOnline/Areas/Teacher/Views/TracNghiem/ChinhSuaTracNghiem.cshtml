@@ -111,32 +111,32 @@
             block.dataset.qid = id;
 
             block.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <strong class="question-label"></strong>
-                        <button class="btn btn-danger btn-sm btn-delete">Xóa</button>
-                    </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <strong class="question-label"></strong>
+                            <button class="btn btn-danger btn-sm btn-delete">Xóa</button>
+                        </div>
 
-                    <label class="small">Nội dung:</label>
-                    <input class="form-control mb-2 question-text" value="${escapeHtml(data?.text || '')}" placeholder="Nhập nội dung..." required>
+                        <label class="small">Nội dung:</label>
+                        <input class="form-control mb-2 question-text" value="${escapeHtml(data?.text || '')}" placeholder="Nhập nội dung..." required>
 
-                    <label class="small">Hình ảnh (tùy chọn):</label>
-                    <input type="file" accept="image/*" class="form-control form-control-sm mb-2 img-input">
+                        <label class="small">Hình ảnh (tùy chọn):</label>
+                        <input type="file" accept="image/*" class="form-control form-control-sm mb-2 img-input">
 
-                    ${data?.image ? `<img src="${data.image}" class="question-img mb-2"
-                    style="max-width:150px;border:1px solid #ddd;border-radius:6px">` : ''}
+                        ${data?.image ? `<img src="${data.image}" class="question-img mb-2"
+                        style="max-width:150px;border:1px solid #ddd;border-radius:6px">` : ''}
 
-                    ${["A", "B", "C", "D"].map((opt, i) => `
-                      <div class="input-group mb-2">
-                        <span class="input-group-text">${opt}</span>
-                        <input class="form-control option-text" data-opt="${opt}" placeholder="Đáp án ${opt}"
-                        value="${escapeHtml(data?.options?.[i] || '')}" required>
-                        <span class="input-group-text">
-                          <input type="radio" name="correct_${id}" value="${opt}"
-                          ${data?.answer === opt ? 'checked' : ''}>
-                        </span>
-                      </div>
-                    `).join('')}
-                `;
+                        ${["A", "B", "C", "D"].map((opt, i) => `
+                          <div class="input-group mb-2">
+                            <span class="input-group-text">${opt}</span>
+                            <input class="form-control option-text" data-opt="${opt}" placeholder="Đáp án ${opt}"
+                            value="${escapeHtml(data?.options?.[i] || '')}" required>
+                            <span class="input-group-text">
+                              <input type="radio" name="correct_${id}" value="${opt}"
+                              ${data?.answer === opt ? 'checked' : ''}>
+                            </span>
+                          </div>
+                        `).join('')}
+                    `;
 
             block.querySelector('.img-input').onchange = (e) => loadImage(e, block);
             block.querySelector('.btn-delete').onclick = () => {
@@ -236,14 +236,14 @@
             let html = `<h5>${escapeHtml(data.title)}</h5>`;
             data.questions.forEach((q, i) => {
                 html += `
-                    <div class="border p-2 mb-2 rounded">
-                      <strong>Câu ${i + 1}</strong> <span class="text-muted">(${q.point} điểm)</span><br>
-                      ${q.image ? `<img src="${q.image}" style="max-width:150px;margin:8px 0;border:1px solid #ddd;border-radius:6px"><br>` : ''}
-                      ${escapeHtml(q.text)}<br>
-                      ${q.options.map((o, j) => `
-                        <label><input disabled type="radio"> ${String.fromCharCode(65 + j)}. ${escapeHtml(o)}</label><br>
-                      `).join('')}
-                    </div>`;
+                        <div class="border p-2 mb-2 rounded">
+                          <strong>Câu ${i + 1}</strong> <span class="text-muted">(${q.point} điểm)</span><br>
+                          ${q.image ? `<img src="${q.image}" style="max-width:150px;margin:8px 0;border:1px solid #ddd;border-radius:6px"><br>` : ''}
+                          ${escapeHtml(q.text)}<br>
+                          ${q.options.map((o, j) => `
+                            <label><input disabled type="radio"> ${String.fromCharCode(65 + j)}. ${escapeHtml(o)}</label><br>
+                          `).join('')}
+                        </div>`;
             });
 
             const modal = new bootstrap.Modal(document.getElementById('previewModal'));
