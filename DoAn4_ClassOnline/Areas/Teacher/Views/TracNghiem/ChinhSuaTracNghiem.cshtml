@@ -1,77 +1,311 @@
-﻿<div class="row g-3 mt-4 p-3 shadow rounded-4 bg-white">
+﻿<!-- BẮT ĐẦU: phần chèn trong div.row ... -->
+<!-- Header + controls -->
+<!-- Thay thế phần header cũ bằng khối này -->
+<div class="position-relative d-flex align-items-center mb-3" style="min-height:48px;">
+    <!-- Nút Quay lại (bên trái) -->
+    <a class="btn border-0"
+       asp-area="Teacher" asp-controller="Course" asp-action="Index">
+        <i class="bi bi-chevron-left me-1" aria-hidden="true"></i>
+        Quay lại
+    </a>
 
-    <!-- Tiêu đề -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="fw-bold mb-3">
-            <i class="bi bi-journal-text me-2 text-primary"></i> Câu hỏi trắc nghiệm
-        </h5>
-        <button class="btn btn-success btn-sm text-light">
-            <i class="bi bi-plus-lg me-1"></i> Thêm câu hỏi
-        </button>
+    <!-- Tiêu đề căn giữa (sử dụng vị trí tuyệt đối để luôn nằm giữa) -->
+    <h5 class="fw-bold mb-0 text-center"
+        style="position:absolute; left:50%; transform:translateX(-50%); pointer-events:none; z-index:1;">
+        Tạo / Chỉnh sửa bài thi
+    </h5>
+
+    <!-- Nhóm nút ở bên phải -->
+    <div class="btn-group ms-auto">
+        <button id="btnAdd" type="button" class="btn btn-success btn-sm">+ Thêm câu hỏi</button>
+        <button id="btnPreview" type="button" class="btn btn-outline-secondary btn-sm">Xem trước</button>
+        <button id="btnExport" type="button" class="btn btn-outline-primary btn-sm">Xuất JSON</button>
+        <button id="btnImport" type="button" class="btn btn-outline-warning btn-sm">Nhập JSON</button>
     </div>
-
-    <!-- ===== CÂU HỎI 1 ===== -->
-    <div class="col-12">
-        <div class="border rounded-4 p-3 bg-body-tertiary mb-3 shadow-sm">
-            <!-- Header -->
-            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
-                <div class="fw-semibold text-primary">1. Shell là gì trong Linux?</div>
-                <div class="text-muted small d-flex align-items-center gap-2">
-                    <i class="bi bi-volume-up"></i> <span>Audio</span>
-                    <i class="bi bi-list-ul"></i> <span>Trắc nghiệm</span>
-                    <i class="bi bi-arrow-repeat"></i> <span>Đổi câu khác</span>
-                </div>
-            </div>
-
-            <!-- Danh sách đáp án -->
-            <div class="d-flex flex-column gap-2 mt-2">
-                <div class="border rounded-3 py-2 px-3">
-                    <strong class="me-2">A.</strong> Một chương trình thuộc kernel
-                </div>
-                <div class="border rounded-3 py-2 px-3">
-                    <strong class="me-2">B.</strong> Một loại trình duyệt
-                </div>
-                <div class="border rounded-3 py-2 px-3 bg-success-subtle border-success">
-                    <strong class="me-2">C.</strong> Một bộ thông dịch lệnh
-                    <span class="text-success fw-semibold">(Đáp án đúng)</span>
-                </div>
-                <div class="border rounded-3 py-2 px-3">
-                    <strong class="me-2">D.</strong> Một phần mềm đồ họa
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== CÂU HỎI 2 ===== -->
-    <div class="col-12">
-        <div class="border rounded-4 p-3 bg-body-tertiary mb-3 shadow-sm">
-            <!-- Header -->
-            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
-                <div class="fw-semibold text-primary">2. Lệnh nào dùng để xem shell hiện tại đang dùng?</div>
-                <div class="text-muted small d-flex align-items-center gap-2">
-                    <i class="bi bi-volume-up"></i> <span>Audio</span>
-                    <i class="bi bi-list-ul"></i> <span>Trắc nghiệm</span>
-                    <i class="bi bi-arrow-repeat"></i> <span>Đổi câu khác</span>
-                </div>
-            </div>
-
-            <!-- Danh sách đáp án -->
-            <div class="d-flex flex-column gap-2 mt-2">
-                <div class="border rounded-3 py-2 px-3">
-                    <strong class="me-2">A.</strong> cat /etc/shells
-                </div>
-                <div class="border rounded-3 py-2 px-3 bg-success-subtle border-success">
-                    <strong class="me-2">B.</strong> echo $SHELL
-                    <span class="text-success fw-semibold">(Đáp án đúng)</span>
-                </div>
-                <div class="border rounded-3 py-2 px-3">
-                    <strong class="me-2">C.</strong> whoami
-                </div>
-                <div class="border rounded-3 py-2 px-3">
-                    <strong class="me-2">D.</strong> pwd
-                </div>
-            </div>
-        </div>
-    </div>
-
 </div>
+
+<!-- Form chứa câu hỏi -->
+<form id="testForm" class="w-100">
+    <div id="questionContainer"></div>
+
+    <div class="d-flex justify-content-end mt-3">
+        <button id="btnSave" type="submit" class="btn btn-primary">Lưu bài thi</button>
+    </div>
+</form>
+
+<!-- Input file ẩn dùng để import JSON -->
+<input type="file" id="fileImport" accept="application/json" style="display:none" />
+
+<!-- Modal xem trước (bootstrap modal structure - nếu bạn đã load bootstrap js thì modal hoạt động) -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xem trước bài thi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="previewBody" style="min-height:200px"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Template JS và logic -->
+<script>
+    (function () {
+        let qIndex = 0;
+        let lastInserted = null; // <--- theo dõi node cuối cùng trong "nhóm câu mới"
+        const questionContainer = document.getElementById('questionContainer');
+        const btnAdd = document.getElementById('btnAdd');
+        const btnPreview = document.getElementById('btnPreview');
+        const btnSave = document.getElementById('btnSave');
+        const btnExport = document.getElementById('btnExport');
+        const fileImport = document.getElementById('fileImport');
+        const btnImport = document.getElementById('btnImport');
+        const STORAGE_KEY = 'local_test_data_v3';
+
+        btnAdd.onclick = () => addQuestion();
+        btnPreview.onclick = preview;
+        btnSave.onclick = (e) => { e.preventDefault(); saveLocal() };
+        btnExport.onclick = exportJSON;
+        btnImport.onclick = () => fileImport.click();
+        fileImport.onchange = handleImport;
+
+        init();
+
+        function init() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    if (Array.isArray(data.questions)) {
+                        // khi load từ storage, ta muốn giữ đúng thứ tự ban đầu:
+                        // gọi addQuestion với isInit=true để mỗi câu được prepend,
+                        // và không ảnh hưởng tới lastInserted (nhóm "câu mới" bắt đầu khi user bấm thêm)
+                        data.questions.reverse().forEach(q => addQuestion(q, false, true));
+                        updateOrder();
+                        // đảm bảo lastInserted rỗng sau khởi tạo để lần thêm đầu tiên bắt đầu nhóm mới
+                        lastInserted = null;
+                        return;
+                    }
+                } catch { /* ignore */ }
+            }
+            // mặc định nếu không có data, tạo 1 câu mới (không phải init)
+            addQuestion();
+        }
+
+        /**
+         * addQuestion(data = null, scroll = true, isInit = false)
+         * - isInit = true: dùng khi khởi tạo/import; chèn câu theo thứ tự lưu (prepend mỗi câu từ reversed list)
+         * - isInit = false (mặc định): hành vi "nhóm mới": nếu chưa có câu mới nào trong session (lastInserted == null)
+         *      thì sẽ prepend (đứng đầu). Nếu đã có lastInserted thì chèn ngay sau lastInserted,
+         *      và cập nhật lastInserted = block (vậy nhóm các câu mới được từ trên xuống theo thứ tự thêm).
+         */
+        function addQuestion(data = null, scroll = true, isInit = false) {
+            qIndex++;
+            const id = qIndex;
+            const block = document.createElement('div');
+            block.className = "border rounded-4 p-3 mb-3 question-block";
+            block.dataset.qid = id;
+
+            block.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong class="question-label"></strong>
+                        <button class="btn btn-danger btn-sm btn-delete">Xóa</button>
+                    </div>
+
+                    <label class="small">Nội dung:</label>
+                    <input class="form-control mb-2 question-text" value="${escapeHtml(data?.text || '')}" placeholder="Nhập nội dung..." required>
+
+                    <label class="small">Hình ảnh (tùy chọn):</label>
+                    <input type="file" accept="image/*" class="form-control form-control-sm mb-2 img-input">
+
+                    ${data?.image ? `<img src="${data.image}" class="question-img mb-2"
+                    style="max-width:150px;border:1px solid #ddd;border-radius:6px">` : ''}
+
+                    ${["A", "B", "C", "D"].map((opt, i) => `
+                      <div class="input-group mb-2">
+                        <span class="input-group-text">${opt}</span>
+                        <input class="form-control option-text" data-opt="${opt}" placeholder="Đáp án ${opt}"
+                        value="${escapeHtml(data?.options?.[i] || '')}" required>
+                        <span class="input-group-text">
+                          <input type="radio" name="correct_${id}" value="${opt}"
+                          ${data?.answer === opt ? 'checked' : ''}>
+                        </span>
+                      </div>
+                    `).join('')}
+                `;
+
+            block.querySelector('.img-input').onchange = (e) => loadImage(e, block);
+            block.querySelector('.btn-delete').onclick = () => {
+                // Nếu đang xóa node là lastInserted thì điều chỉnh lastInserted về node trước nó trong DOM
+                if (lastInserted === block) {
+                    lastInserted = block.previousElementSibling && block.previousElementSibling.classList.contains('question-block')
+                        ? block.previousElementSibling
+                        : null;
+                    // nếu previous là import/khởi tạo block thì ta vẫn chấp nhận lastInserted = previous (nhóm mới có thể mở rộng)
+                }
+                block.remove();
+                updateOrder();
+            };
+
+            // CHÈN block vào DOM theo chế độ
+            if (isInit) {
+                // khi khởi tạo/import: giữ thứ tự đã lưu (gọi addQuestion reversed + prepend)
+                questionContainer.prepend(block);
+            } else {
+                // CHẾ ĐỘ "NHÓM MỚI":
+                // nếu chưa có lastInserted -> chèn lên đầu và đặt lastInserted = block
+                // nếu đã có lastInserted -> chèn ngay sau lastInserted (nhóm mới mở rộng)
+                if (!lastInserted) {
+                    questionContainer.prepend(block);
+                    lastInserted = block;
+                } else {
+                    // insert after lastInserted
+                    if (lastInserted.nextSibling) questionContainer.insertBefore(block, lastInserted.nextSibling);
+                    else questionContainer.appendChild(block);
+                    lastInserted = block;
+                }
+            }
+
+            updateOrder();
+
+            if (scroll) block.scrollIntoView({ behavior: "smooth" });
+        }
+
+        function updateOrder() {
+            const blocks = [...document.querySelectorAll('.question-block')];
+            blocks.forEach((b, i) => {
+                b.querySelector('.question-label').innerText = `Câu ${i + 1}`;
+            });
+        }
+
+        function loadImage(e, block) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                let img = block.querySelector('.question-img');
+                if (!img) {
+                    img = document.createElement('img');
+                    img.className = 'question-img mb-2';
+                    img.style.maxWidth = '150px';
+                    img.style.border = '1px solid #ddd';
+                    img.style.borderRadius = '6px';
+                    // chèn trước các option để dễ nhìn
+                    const firstInputGroup = block.querySelector('.input-group');
+                    if (firstInputGroup) block.insertBefore(img, firstInputGroup);
+                    else block.appendChild(img);
+                }
+                img.src = reader.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function collect() {
+            const blocks = [...document.querySelectorAll('.question-block')];
+            if (!blocks.length) throw new Error("Phải có ít nhất 1 câu!");
+
+            const total = blocks.length;
+            const pointEach = +(10 / total).toFixed(2);
+
+            return {
+                title: "Bài thi",
+                questions: blocks.map((b, i) => {
+                    const text = b.querySelector('.question-text').value.trim();
+                    const opts = [...b.querySelectorAll('.option-text')].map(o => o.value.trim());
+                    const ans = b.querySelector('input[type="radio"]:checked');
+                    const img = b.querySelector('.question-img')?.src || null;
+
+                    if (!text) throw new Error(`Câu ${total - i} chưa có nội dung!`);
+                    if (opts.some(o => !o)) throw new Error(`Câu ${total - i} có đáp án bị trống!`);
+                    if (!ans) throw new Error(`Câu ${total - i} chưa chọn đáp án đúng!`);
+
+                    return { text, image: img, options: opts, answer: ans.value, point: pointEach };
+                })
+            };
+        }
+
+        function preview() {
+            let data;
+            try { data = collect(); }
+            catch (e) { return alert(e.message); }
+
+            let html = `<h5>${escapeHtml(data.title)}</h5>`;
+            data.questions.forEach((q, i) => {
+                html += `
+                    <div class="border p-2 mb-2 rounded">
+                      <strong>Câu ${i + 1}</strong> <span class="text-muted">(${q.point} điểm)</span><br>
+                      ${q.image ? `<img src="${q.image}" style="max-width:150px;margin:8px 0;border:1px solid #ddd;border-radius:6px"><br>` : ''}
+                      ${escapeHtml(q.text)}<br>
+                      ${q.options.map((o, j) => `
+                        <label><input disabled type="radio"> ${String.fromCharCode(65 + j)}. ${escapeHtml(o)}</label><br>
+                      `).join('')}
+                    </div>`;
+            });
+
+            const modal = new bootstrap.Modal(document.getElementById('previewModal'));
+            document.getElementById('previewBody').innerHTML = html;
+            modal.show();
+        }
+
+        function saveLocal() {
+            try {
+                const data = collect();
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                alert("✅ Đã lưu!");
+            } catch (e) {
+                alert(e.message);
+            }
+        }
+
+        function exportJSON() {
+            let data;
+            try { data = collect(); }
+            catch (e) { return alert(e.message); }
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "bai_thi.json";
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function handleImport(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                try {
+                    const data = JSON.parse(reader.result);
+                    questionContainer.innerHTML = "";
+                    qIndex = 0;
+                    lastInserted = null; // khi import, reset nhóm "câu mới"
+                    data.questions.forEach(q => addQuestion(q, false, true));
+                    updateOrder();
+                    alert("✅ Import thành công!");
+                } catch {
+                    alert("❌ File JSON không hợp lệ!");
+                } finally {
+                    fileImport.value = '';
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // simple HTML escape to prevent injecting raw HTML into inputs/preview
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+    })();
+</script>
