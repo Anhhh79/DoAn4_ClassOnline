@@ -223,7 +223,6 @@
 						</button>
 						<ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
 							<li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#profileModal">Thông tin cá nhân</a></li>
-							<li><a class="dropdown-item" href="#">Cài đặt</a></li>
 							<li><hr class="dropdown-divider"></li>
 							<li><a class="dropdown-item text-danger" href="/Account/Logout">Đăng xuất</a></li>
 						</ul>
@@ -255,7 +254,7 @@
 													<input id="avatarInput" type="file" accept="image/*" class="d-none" aria-label="Upload ảnh đại diện">
 												</div>
 												<h5 class="mt-3 mb-1 fw-bold" id="displayName">Nguyễn Văn A</h5>
-												<div class="small text-muted" id="displayRole">Giáo viên</div>
+												<div class="small text-muted" id="displayRole">Sinh Viên</div>
 											</div>
 
 											<!-- Fields (mặc định có thể chỉnh sửa) -->
@@ -263,15 +262,15 @@
 												<div class="row g-2">
 													<div class="col-md-6">
 														<div class="form-floating">
-															<input type="text" class="form-control" id="firstName" name="firstName" placeholder="Họ và tên" required>
-															<label for="firstName">Họ và tên</label>
+															<input type="text" class="form-control" id="firstName_InforSinhVien" name="firstName" placeholder="Họ và tên" value="Nguyễn Bảo Anh" required>
+															<label for="firstName_InforSinhVien">Họ và tên</label>
 															<div class="invalid-feedback">Vui lòng nhập họ và tên.</div>
 														</div>
 													</div>
 
 													<div class="col-md-6">
 														<div class="form-floating">
-															<input type="text" class="form-control" id="dob" name="dob" placeholder="Ngày sinh">
+															<input type="text" class="form-control" id="dob" name="dob" value="07/09/2004" placeholder="Ngày sinh">
 															<label for="dob">Ngày sinh</label>
 															<div class="invalid-feedback">Ngày sinh không hợp lệ.</div>
 														</div>
@@ -279,16 +278,16 @@
 
 													<div class="col-md-6">
 														<div class="form-floating">
-															<input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
-															<label for="email">Email</label>
+															<input type="email" class="form-control" id="email_InforSinhVien" name="email" value="baoanh@gmail.com" placeholder="Email" required>
+															<label for="email_InforSinhVien">Email</label>
 															<div class="invalid-feedback">Email không hợp lệ.</div>
 														</div>
 													</div>
 
 													<div class="col-md-6">
 														<div class="form-floating">
-															<input type="tel" class="form-control" id="phone" name="phone" placeholder="Số điện thoại" pattern="[\d\s\+\-()]{6,}">
-															<label for="phone">Số điện thoại</label>
+															<input type="tel" class="form-control" id="phone_InforSinhVien" name="phone" value="09432322112" placeholder="Số điện thoại" pattern="[\d\s\+\-()]{6,}">
+															<label for="phone_InforSinhVien">Số điện thoại</label>
 															<div class="invalid-feedback">Số điện thoại không hợp lệ.</div>
 														</div>
 													</div>
@@ -297,67 +296,34 @@
 														<label class="form-label small mb-1">Giới tính</label>
 														<div class="d-flex gap-2">
 															<div class="form-check">
-																<input class="form-check-input" type="radio" name="gender" id="genderMale" value="Nam">
-																<label class="form-check-label" for="genderMale">Nam</label>
+																<input class="form-check-input" type="radio" name="gender" id="genderMale_InforSinhVien" value="Nam">
+																<label class="form-check-label" for="genderMale_InforSinhVien">Nam</label>
 															</div>
 															<div class="form-check">
-																<input class="form-check-input" type="radio" name="gender" id="genderFemale" value="Nữ">
-																<label class="form-check-label" for="genderFemale">Nữ</label>
+																<input class="form-check-input" type="radio" name="gender" id="genderFemale_InforSinhVien" value="Nữ">
+																<label class="form-check-label" for="genderFemale_InforSinhVien">Nữ</label>
 															</div>
 															<div class="form-check">
-																<input class="form-check-input" type="radio" name="gender" id="genderOther" value="Khác">
-																<label class="form-check-label" for="genderOther">Khác</label>
+																<input class="form-check-input" type="radio" name="gender" id="genderOther_InforSinhVien" value="Khác">
+																<label class="form-check-label" for="genderOther_InforSinhVien">Khác</label>
 															</div>
 														</div>
 													</div>
 
-													<!-- Chức vụ: KHÔNG CHỈNH ĐƯỢC -->
-													<!-- Khối (chọn) -->
 													<div class="col-md-6">
 														<div class="form-floating">
-															<select class="form-select" id="khoi" aria-label="Khối học">
-																<option value="">Chọn khối</option>
-																<option value="tieu_hoc">Tiểu học</option>
-																<option value="thcs">THCS</option>
-																<option value="thpt">THPT</option>
-																<option value="daihoc">Đại học</option>
-																<option value="khac">Khác</option>
-															</select>
-															<label for="khoi">Khối</label>
+															<input type="text" class="form-control bg-body-tertiary" id="MSSV_InforSinhVien" placeholder="MSSV" value="CNTT2211026" readonly>
+															<label for="MSSV_InforSinhVien">MSSV</label>
 														</div>
 													</div>
 
 
 													<div class="col-md-12">
 														<div class="form-floating">
-															<input type="text" class="form-control" id="school" placeholder="Trường">
-															<label for="school">Trường</label>
+															<input type="text" class="form-control bg-body-tertiary" id="khoaName_InforSinhVien" placeholder="Khoa" value="Công nghệ thông tin" readonly>
+															<label for="khoaName_InforSinhVien">Khoa</label>
 														</div>
 													</div>
-
-													<!-- Môn dạy: checkbox -->
-													<div class="col-md-12">
-														<label class="form-label mb-2">Môn dạy</label>
-														<div id="subjectsWrapper" class="d-flex flex-wrap gap-2">
-															<div class="form-check">
-																<input class="form-check-input subject-checkbox" type="checkbox" id="sub_toan" value="Toán" name="subjects">
-																<label class="form-check-label" for="sub_toan">Toán</label>
-															</div>
-															<div class="form-check">
-																<input class="form-check-input subject-checkbox" type="checkbox" id="sub_vatly" value="Vật lý" name="subjects">
-																<label class="form-check-label" for="sub_vatly">Vật lý</label>
-															</div>
-															<div class="form-check">
-																<input class="form-check-input subject-checkbox" type="checkbox" id="sub_hoa" value="Hóa học" name="subjects">
-																<label class="form-check-label" for="sub_hoa">Hóa học</label>
-															</div>
-															<div class="form-check">
-																<input class="form-check-input subject-checkbox" type="checkbox" id="sub_tienganh" value="Tiếng Anh" name="subjects">
-																<label class="form-check-label" for="sub_tienganh">Tiếng Anh</label>
-															</div>
-														</div>
-													</div>
-
 												</div>
 											</div> <!-- end fields -->
 										</div> <!-- end row -->
