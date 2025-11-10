@@ -46,7 +46,7 @@
     <div id="danhSachKhoaHoc" class="row row-cols-1 row-cols-md-3 g-4">
         @foreach (var kh in khoaHocList)
         {
-            <div class="col-12 col-md-3 khoaHocItem d-none" data-hocky="@kh.HocKy">
+            <div class="col-12 col-md-3 khoaHocItem" data-hocky="@kh.HocKy">
                 <div class="card shadow border-0 rounded-4 overflow-hidden h-100">
 
                     <!-- Ảnh banner -->
@@ -82,26 +82,5 @@
     </div>
 </div>
 
-<!-- Script hiển thị khóa học theo học kỳ -->
-<script>
-    function filterKhoaHoc() {
-        const selected = document.getElementById("selectHocKy").value;
-        const items = document.querySelectorAll(".khoaHocItem");
-
-        items.forEach(card => {
-            if (selected === "all" || card.getAttribute("data-hocky") === selected) {
-                card.classList.remove("d-none");
-            } else {
-                card.classList.add("d-none");
-            }
-        });
-    }
-
-    // Gọi khi đổi học kỳ
-    document.getElementById("selectHocKy").addEventListener("change", filterKhoaHoc);
-
-    // Gọi ngay khi vừa load trang → hiển thị tất cả
-    window.addEventListener("load", filterKhoaHoc);
-</script>
 
 
