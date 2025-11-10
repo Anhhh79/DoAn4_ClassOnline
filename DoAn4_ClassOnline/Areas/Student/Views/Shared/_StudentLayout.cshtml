@@ -396,12 +396,6 @@
 						<i class="bi bi-journal-bookmark"></i> Khóa học
 					</a>
 				</li>
-
-				<li class="nav-item">
-					<a class="nav-link text-body-emphasis fw-semibold d-flex align-items-center gap-2" asp-controller="Instructors" asp-action="Index">
-						<i class="bi bi-person-badge"></i> Giáo viên
-					</a>
-				</li>
 			</ul>
 		</aside>
 
@@ -430,12 +424,7 @@
 						<a class="nav-link text-body-emphasis fw-semibold d-flex align-items-center gap-2" asp-area="Student" asp-controller="KhoaHoc" asp-action="Index">
 							<i class="bi bi-journal-bookmark"></i> Khóa học
 						</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link text-body-emphasis fw-semibold d-flex align-items-center gap-2" asp-controller="Instructors" asp-action="Index">
-							<i class="bi bi-person-badge"></i> Giáo viên
-						</a>
-					</li>
+					</li>					
 				</ul>
 			</div>
 		</aside>
@@ -444,58 +433,6 @@
 		<!-- Nội dung chính -->
 		<section class="flex-grow-1 p-4" id="bodyMainContent">
 			@RenderBody()
-			<!--Footer-->
-			@* <footer class="bg-dark text-light pt-5 pb-4">
-				<div class="container">
-					<div class="row">
-						<!-- Logo + Giới thiệu -->
-						<div class="col-md-4 col-lg-4 col-xl-4 mb-4">
-							<h5 class="fw-bold text-uppercase">Lớp Học Online</h5>
-							<p class="small">
-								Nền tảng học trực tuyến, giúp bạn tiếp cận tri thức mọi lúc mọi nơi.
-								Chúng tôi mang đến các khóa học chất lượng từ cơ bản đến nâng cao.
-							</p>
-						</div>
-
-						<!-- Menu nhanh -->
-						<div class="col-md-2 col-lg-2 col-xl-2 mb-4">
-							<h6 class="text-uppercase fw-bold mb-3">Menu</h6>
-							<ul class="list-unstyled">
-								<li><a asp-controller="Home" asp-action="Index" class="text-light text-decoration-none">Trang chủ</a></li>
-								<li><a asp-controller="Courses" asp-action="Index" class="text-light text-decoration-none">Khóa học</a></li>
-								<li><a asp-controller="About" asp-action="Index" class="text-light text-decoration-none">Giới thiệu</a></li>
-								<li><a asp-controller="Contact" asp-action="Index" class="text-light text-decoration-none">Liên hệ</a></li>
-							</ul>
-						</div>
-
-						<!-- Thông tin liên hệ -->
-						<div class="col-md-3 col-lg-3 col-xl-3 mb-4">
-							<h6 class="text-uppercase fw-bold mb-3">Liên hệ</h6>
-							<p><i class="bi bi-geo-alt-fill me-2"></i> 123 Đường ABC, Quận 1, TP.HCM</p>
-							<p><i class="bi bi-envelope-fill me-2"></i> support@lophoconline.com</p>
-							<p><i class="bi bi-telephone-fill me-2"></i> +84 123 456 789</p>
-						</div>
-
-						<!-- Mạng xã hội -->
-						<div class="col-md-3 col-lg-3 col-xl-3 mb-4">
-							<h6 class="text-uppercase fw-bold mb-3">Kết nối</h6>
-							<a href="#" class="btn btn-outline-light btn-sm rounded-circle me-2"><i class="bi bi-facebook"></i></a>
-							<a href="#" class="btn btn-outline-light btn-sm rounded-circle me-2"><i class="bi bi-youtube"></i></a>
-							<a href="#" class="btn btn-outline-light btn-sm rounded-circle me-2"><i class="bi bi-instagram"></i></a>
-							<a href="#" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-twitter"></i></a>
-						</div>
-					</div>
-
-					<hr class="border-light">
-
-					<!-- Bản quyền -->
-					<div class="row">
-						<div class="col text-center">
-							<p class="mb-0">&copy; 2025 Lớp Học Online. All rights reserved.</p>
-						</div>
-					</div>
-				</div>
-			</footer> *@
 		</section>
 	</main>
 

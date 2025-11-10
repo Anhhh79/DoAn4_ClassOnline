@@ -9,5 +9,10 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
         {
             return View();
         }
+
+        public IActionResult QuanLyKhoaHoc()
+        {
+            return View();
+        }
     }
 }
