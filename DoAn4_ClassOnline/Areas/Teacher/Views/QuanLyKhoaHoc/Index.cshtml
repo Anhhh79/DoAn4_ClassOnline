@@ -1,0 +1,145 @@
+﻿@{
+    ViewData["Title"] = "Quản lý khóa học";
+}
+<div class="container">
+    <!-- Tiêu đề -->
+    <div class="text-center mb-5">
+        <h2 class="fw-bold mb-2">Quản Lý Khóa Học</h2>
+        <!-- Dropdown chọn học kỳ -->
+        <div class="d-flex align-items-center position-relative">
+            <!-- Dropdown nằm giữa -->
+            <div class="mx-auto">
+                <select id="selectHocKy_QuanLy" class="form-select w-auto rounded-pill shadow-sm fw-semibold">
+                    <option value="0">-- Tất cả khóa học --</option>
+                    <option value="1">HK1 / 2024 - 2025</option>
+                    <option value="2">HK2 / 2024 - 2025</option>
+                    <option value="3">HK3 / 2024 - 2025</option>
+                </select>
+            </div>
+
+            <!-- Nút thêm nằm cuối hàng -->
+            <a  class="btn btn-success btn-sm text-light position-absolute end-0 p-2 fw-bold" data-bs-toggle="modal" data-bs-target="#themKhoaHocModal">
+                <i class="bi bi-plus-circle me-1"></i> Khóa học mới
+            </a>
+        </div>
+
+        <!-- Card Khóa học -->
+        <div class="row g-4 mt-2">
+            <div class="col-12 col-md-3">
+                <div class="card shadow border-0 rounded-4 overflow-hidden h-100">
+
+                    <!-- Ảnh banner -->
+                    <a asp-controller="QuanLyKhoaHoc" asp-action="QuanLyKhoaHoc">
+                        <div class="card-header p-0 border-0 bg-white image-cuser">
+                            <img src="~/assets/image/tải xuống.jpg  "
+                                 class="w-100"
+                                 alt="Banner"
+                                 style="height: 130px; object-fit: cover;">
+                        </div>
+                    </a>
+                    <!-- Nội dung khóa học -->
+                    <div class="card-body text-start">
+                        <h6 class="fw-bold mb-2" style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;" title="">Phát triển ứng dụng IOT</h6>
+                        <span class="" style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">Giảng viên: Nguyễn Đình Tứ</span>
+                        <span class="" style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">Khoa Công nghệ thông tin</span>
+                        <span class="">HK1 / 2025 - 2026</span>
+
+                        <div class="d-flex justify-content-between text-secondary small mb-3 mt-2">
+                            <span>24 SV đã tham gia</span>
+                            <span>Tất cả mọi người</span>
+                        </div>
+                        <div class="text-start">
+                            <a class="btn btn-light w-100 border rounded-3" asp-controller="QuanLyKhoaHoc" asp-action="QuanLyKhoaHoc">
+                               Quản lý khóa học
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal Thêm Khóa Học -->
+<div class="modal fade" id="themKhoaHocModal" tabindex="-1" aria-labelledby="themKhoaHocModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <!-- Header -->
+            <div class="modal-header rounded-top-4">
+                <h5 class="modal-title fw-bold" id="themKhoaHocModalLabel">
+                    <i class="bi bi-journal-plus me-2"></i>Thêm khóa học mới
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body px-4 py-3 mb-2">
+                <form id="formThemKhoaHoc">
+                    <div class="row g-3">
+
+                        <!-- Tên khóa học -->
+                        <div class="col-md-6">
+                            <label for="tenKhoaHoc" class="form-label fw-semibold">Tên khóa học</label>
+                            <input type="text" id="tenKhoaHoc" class="form-control" placeholder="Nhập tên khóa học" required>
+                        </div>
+
+                        <!-- Khoa -->
+                        <div class="col-md-6">
+                            <label for="khoa" class="form-label fw-semibold">Khoa</label>
+                            <select id="khoa" class="form-select" required>
+                                <option selected disabled>-- Chọn khoa --</option>
+                                <option value="CNTT">Công nghệ thông tin</option>
+                                <option value="DTVT">Điện tử - Viễn thông</option>
+                                <option value="CK">Cơ khí</option>
+                                <option value="KT">Kinh tế</option>
+                            </select>
+                        </div>
+
+                        <!-- Học kỳ -->
+                        <div class="col-md-6">
+                            <label for="hocKy" class="form-label fw-semibold">Học kỳ</label>
+                            <select id="hocKy" class="form-select" required>
+                                <option selected disabled>-- Chọn học kỳ --</option>
+                                <option value="1">Học kỳ I</option>
+                                <option value="2">Học kỳ II</option>
+                                <option value="3">Học kỳ hè</option>
+                            </select>
+                        </div>
+
+                        <!-- Năm học -->
+                        <div class="col-md-6">
+                            <label for="namHoc" class="form-label fw-semibold">Năm học</label>
+                            <input type="text" id="namHoc" class="form-control" placeholder="VD: 2025 - 2026" required>
+                        </div>
+
+                        <!-- Ảnh khóa học -->
+                        <div class="col-md-6">
+                            <label for="anhKhoaHoc" class="form-label fw-semibold">Hình ảnh khóa học</label>
+                            <input type="file" id="anhKhoaHoc" class="form-control" accept="image/*">
+                        </div>
+
+                        <!-- Mật khẩu (nếu cần) -->
+                        <div class="col-md-6">
+                            <label for="matKhau" class="form-label fw-semibold">Mật khẩu (nếu cần)</label>
+                            <input type="password" id="matKhau" class="form-control" placeholder="Nhập mật khẩu (nếu có)">
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i>Hủy
+                </button>
+                <button type="submit" form="formThemKhoaHoc" class="btn btn-primary text-light">
+                    <i class="bi bi-save me-1"></i>Lưu khóa học
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
