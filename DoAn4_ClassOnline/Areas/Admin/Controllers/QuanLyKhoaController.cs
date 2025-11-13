@@ -3,7 +3,7 @@
 namespace DoAn4_ClassOnline.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class HomeController : Controller
+    public class QuanLyKhoaController : Controller
     {
         public IActionResult Index()
         {
