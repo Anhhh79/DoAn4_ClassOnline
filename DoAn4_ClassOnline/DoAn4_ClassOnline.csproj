@@ -7,10 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\Admin\Controllers\" />
     <Folder Include="Areas\Admin\Models\" />
     <Folder Include="Areas\Student\Models\" />
     <Folder Include="Areas\Teacher\Models\" />
+    <Folder Include="wwwroot\assets\css\admin\" />
   </ItemGroup>
 
   <ItemGroup>
