@@ -5,7 +5,7 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <!-- Nút quay lại -->
-        <a class="btn border-0" href="javascript:history.back()">
+        <a class="btn border-0" asp-controller="Home" asp-action="Index">
             <i class="bi bi-chevron-left"></i> Quay lại
         </a>
 
@@ -24,14 +24,9 @@
         <!-- Card 2 -->
         <div class="col">
             <a id="btnThongBao" style="text-decoration: none;">
-                <div class="card custom-card text-center p-2 h-95 border-0 rounded-4 bg-body-tertiary">
+                <div class="card custom-card text-center p-2 h-95 border-0 rounded-4 bg-body-tertiary text-primary">
                     <div class="icon mb-2 position-relative" style="display: inline-block;">
                         <i class="bi bi-bell fs-1"></i>
-
-                        <!-- Badge số lượng thông báo -->
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                            5
-                        </span>
                     </div>
                     <h6 class="fw-bold mb-2">Thông báo</h6>
                 </div>

@@ -1,4 +1,5 @@
-﻿document.addEventListener("DOMContentLoaded", () => {
+﻿//Load nội dung cho tab Thông báo, Tài liệu, Bài tập
+document.addEventListener("DOMContentLoaded", () => {
 
     function loadNoiDung_Tc(url) {
         fetch(url)
@@ -10,12 +11,32 @@
             .catch(err => console.error("Lỗi tải nội dung:", err));
     }
 
+    // Danh sách button
+    const tabButtons = ["btnThongBao", "btnTaiLieu", "btnBaiTap", "btnTracNghiem"];
+
+    // Hàm set active
+    function setActiveButton(clickedBtn) {
+        const tabButtons = ["btnThongBao", "btnTaiLieu", "btnBaiTap", "btnTracNghiem"];
+        tabButtons.forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) {
+                const card = btn.querySelector('.card');
+                if (card) card.classList.remove("text-primary");
+            }
+        });
+        if (clickedBtn) {
+            const card = clickedBtn.querySelector('.card');
+            if (card) card.classList.add("text-primary");
+        }
+    }
+
     // Khi bấm Thông báo
     const btnThongBao = document.getElementById("btnThongBao");
     if (btnThongBao) {
         btnThongBao.addEventListener("click", function (e) {
             e.preventDefault();
             loadNoiDung_Tc('/Teacher/Course/ThongBao');
+            setActiveButton(this);
         });
     }
 
@@ -25,27 +46,32 @@
         btnTaiLieu.addEventListener("click", function (e) {
             e.preventDefault();
             loadNoiDung_Tc('/Teacher/Course/TaiLieu');
+            setActiveButton(this);
         });
     }
 
-    // Khi bấm bài tập
+    // Khi bấm Bài tập
     const btnBaiTap = document.getElementById("btnBaiTap");
     if (btnBaiTap) {
         btnBaiTap.addEventListener("click", function (e) {
             e.preventDefault();
             loadNoiDung_Tc('/Teacher/Course/BaiTap');
+            setActiveButton(this);
         });
     }
-    // Khi bấm trắc nghiệm
+
+    // Khi bấm Trắc nghiệm
     const btnTracNghiem = document.getElementById("btnTracNghiem");
     if (btnTracNghiem) {
         btnTracNghiem.addEventListener("click", function (e) {
             e.preventDefault();
             loadNoiDung_Tc('/Teacher/TracNghiem/Index');
+            setActiveButton(this);
         });
     }
 
 });
+
 
 // tạo phòng học — không cần bind nếu gọi từ onclick trên button trong modal
 window.startMeeting = async function () {
