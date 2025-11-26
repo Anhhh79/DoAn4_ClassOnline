@@ -1,6 +1,17 @@
 ﻿@{
     ViewData["Title"] = "Trang chủ";
 }
+@model IEnumerable<DoAn4_ClassOnline.Models.KhoaHoc>
+
+@foreach (var khoaHoc in Model)
+{
+    <div>
+        <h3>@khoaHoc.TenKhoaHoc</h3>
+        <p>Giáo viên: @khoaHoc.GiaoVien.Email</p>
+        <p>Khoa: @khoaHoc.Khoa.TenKhoa</p>
+        <p>Học kỳ: @khoaHoc.HocKy.TenHocKy</p>
+    </div>
+}
 <div class="container">
     <!-- Tiêu đề -->
     <div class="text-center mb-5">
