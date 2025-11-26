@@ -1,10 +1,10 @@
-﻿
+﻿<div class="main" id="content">
     <nav class="navbar navbar-expand px-4 py-3">
         <div class="container-fluid">
             <div class="navbar-collapse collapse">
                 <ul class="navbar-nav justify-content-between w-100 flex-wrap">
                     <li>
-                        <h2 class="fw-bold">Thông tin tài khoản</h2>
+                        <h2 class="fw-bold">Thông tin sân</h2>
                     </li>
                    
                 </ul>
@@ -12,23 +12,52 @@
         </div>
     </nav>
 
-    <main class="px-3 py-3 m-0">
+    <main class="content px-3 py-3">
         <div class="container-fluid">
             <div>
-                <div class="row justify-content-between mx-1 mb-4">
-                    <div class="col-12 col-md-4">
-                        <div class="input-group align-items-center border border-dark rounded w-100">
-                            <i class="fa-solid fa-magnifying-glass fa-1x ms-2"></i>
-                            <input type="text" id="timKiemSan" class="form-control input-border border-0" placeholder="Thông tin tài khoản" onkeyup="TimKiemSan()">
+                <div class="row align-items-center justify-content-between mx-1 mb-4">
+                    <!-- Ô tìm kiếm và chọn khoa nằm cùng hàng -->
+                    <div class="col-12 col-md-8">
+                        <div class="row g-2 align-items-center">
+                            <!-- Ô tìm kiếm -->
+                            <div class="col-12 col-md-5">
+                                <div class="input-group align-items-center border border-dark rounded w-100">
+                                    <i class="fa-solid fa-magnifying-glass fa-1x ms-2"></i>
+                                    <input type="text" id="timKiemSan" class="form-control input-border border-0"
+                                           placeholder="Thông tin tài khoản" onkeyup="TimKiemSan()">
+                                </div>
+                            </div>
+
+                            <!-- Select chọn khoa -->
+                            <div class="col-12 col-md-5">
+                                <select class="form-select" id="LoaiSan" required style="border: solid 1px;">
+                                    <option value="">Chọn khoa</option>
+                                    <option value="cntt">Khoa Công Nghệ Thông Tin</option>
+                                    <option value="ddt">Khoa Điện - Điện tử</option>
+                                    <option value="khxh">Khoa Khoa Học Xã Hội</option>
+                                    <option value="ktql">Khoa Kinh Tế và Quản Lý Công Nghiệp</option>
+                                    <option value="ktxd">Khoa Kỹ Thuật Xây Dựng</option>
+                                </select>
+                            </div>
+
+                            <!-- Nút Tìm -->
+                            <div class="col-12 col-md-2">
+                                <button class="btn btn-primary w-100" onclick="TimKiemSan()">
+                                    <i class="fa-solid fa-magnifying-glass me-1"></i> Tìm kiếm
+                                </button>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Nút thêm tài khoản -->
                     <div class="col-12 col-md-auto mt-2 mt-md-0">
-                        <button type="button" class="btn btn-success w-100 w-md-auto" data-bs-toggle="modal"
-                                data-bs-target="#them" data-bs-dismiss="modal">
+                        <button type="button" class="btn btn-success w-100 w-md-auto"
+                                data-bs-toggle="modal" data-bs-target="#them" data-bs-dismiss="modal">
                             Thêm tài khoản
                         </button>
                     </div>
                 </div>
+
 
                 <div class="row mt-2">
                     <div class="col-12">
@@ -37,14 +66,60 @@
                                 <thead style="background: #0e2238;">
                                     <tr>
                                         <th scope="col" class="col-1">#</th>
-                                        <th scope="col" class="col-3"><span>Tên</span></th>
+                                        <th scope="col" class="col-2"><span>Họ và tên</span></th>
                                         <th scope="col" class="col-2">Khoa</th>
-                                        <th scope="col" class="col-2">Chức vụ</th>
-                                        <th scope="col" class="col-2">Email</th>
-                                        <th scope="col" class="col-2">Mật khẩu</th>
+                                        <th scope="col" class="col-1">Chức vụ</th>
+                                        <th scope="col" class="col-3">Email</th>
+                                        <th scope="col" class="col-2"></th>
                                     </tr>
                                 </thead>
                                 <tbody id="sanBongTable">
+                                    <tr>
+                                        <th scope="row">1</th>
+                                        <td>Nguyễn Văn An</td>
+                                        <td>Công nghệ thông tin</td>
+                                        <td>Giảng viên</td>
+                                        <td>an.nguyen@univ.edu.vn</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#detailModal">
+                                                <i class="bi bi-eye"></i> Chi tiết
+                                            </button>
+                                            <button class="btn btn-sm btn-danger btn-lock">Khóa tài khoản</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">2</th>
+                                        <td>Trần Thị Bích</td>
+                                        <td>Kinh tế</td>
+                                        <td>Sinh Viên</td>
+                                        <td>bich.tran@univ.edu.vn</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary me-2">Chi tiết</button>
+                                            <button class="btn btn-sm btn-success btn-unlock" style="padding-left:15px; padding-right:14px">Mở tài khoản</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">3</th>
+                                        <td>Lê Minh Quân</td>
+                                        <td>Điện - Điện tử</td>
+                                        <td>Sinh Viên</td>
+                                        <td>quan.le@univ.edu.vn</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary me-2">Chi tiết</button>
+                                            <button class="btn btn-sm btn-danger">Khóa tài khoản</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">4</th>
+                                        <td>Phạm Hồng Nhung</td>
+                                        <td>Ngôn ngữ Anh</td>
+                                        <td>Sinh Viên</td>
+                                        <td>nhung.pham@univ.edu.vn</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary me-2">Chi tiết</button>
+                                            <button class="btn btn-sm btn-danger">Khóa tài khoản</button>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -65,7 +140,7 @@
             <div class="modal-content" style="border-radius: 20px;">
                 <div class="modal-header d-flex justify-content-center text-center">
                     <div>
-                        <h5 style="font-weight: bolder;">Thêm sân</h5>
+                        <h5 style="font-weight: bolder;">Thêm tài khoản</h5>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -73,22 +148,26 @@
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col-12">
-                                <label for="tenSan" class="ms-1 mb-1 label-modal">Tên sân</label>
-                                <input type="text" id="tenSan" class="form-control" placeholder="Nhập tên sân">
+                                <label for="tenSan" class="ms-1 mb-1 label-modal">Họ và Tên</label>
+                                <input type="text" id="tenSan" class="form-control" placeholder="Nhập họ và tên">
                                 <span id="errortenSan" class="text-danger"></span>
                             </div>
-                            <div class="col-12">
-                                <label for="gia" class="ms-1 mb-1 label-modal">Giá</label>
-                                <input type="number" id="gia" class="form-control" placeholder="Nhập giá sân">
+                            <div class="col-12 mt-3">
+                                <label for="gia" class="ms-1 mb-1 label-modal">Email</label>
+                                <input type="email" id="gia" class="form-control" placeholder="Nhập email">
                                 <span id="errorGia" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="row mt-3">
                             <div class="col-12">
-                                <label class="mb-1 ms-1 label-modal">Loại sân</label>
+                                <label class="mb-1 ms-1 label-modal">Khoa</label>
                                 <select class="form-select" id="LoaiSan" required>
-                                    <option value="">Chọn loại sân</option>
-                                    <option value="5">Sân 5</option>
+                                    <option value="">Chọn khoa</option>
+                                    <option value="5">Khoa Công Nghệ Thông Tin</option>
+                                    <option value="5">Khoa Điện - Điện tử</option>
+                                    <option value="5">Khoa Khoa Học Xã Hội</option>
+                                    <option value="5">Khoa Kinh Tế và Quản Lý Công Nghiệp</option>
+                                    <option value="5">Khoa Kỹ Thuật Xây Dựng</option>
                                 </select>
                                 <span class="error text-danger" id="ErrorLoaiSan"></span>
                             </div>
@@ -100,7 +179,7 @@
                             <div class="col-12 d-flex justify-content-end" style="width: 160px;">
                                 <button type="button" id="btnThem" class="btn btn-success w-100 w-md-auto"
                                         style="font-size: small;" onclick="KiemTraLoi()">
-                                    Thêm sân
+                                    Thêm tài khoản
                                 </button>
                             </div>
                         </div>
@@ -110,79 +189,49 @@
         </div>
     </div>
 
-
-    <!-- Modal sửa -->
-    <div class="modal fade" id="sua" tabindex="-1" aria-labelledby="sua" aria-hidden="true">
-        <div class="modal-dialog modal-fullscreen-xl-down">
-            <div class="modal-content" style="border-radius: 20px;">
-                <div class="modal-header d-flex justify-content-center text-center">
-                    <div>
-                        <h5 style="font-weight: bolder;">Sửa thông tin sân</h5>
-                    </div>
+    <!-- Modal Chi Tiết -->
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rounded-4">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="detailModalLabel">Thông tin chi tiết</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+
                 <div class="modal-body">
-                    <input type="hidden" id="EditmaSan"> <!-- Ẩn mã sân -->
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-12">
-                                <label for="EdittenSan" class="ms-1 mb-1 label-modal">Tên sân</label>
-                                <input type="text" id="EdittenSan" class="form-control" placeholder="">
-                                <span id="EditerrorTenSan" class="text-danger"></span>
-                            </div>
-                            <div class="col-12">
-                                <label for="Editgia" class="ms-1 mb-1 label-modal">Giá</label>
-                                <input type="number" id="Editgia" class="form-control" placeholder="">
-                                <span id="EditerrorGia" class="text-danger"></span>
-                            </div>
+                    <div class="row g-4 align-items-center">
+                        <!-- Cột ảnh -->
+                        <div class="col-md-3 text-center">
+                            <img src="https://i.pravatar.cc/200?img=11" alt="Ảnh giảng viên"
+                                 class="img-fluid rounded-4 shadow-sm" style="max-height: 180px; object-fit: cover;">
                         </div>
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <label class="mb-1 ms-1 label-modal">Loại sân</label>
-                                <select class="form-select" id="EditloaiSan" required>
-                                    <option value="">Chọn loại sân</option>
-                                    <option value="5">Sân 5</option>
-                                    <option value="7">Sân 7</option>
-                                </select>
-                                <span class="error text-danger" id="EditErrorLoaiSan"></span>
+
+                        <!-- Cột thông tin -->
+                        <div class="col-md-9">
+                            <div class="row mb-2">
+                                <div class="col-md-6"><strong>Họ và tên:</strong> Nguyễn Văn An</div>
+                                <div class="col-md-6"><strong>Ngày sinh:</strong> 12/04/1998</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-6"><strong>Email:</strong> an.nguyen@univ.edu.vn</div>
+                                <div class="col-md-6"><strong>Số điện thoại:</strong> 0905 123 456</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-6"><strong>Giới tính:</strong> Nam</div>
+                                <div class="col-md-6"><strong>MSSV:</strong> SV001</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-6"><strong>Khoa:</strong> Công nghệ thông tin</div>
+                                <div class="col-md-6"><strong>Chức vụ:</strong> Giảng viên</div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Footer -->
-                <div class="container my-2">
-                    <div class="row justify-content-end">
-                        <div class="col-12 d-flex justify-content-end" style="width: 160px;">
-                            <button type="button" id="btnSua" class="btn btn-success w-100 w-md-auto"
-                                    style="font-size: small;" onclick="KiemTraLoiSua()">
-                                Đồng ý
-                            </button>
-                        </div>
-                    </div>
+
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                 </div>
             </div>
         </div>
     </div>
-    <script>
-        // Xóa thông báo lỗi khi người dùng nhập lại
-        document.getElementById("tenSan").addEventListener("input", function () {
-            document.getElementById("errortenSan").textContent = "";
-        });
-        document.getElementById("gia").addEventListener("input", function () {
-            document.getElementById("errorGia").textContent = "";
-        });
-        document.getElementById("LoaiSan").addEventListener("change", function () {
-            document.getElementById("ErrorLoaiSan").textContent = "";
-        });
-
-        // Xóa thông báo lỗi khi người dùng nhập lại
-        document.getElementById("EdittenSan").addEventListener("input", function () {
-            document.getElementById("EditerrorTenSan").textContent = "";
-        });
-        document.getElementById("Editgia").addEventListener("input", function () {
-            document.getElementById("EditerrorGia").textContent = "";
-        });
-        document.getElementById("EditloaiSan").addEventListener("change", function () {
-            document.getElementById("EditErrorLoaiSan").textContent = "";
-        });
-    </script>
+</div>
