@@ -139,5 +139,53 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
             }
         }
 
+        // lấy thông tin chi tiết sinh viên theo id
+        [HttpGet]
+        public async Task<IActionResult> ThongTinSinhVien(int? id)
+        {
+            try
+            {
+                // Lấy UserId từ Session
+                var userId = HttpContext.Session.GetInt32("UserId");
+                //if (userId == null)
+                //{
+                //    TempData["Error"] = "Vui lòng đăng nhập!";
+                //    return RedirectToAction("Index", "DangNhap", new { area = "Admin" });
+                //}
+
+                // Kiểm tra id
+                if (id == null)
+                    return Json(new { success = false, message = "ID không hợp lệ" });
+
+                // ✅ Lấy thông tin chi tiết sinh viên với Select để tránh circular reference
+                var sinhVien = await _context.Users
+                    .Where(s => s.UserId == id)
+                    .Include(s => s.Khoa)
+                    .Select(s => new
+                    {
+                        s.UserId,
+                        s.FullName,
+                        s.Email,
+                        s.Avatar,
+                        s.MaSo,
+                        s.PhoneNumber,
+                        s.GioiTinh,
+                        NgaySinh = s.NgaySinh.HasValue ? s.NgaySinh.Value.ToString("dd/MM/yyyy") : null,
+                        s.DiaChi,
+                        s.KhoaId,
+                        TenKhoa = s.Khoa != null ? s.Khoa.TenKhoa : null
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (sinhVien == null)
+                    return Json(new { success = false, message = "Không tìm thấy sinh viên" });
+
+                return Json(new { success = true, sinhVien });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+            }
+        }
     }
 }

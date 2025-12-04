@@ -73,16 +73,20 @@
 
                     <div class="col-12">
                         <label class="fw-semibold">Link google meet</label>
-                        <input type="text" class="form-control" value="@(Model.LinkHocOnline ?? "")" />
-
+                        <div class="input-group">
+                            <input type="text" id="googleMeetLink" class="form-control" value="@(Model.LinkHocOnline ?? "")" />
+                            <button class="btn btn-outline-primary" type="button" id="copyLinkBtn" title="Copy link">
+                                <i class="bi bi-clipboard" id="copyLinkIcon"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="col-12">
                         <label class="fw-semibold">Mật khẩu truy cập (không bắt buộc)</label>
                         <div class="input-group">
-                            <input type="password" class="form-control" value="@(Model.MatKhau ?? "")">
-                            <button class="btn btn-secondary" type="button" title="Hiện/ẩn mật khẩu">
-                                <i class="bi bi-eye"></i>
+                            <input type="password" id="passwordInput" class="form-control" value="@(Model.MatKhau ?? "")">
+                            <button class="btn btn-outline-secondary" type="button" id="togglePassword" title="Hiện/Ẩn mật khẩu">
+                                <i class="bi bi-eye" id="togglePasswordIcon"></i>
                             </button>
                         </div>
                     </div>
@@ -186,7 +190,7 @@
                                     <td class="text-center">
                                         <button class="btn btn-outline-secondary btn-sm" title="Xem hồ sơ"
                                                 data-bs-toggle="modal"
-                                                data-bs-target="#studentInfoModal_QuanLy">
+                                                data-bs-target="#studentInfoModal_QuanLy" onclick="xemHoSoSinhVien(@item.SinhVienId)">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                         <button class="btn btn-outline-danger btn-sm" title="Xóa khỏi khóa học">
@@ -221,33 +225,30 @@
                 <div class="row g-3">
 
                     <div class="col-md-4 text-center">
-                        <img src="~/assets/image/tải xuống.jpg"
+                        <img id="modal_avatar" src="~/assets/image/tải xuống.jpg"
                              class="rounded-circle border shadow-sm mb-3"
                              style="width:140px;height:140px;object-fit:cover;">
 
-                        <h5 class="fw-bold" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">Nguyễn Văn A</h5>
-                        <small class="text-muted d-block">CNTT2211026</small>
+                        <h5 id="modal_fullname" class="fw-bold" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">Nguyễn Văn A</h5>
+                        <small id="modal_maso" class="text-muted d-block">CNTT2211026</small>
                     </div>
 
                     <div class="col-md-8">
                         <dl class="row mb-0">
                             <dt class="col-sm-4">Giới tính</dt>
-                            <dd class="col-sm-8">Nam</dd>
+                            <dd id="modal_gioitinh" class="col-sm-8">Nam</dd>
 
                             <dt class="col-sm-4">Ngày sinh</dt>
-                            <dd class="col-sm-8">01/01/2003</dd>
+                            <dd id="modal_ngaysinh" class="col-sm-8">01/01/2003</dd>
 
                             <dt class="col-sm-4">Email</dt>
-                            <dd class="col-sm-8">vana@example.com</dd>
+                            <dd id="modal_email" class="col-sm-8">vana@example.com</dd>
 
                             <dt class="col-sm-4">Số điện thoại</dt>
-                            <dd class="col-sm-8">0123 456 789</dd>
+                            <dd id="modal_phone" class="col-sm-8">0123 456 789</dd>
 
                             <dt class="col-sm-4">Khoa</dt>
-                            <dd class="col-sm-8">Công nghệ thông tin</dd>
-
-                            <dt class="col-sm-4">Khóa</dt>
-                            <dd class="col-sm-8">K17</dd>
+                            <dd id="modal_khoa" class="col-sm-8">Công nghệ thông tin</dd>
                         </dl>
                     </div>
 
@@ -257,3 +258,39 @@
         </div>
     </div>
 </div>
+
+<script>
+    // hiển thị thông tin sinh viên lên modal
+        // ✅ FUNCTION XEM HỒ SƠ SINH VIÊN (ĐÃ SỬA LỖI TYPO)
+    async function xemHoSoSinhVien(id) {
+        try {
+            const res = await fetch(`/Teacher/QuanLyKhoaHoc/ThongTinSinhVien?id=${id}`);
+
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+            const result = await res.json();
+
+            if (result.success) {
+                const d = result.sinhVien;
+                console.log('Dữ liệu sinh viên:', d); // ✅ ĐÃ SỬA: console thay vì consoole
+                document.getElementById('modal_avatar').src = d.avatar || '/assets/image/tải xuống.jpg';
+                document.getElementById('modal_fullname').textContent = d.fullName || 'Chưa cập nhật';
+                document.getElementById('modal_maso').textContent = d.maSo || 'Chưa có mã số';
+                document.getElementById('modal_gioitinh').textContent = d.gioiTinh || 'Chưa cập nhật';
+                document.getElementById('modal_ngaysinh').textContent = d.ngaySinh || 'Chưa cập nhật';
+                document.getElementById('modal_email').textContent = d.email || 'Chưa cập nhật';
+                document.getElementById('modal_phone').textContent = d.phoneNumber || 'Chưa cập nhật';
+                document.getElementById('modal_khoa').textContent = d.tenKhoa || 'Chưa cập nhật';
+            } else {
+                alert(result.message || 'Không thể tải thông tin sinh viên.');
+            }
+        } catch (error) {
+            console.error('Lỗi:', error); // ✅ ĐÃ SỬA: console thay vì consoole
+            alert('Không thể tải thông tin sinh viên!');
+        }
+    }
+</script>
+
+<script src="~/assets/js/teacher/chitietkhoahoc_quanly.js"></script>
+
+
