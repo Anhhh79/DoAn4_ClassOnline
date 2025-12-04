@@ -44,7 +44,7 @@ app.UseSession(); // Chỉ dùng Session
 // Routing cho Areas
 app.MapControllerRoute(
     name: "areas",
-    pattern: "{area=Teacher}/{controller=QuanLyKhoaHoc}/{action=Index}/{id?}");
+    pattern: "{area=Admin}/{controller=DangNhap}/{action=Index}/{id?}");
 
 // Routing mặc định
 app.MapControllerRoute(
