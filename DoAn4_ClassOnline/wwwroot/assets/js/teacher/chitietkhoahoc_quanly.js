@@ -101,33 +101,5 @@
                 tableBody.appendChild(noResultRow);
             }
         });
-
-    // hiển thị thông tin sinh viên lên modal
-    async function xemHoSoSinhVien(id) {
-        try {
-            const res = await fetch(`/Teacher/QuanLyKhoaHoc/ThongTinSinhVien?id=${id}`);
-
-            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-
-            const result = await res.json();
-
-            if (result.success) {
-                const d = result.sinhVien; // sửa từ result.data -> result.sinhVien
-                document.getElementById('modal_avatar').src = d.avatar || '/assets/image/tải xuống.jpg';
-                document.getElementById('modal_fullname').textContent = d.fullName || 'Chưa cập nhật';
-                document.getElementById('modal_maso').textContent = d.maSo || 'Chưa có mã số';
-                document.getElementById('modal_gioitinh').textContent = d.gioiTinh || 'Chưa cập nhật';
-                document.getElementById('modal_ngaysinh').textContent = d.ngaySinh || 'Chưa cập nhật';
-                document.getElementById('modal_email').textContent = d.email || 'Chưa cập nhật';
-                document.getElementById('modal_phone').textContent = d.phoneNumber || 'Chưa cập nhật';
-                document.getElementById('modal_khoa').textContent = d.tenKhoa || 'Chưa cập nhật';
-            } else {
-                alert(result.message || 'Không thể tải thông tin sinh viên.');
-            }
-        } catch (error) {
-            console.error('Lỗi:', error);
-            alert('Không thể tải thông tin sinh viên!');
-        }
-    }
 });
 
