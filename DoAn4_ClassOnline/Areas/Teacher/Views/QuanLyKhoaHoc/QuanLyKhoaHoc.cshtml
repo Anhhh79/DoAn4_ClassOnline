@@ -1,4 +1,6 @@
-﻿<div class="container">
+﻿@model DoAn4_ClassOnline.Models.KhoaHoc
+
+<div class="container">
 
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -7,7 +9,7 @@
         </a>
 
         <div class="text-center flex-grow-1">
-            <h3 class="fw-bold mb-0">Phát triển ứng dụng IoT</h3>
+            <h3 class="fw-bold mb-0">@Model.TenKhoaHoc</h3>
         </div>
 
         <div style="width:108px;"></div>
@@ -26,35 +28,45 @@
 
                     <div class="col-12">
                         <label class="fw-semibold">Tên khóa học</label>
-                        <input type="text" class="form-control" placeholder="Phát triển ứng dụng IOT">
+                        <input type="text" class="form-control" value="@Model.TenKhoaHoc">
                     </div>
 
                     <div class="col-12">
                         <label class="fw-semibold">Khoa</label>
                         <select class="form-select">
-                            <option>Khoa Công Nghệ Thông Tin</option>
-                            <option>Khoa Kinh Tế</option>
-                            <option>Khoa Điện Tử</option>
+                            <option selected disabled value="@Model.Khoa.KhoaId">@Model.Khoa.TenKhoa</option>
+                            @foreach (var hk in ViewBag.KhoaList)
+                            {
+                                <option value="@hk.KhoaId">
+                                    @hk.TenKhoa
+                                </option>
+                            }
                         </select>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-12">
                         <label class="fw-semibold">Học kỳ</label>
                         <select class="form-select">
-                            <option>HK1</option>
-                            <option>HK2</option>
+                            <option selected disabled value="@Model.HocKyId">@Model.HocKy.TenHocKy / @Model.HocKy.NamHoc</option>
+                            @foreach (var hk in ViewBag.HocKyList)
+                            {
+                                <option value="@hk.HocKyId">
+                                    @hk.Ten
+                                </option>
+                            }
                         </select>
                     </div>
 
-                    <div class="col-md-6">
-                        <label class="fw-semibold">Năm học</label>
-                        <input type="text" class="form-control" placeholder="2025 - 2026">
+                    <div class="col-12">
+                        <label class="fw-semibold">Link google meet</label>
+                        <input type="text" class="form-control" value="@(Model.LinkHocOnline ?? "")" />
+
                     </div>
 
                     <div class="col-12">
                         <label class="fw-semibold">Mật khẩu truy cập (không bắt buộc)</label>
                         <div class="input-group">
-                            <input type="password" class="form-control" placeholder="Nhập mật khẩu">
+                            <input type="password" class="form-control" value="@(Model.MatKhau ?? "")">
                             <button class="btn btn-secondary" type="button" title="Hiện/ẩn mật khẩu">
                                 <i class="bi bi-eye"></i>
                             </button>
@@ -68,7 +80,7 @@
 
                     <div class="col-12">
                         <div class="border rounded-4 p-2 text-center" style="max-height:200px; overflow:hidden;">
-                            <img src="~/assets/image/tải xuống.jpg"
+                            <img src="@Model.HinhAnh"
                                  class="rounded-3"
                                  style="max-width:100%; height:150px; object-fit:cover;">
                         </div>

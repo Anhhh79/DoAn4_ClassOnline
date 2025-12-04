@@ -52,7 +52,7 @@ app.UseAuthorization();
 // Routing cho Areas
 app.MapControllerRoute(
     name: "areas",
-    pattern: "{area=Admin}/{controller=DangNhap}/{action=Index}/{id?}");
+    pattern: "{area=Teacher}/{controller=QuanLyKhoaHoc}/{action=Index}/{id?}");
 
 // Routing mặc định
 app.MapControllerRoute(
