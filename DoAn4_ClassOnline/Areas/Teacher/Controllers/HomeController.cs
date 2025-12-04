@@ -59,6 +59,7 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
                         tenGiaoVien = k.GiaoVien.FullName,
                         tenKhoa = k.Khoa.TenKhoa,
                         tenHocKy = k.HocKy.TenHocKy,
+                        namHoc = k.HocKy.NamHoc,
                         soLuongSinhVien = k.ThamGiaKhoaHocs.Count,
                         isPublic = k.IsPublic,
                         createdAt = k.CreatedAt
@@ -84,7 +85,8 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
                     .Select(h => new
                     {
                         hocKyId = h.HocKyId,
-                        tenHocKy = h.TenHocKy
+                        tenHocKy = h.TenHocKy,
+                        namHoc = h.NamHoc
                     })
                     .ToListAsync();
 
