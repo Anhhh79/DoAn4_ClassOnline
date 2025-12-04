@@ -14,6 +14,7 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
             _context = context;
         }
 
+        //lấy danh sách khóa học của giảng viên
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -66,8 +67,8 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
 
         }
 
-
-
+        //lấy thông tin khóa học theo id
+        [HttpGet]
         public async Task<IActionResult> QuanLyKhoaHoc(int? id)
         {
             try
@@ -89,10 +90,26 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
                     .Include(k => k.Khoa)
                     .Include(k => k.HocKy)
                     .Include(k => k.GiaoVien)
+                    .Include(k => k.ThamGiaKhoaHocs)
+                       .ThenInclude(t => t.SinhVien)
                     .FirstOrDefaultAsync();
 
                 if (khoaHoc == null)
                     return NotFound();
+
+                // 🆕 Lấy thời gian truy cập cuối cùng của từng sinh viên trong khóa học này
+                var lichSuTruyCaps = await _context.LichSuTruyCaps
+                    .Where(l => l.KhoaHocId == id)
+                    .GroupBy(l => l.UserId)
+                    .Select(g => new
+                    {
+                        UserId = g.Key,
+                        ThoiGianCuoi = g.Max(l => l.ThoiGianTruyCap)
+                    })
+                    .ToDictionaryAsync(x => x.UserId, x => x.ThoiGianCuoi);
+
+                ViewBag.LichSuTruyCap = lichSuTruyCaps;
+
 
                 // Lấy danh sách học kỳ cho dropdown
                 ViewBag.HocKyList = await _context.HocKies
@@ -121,5 +138,6 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
                 return View("Error");
             }
         }
+
     }
 }

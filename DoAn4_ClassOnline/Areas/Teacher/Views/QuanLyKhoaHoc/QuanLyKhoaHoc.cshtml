@@ -1,5 +1,19 @@
 ﻿@model DoAn4_ClassOnline.Models.KhoaHoc
 
+@functions {
+    string TimeAgo(DateTime date)
+    {
+        var ts = DateTime.Now - date;
+
+        if (ts.TotalMinutes < 1) return "Vừa xong";
+        if (ts.TotalHours < 1) return $"{(int)ts.TotalMinutes} phút trước";
+        if (ts.TotalDays < 1) return $"{(int)ts.TotalHours} giờ trước";
+        if (ts.TotalDays < 7) return $"{(int)ts.TotalDays} ngày trước";
+
+        return $"{(int)ts.TotalDays} ngày trước";
+    }
+}
+
 <div class="container">
 
     <!-- Header -->
@@ -136,30 +150,53 @@
                         </thead>
 
                         <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <img src="~/assets/image/tải xuống.jpg"
-                                             class="rounded-circle me-3"
-                                             style="width:45px; height:45px; object-fit:cover;">
-                                        <div class="fw-semibold" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">Nguyễn Văn A</div>
-                                    </div>
-                                </td>                              
-                                <td class="fw-semibold">B2012001</td>
-                                <td class="fw-semibold"> Nam</td>
-                                <td>2 ngày trước</td>
-                                <td class="text-center">
-                                    <button class="btn btn-outline-secondary btn-sm" title="Xem hồ sơ"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#studentInfoModal_QuanLy">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-                                    <button class="btn btn-outline-danger btn-sm" title="Xóa khỏi khóa học">
-                                        <i class="bi bi-person-x"></i>
-                                    </button>
-                                </td>
-                            </tr>
+                            @{
+                                var lichSuDict = ViewBag.LichSuTruyCap as Dictionary<int, DateTime?>;
+                                int stt = 1;
+                            }
+                            @foreach (var item in Model.ThamGiaKhoaHocs)
+                            {
+                                var thoiGianTruyCap = lichSuDict != null && lichSuDict.ContainsKey(item.SinhVienId)
+                                ? lichSuDict[item.SinhVienId]
+                                : null;
+                                <tr>
+                                    <td>@stt</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="@item.SinhVien.Avatar"
+                                                 class="rounded-circle me-3"
+                                                 style="width:45px; height:45px; object-fit:cover;">
+                                            <div class="fw-semibold" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">@item.SinhVien.FullName</div>
+                                        </div>
+                                    </td>
+                                    <td class="fw-semibold">@item.SinhVien.MaSo</td>
+                                    <td class="fw-semibold">@item.SinhVien.GioiTinh</td>
+                                    <td>
+                                        @if (thoiGianTruyCap.HasValue)
+                                        {
+                                            <small class="text-muted">
+                                                @TimeAgo(thoiGianTruyCap.Value)
+                                            </small>
+                                        }
+                                        else
+                                        {
+                                            <small class="text-muted fst-italic">Chưa truy cập</small>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn btn-outline-secondary btn-sm" title="Xem hồ sơ"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#studentInfoModal_QuanLy">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm" title="Xóa khỏi khóa học">
+                                            <i class="bi bi-person-x"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                stt++; 
+                            }
+                            
                         </tbody>
 
                     </table>
