@@ -224,7 +224,14 @@
 						<ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
 							<li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#profileModal">Thông tin cá nhân</a></li>
 							<li><hr class="dropdown-divider"></li>
-							<li><a class="dropdown-item text-danger" href="/Account/Logout">Đăng xuất</a></li>
+							<li>
+                                <form asp-area="Admin" asp-controller="DangNhap" asp-action="Logout" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                                    </button>
+                                </form>
+                            </li>
 						</ul>
 					</div>
 					<!-- Modal Hồ sơ cá nhân (mặc định data-bs-backdrop="false" theo snippet của bạn) -->
@@ -412,6 +419,7 @@
 	<script src="~/assets/js/teacher/course_details.js"></script>
 	<script src="~/assets/js/teacher/TaoBaiTracNghiem.js"></script>
 	<script src="~/assets/js/teacher/ChinhSuaTracNghiem.js"></script>
+	<script src="~/assets/js/teacher/JS_LoadThongTin.js"></script>
 
 	<!-- Thông báo đẹp -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
