@@ -1,9 +1,6 @@
 ﻿using DoAn4_ClassOnline.Models;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -22,7 +19,9 @@ namespace DoAn4_ClassOnline.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult Index(string? returnUrl = null)
         {
-            if (User.Identity?.IsAuthenticated == true)
+            // ⭐ CHỈ KIỂM TRA SESSION THAY VÌ AUTHENTICATION ⭐
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId.HasValue)
             {
                 return RedirectToHomePage();
             }
@@ -33,7 +32,7 @@ namespace DoAn4_ClassOnline.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(string email, string password, bool rememberMe, string? returnUrl = null)
+        public async Task<IActionResult> Login(string email, string password, string? returnUrl = null)
         {
             try
             {
@@ -62,11 +61,9 @@ namespace DoAn4_ClassOnline.Areas.Admin.Controllers
                 var userRole = user.UserRoles.FirstOrDefault();
                 int? roleId = userRole?.RoleId;
 
-                // LƯU THÔNG TIN VÀO SESSION (MỚI)
+                // ⭐ CHỈ LƯU SESSION - XÓA AUTHENTICATION ⭐
                 SaveUserToSession(user, roleId);
 
-                // Đăng nhập
-                await SignInUser(user, roleId, rememberMe);
                 return RedirectByRole(roleId, returnUrl);
             }
             catch (Exception ex)
@@ -78,27 +75,24 @@ namespace DoAn4_ClassOnline.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Logout()
+        public IActionResult Logout()
         {
-            // XÓA toàn bộ Session
+            // ⭐ CHỈ XÓA SESSION ⭐
             HttpContext.Session.Clear();
-
-            // Đăng xuất Authentication (xóa cookie)
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
             return RedirectToAction("Index", "DangNhap", new { area = "Admin" });
         }
 
         #region Private Methods
 
-        // LƯU THÔNG TIN USER VÀO SESSION (MỚI)
+        // LƯU THÔNG TIN USER VÀO SESSION - CHỈ TỒN TẠI TRONG PHIÊN LÀM VIỆC
         private void SaveUserToSession(User user, int? roleId)
         {
             HttpContext.Session.SetInt32("UserId", user.UserId);
             HttpContext.Session.SetString("Username", user.Username);
             HttpContext.Session.SetString("Email", user.Email);
             HttpContext.Session.SetString("FullName", user.FullName);
-            HttpContext.Session.SetString("Avatar", user.Avatar ?? "~/assets/image/logo.png");
+            HttpContext.Session.SetString("Avatar", user.Avatar ?? "");
             HttpContext.Session.SetString("PhoneNumber", user.PhoneNumber ?? "");
             HttpContext.Session.SetString("MaSo", user.MaSo ?? "");
             HttpContext.Session.SetString("GioiTinh", user.GioiTinh ?? "");
@@ -123,36 +117,6 @@ namespace DoAn4_ClassOnline.Areas.Admin.Controllers
             }
         }
 
-        private async Task SignInUser(User user, int? roleId, bool rememberMe)
-        {
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Name, user.FullName),
-                new Claim("Username", user.Username),
-                new Claim("RoleId", roleId?.ToString() ?? "3"),
-                new Claim(ClaimTypes.Role, GetRoleName(roleId))
-            };
-
-            if (!string.IsNullOrEmpty(user.Avatar))
-            {
-                claims.Add(new Claim("Avatar", user.Avatar));
-            }
-
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var authProperties = new AuthenticationProperties
-            {
-                IsPersistent = rememberMe,
-                ExpiresUtc = rememberMe ? DateTimeOffset.UtcNow.AddDays(30) : DateTimeOffset.UtcNow.AddHours(2)
-            };
-
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(claimsIdentity),
-                authProperties);
-        }
-
         private IActionResult RedirectByRole(int? roleId, string? returnUrl)
         {
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
@@ -171,13 +135,13 @@ namespace DoAn4_ClassOnline.Areas.Admin.Controllers
 
         private IActionResult RedirectToHomePage()
         {
-            var roleId = User.FindFirstValue("RoleId");
+            var roleId = HttpContext.Session.GetInt32("RoleId");
 
             return roleId switch
             {
-                "1" => RedirectToAction("Index", "Home", new { area = "Admin" }),
-                "2" => RedirectToAction("Index", "Home", new { area = "Teacher" }),
-                "3" => RedirectToAction("Index", "Home", new { area = "Student" }),
+                1 => RedirectToAction("Index", "Home", new { area = "Admin" }),
+                2 => RedirectToAction("Index", "Home", new { area = "Teacher" }),
+                3 => RedirectToAction("Index", "Home", new { area = "Student" }),
                 _ => RedirectToAction("Index", "Home", new { area = "Student" })
             };
         }

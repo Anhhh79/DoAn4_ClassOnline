@@ -52,7 +52,7 @@ function populateProfileData(user) {
     if (headerAvatar && user.avatar) {
         headerAvatar.src = user.avatar;
         headerAvatar.onerror = function () {
-            this.src = '/assets/image/logo.png';
+            this.src = '/assets/image/tải xuống.jpg';
         };
     }
 
@@ -72,7 +72,7 @@ function populateProfileData(user) {
     if (avatarPreview && user.avatar) {
         avatarPreview.src = user.avatar;
         avatarPreview.onerror = function () {
-            this.src = '/assets/image/logo.png';
+            this.src = '/assets/image/tải xuống.jpg';
         };
     }
 
@@ -219,8 +219,17 @@ async function updateUserProfile() {
         if (result.success) {
             showNotification('✓ Cập nhật thành công!', 'success');
 
-            // Cập nhật lại UI
+            // Cập nhật lại thông tin profile
             await loadUserProfile();
+
+            // ⭐ TRIGGER EVENT ĐỂ CẬP NHẬT DANH SÁCH KHÓA HỌC ⭐
+            const profileUpdatedEvent = new CustomEvent('profileUpdated', {
+                detail: {
+                    userInfo: result.user,
+                    timestamp: Date.now()
+                }
+            });
+            document.dispatchEvent(profileUpdatedEvent);
 
             // Đóng modal sau 1 giây
             setTimeout(() => {
@@ -278,6 +287,16 @@ async function uploadAvatar(file) {
             console.log('Upload avatar thành công:', result.avatarUrl);
             // Cập nhật avatar URL trong session
             await loadUserProfile();
+
+            // ⭐ TRIGGER EVENT CŨNG CHO UPLOAD AVATAR ⭐
+            const profileUpdatedEvent = new CustomEvent('profileUpdated', {
+                detail: {
+                    userInfo: result.user,
+                    timestamp: Date.now(),
+                    type: 'avatar'
+                }
+            });
+            document.dispatchEvent(profileUpdatedEvent);
         } else {
             console.error('Upload avatar thất bại:', result.message);
             showNotification('Upload avatar thất bại', 'error');

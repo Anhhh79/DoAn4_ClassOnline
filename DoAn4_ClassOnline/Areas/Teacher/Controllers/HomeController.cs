@@ -14,50 +14,91 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index(int? hocKyId)
+        // Action trả về View (không có dữ liệu)
+        public IActionResult Index()
         {
-            // Lấy UserId từ Session
-            var userId = HttpContext.Session.GetInt32("UserId");
-            
-            if (userId == null)
-            {
-                TempData["Error"] = "Vui lòng đăng nhập!";
-                return RedirectToAction("Index", "DangNhap", new { area = "Admin" });
-            }
-
-            // Query lấy khóa học của giảng viên đang đăng nhập
-            var query = _context.KhoaHocs
-                .Where(k => k.GiaoVienId == userId) // SỬA: Dùng GiaoVienId
-                .Include(k => k.GiaoVien)
-                .Include(k => k.Khoa)
-                .Include(k => k.HocKy)
-                .Include(k => k.ThamGiaKhoaHocs)
-                .AsQueryable();
-
-            // Lọc theo học kỳ nếu có
-            if (hocKyId.HasValue && hocKyId.Value > 0)
-            {
-                query = query.Where(k => k.HocKyId == hocKyId.Value);
-            }
-
-            var khoaHocs = await query
-                .OrderByDescending(k => k.CreatedAt)
-                .ToListAsync();
-
-            // Lấy danh sách học kỳ để hiển thị dropdown
-            var hocKyList = await _context.HocKies
-                .OrderByDescending(h => h.HocKyId)
-                .ToListAsync();
-
-            ViewBag.HocKyList = hocKyList;
-            ViewBag.SelectedHocKy = hocKyId ?? 0;
-
-            return View(khoaHocs);
+            return View();
         }
 
+        // API: Lấy danh sách khóa học (JSON)
+        [HttpGet]
+        public async Task<IActionResult> GetKhoaHocs(int? hocKyId)
+        {
+            try
+            {
+                var userId = HttpContext.Session.GetInt32("UserId");
+                
+                if (userId == null)
+                {
+                    return Json(new { success = false, message = "Vui lòng đăng nhập!" });
+                }
+
+                // Query lấy khóa học
+                var query = _context.KhoaHocs
+                    .Where(k => k.GiaoVienId == userId)
+                    .Include(k => k.GiaoVien)
+                    .Include(k => k.Khoa)
+                    .Include(k => k.HocKy)
+                    .Include(k => k.ThamGiaKhoaHocs)
+                    .AsQueryable();
+
+                // Lọc theo học kỳ
+                if (hocKyId.HasValue && hocKyId.Value > 0)
+                {
+                    query = query.Where(k => k.HocKyId == hocKyId.Value);
+                }
+
+                var khoaHocs = await query
+                    .OrderByDescending(k => k.CreatedAt)
+                    .Select(k => new
+                    {
+                        khoaHocId = k.KhoaHocId,
+                        tenKhoaHoc = k.TenKhoaHoc,
+                        moTa = k.MoTa,
+                        hinhAnh = k.HinhAnh,
+                        tenGiaoVien = k.GiaoVien.FullName,
+                        tenKhoa = k.Khoa.TenKhoa,
+                        tenHocKy = k.HocKy.TenHocKy,
+                        soLuongSinhVien = k.ThamGiaKhoaHocs.Count,
+                        isPublic = k.IsPublic,
+                        createdAt = k.CreatedAt
+                    })
+                    .ToListAsync();
+
+                return Json(new { success = true, khoaHocs });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        // API: Lấy danh sách học kỳ
+        [HttpGet]
+        public async Task<IActionResult> GetHocKies()
+        {
+            try
+            {
+                var hocKies = await _context.HocKies
+                    .OrderByDescending(h => h.HocKyId)
+                    .Select(h => new
+                    {
+                        hocKyId = h.HocKyId,
+                        tenHocKy = h.TenHocKy
+                    })
+                    .ToListAsync();
+
+                return Json(new { success = true, hocKies });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        // Action DanhSach giữ nguyên
         public async Task<IActionResult> DanhSach(int khoaHocId)
         {
-            // Kiểm tra quyền truy cập
             var userId = HttpContext.Session.GetInt32("UserId");
             
             if (userId == null)
@@ -66,7 +107,6 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
                 return RedirectToAction("Index", "DangNhap", new { area = "Admin" });
             }
 
-            // Lấy thông tin khóa học và danh sách sinh viên
             var khoaHoc = await _context.KhoaHocs
                 .Include(k => k.GiaoVien)
                 .Include(k => k.Khoa)
@@ -77,7 +117,7 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
 
             if (khoaHoc == null)
             {
-                TempData["Error"] = "Không tìm thấy khóa học hoặc bạn không có quyền truy cập!";
+                TempData["Error"] = "Không tìm thấy khóa học!";
                 return RedirectToAction("Index");
             }
 
