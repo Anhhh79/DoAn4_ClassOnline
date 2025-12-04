@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using DoAn4_ClassOnline.Models;
-using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,26 +10,20 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Thêm Authentication (MỚI)
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/Admin/DangNhap/Index";
-        options.LogoutPath = "/Admin/DangNhap/Logout";
-        options.AccessDeniedPath = "/Admin/DangNhap/AccessDenied";
-        options.ExpireTimeSpan = TimeSpan.FromDays(30);
-        options.SlidingExpiration = true;
-    });
-
-// Thêm Session (nếu cần cho login)
+// ⭐ XÓA AUTHENTICATION - CHỈ GIỮ SESSION ⭐
+// Thêm Session cho login
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
+    // ⭐ ĐẢAM BẢO SESSION SẼ MẤT KHI ĐÓNG BROWSER ⭐
+    options.Cookie.SameSite = SameSiteMode.Lax;
 });
 
-builder.Services.AddHttpContextAccessor();var app = builder.Build();
+builder.Services.AddHttpContextAccessor();
+
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -44,10 +37,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseSession(); // Bật Session
+app.UseSession(); // Chỉ dùng Session
 
-app.UseAuthentication(); // MỚI - Thêm dòng này
-app.UseAuthorization();
+// ⭐ XÓA app.UseAuthentication() VÀ app.UseAuthorization() ⭐
 
 // Routing cho Areas
 app.MapControllerRoute(
