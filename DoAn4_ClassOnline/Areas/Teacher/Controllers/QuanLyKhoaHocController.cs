@@ -139,5 +139,39 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
             }
         }
 
+        // lấy thông tin chi tiết sinh viên theo id
+        [HttpGet]
+        public async Task<IActionResult> ThongTinSinhVien(int? id)
+        {
+            try
+            {
+                // Lấy UserId từ Session
+                var userId = HttpContext.Session.GetInt32("UserId");
+                //if (userId == null)
+                //{
+                //    TempData["Error"] = "Vui lòng đăng nhập!";
+                //    return RedirectToAction("Index", "DangNhap", new { area = "Admin" });
+                //}
+
+                // Kiểm tra id
+                if (id == null)
+                    return NotFound();
+
+                // Lấy thông tin chi tiết sinh viên với các quan hệ
+                var sinhVien = await _context.Users
+                    .Where(s => s.UserId == id)
+                     // Thông tin khoa
+                    .FirstOrDefaultAsync();
+
+                if (sinhVien == null)
+                    return NotFound();
+
+                return Json(new { success = true, sinhVien });
+            }
+            catch (Exception)
+            {
+                return View("Error");
+            }
+        }
     }
 }
