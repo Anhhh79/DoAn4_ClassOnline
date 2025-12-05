@@ -26,7 +26,7 @@
 
             <!-- Nút thêm -->
             <a class="btn btn-success btn-sm text-light position-absolute end-0 p-2 fw-bold"
-               data-bs-toggle="modal" data-bs-target="#themKhoaHocModal">
+               onclick="openModal('themKhoaHocModal')">
                 <i class="bi bi-plus-circle me-1"></i> Khóa học mới
             </a>
         </div>
@@ -37,7 +37,7 @@
             @foreach (var item in Model)
             {
                 <div class="col-12 col-md-3 khoaHocItem"
-                     data-hocky="@item.HocKy.TenHocKy.Replace("HK", "")"
+                     data-hockyid="@item.HocKyId"
                      data-namhoc="@item.HocKy.NamHoc">
 
                     <div class="card shadow border-0 rounded-4 overflow-hidden h-100">
@@ -98,7 +98,7 @@
                 <h5 class="modal-title fw-bold" id="themKhoaHocModalLabel">
                     <i class="bi bi-journal-plus me-2"></i>Thêm khóa học mới
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng" onclick="resetForm_ThemKhoaHoc()"></button>
             </div>
 
             <!-- Body -->
@@ -108,14 +108,15 @@
 
                         <!-- Tên khóa học -->
                         <div class="col-md-6">
-                            <label for="tenKhoaHoc" class="form-label fw-semibold">Tên khóa học</label>
-                            <input type="text" id="tenKhoaHoc" class="form-control" placeholder="Nhập tên khóa học" required>
+                            <label for="tenKhoaHoc_Insert" class="form-label fw-semibold">Tên khóa học</label>
+                            <input type="text" id="tenKhoaHoc_Insert" class="form-control" placeholder="Nhập tên khóa học" required>
+                            <small class="text-danger error-msg" id="err_ten"></small>
                         </div>
 
                         <!-- Khoa -->
                         <div class="col-md-6">
-                            <label for="khoa" class="form-label fw-semibold">Khoa</label>
-                            <select id="khoa" class="form-select" required>
+                            <label for="khoa_Insert" class="form-label fw-semibold">Khoa</label>
+                            <select id="khoa_Insert" class="form-select" required>
                                 <option selected disabled>-- Chọn khoa --</option>
                                 @foreach (var hk in ViewBag.KhoaList)
                                 {
@@ -124,12 +125,13 @@
                                     </option>
                                 }
                             </select>
+                            <small class="text-danger error-msg" id="err_khoa"></small>
                         </div>
 
                         <!-- Học kỳ -->
                         <div class="col-md-6">
-                            <label for="hocKy" class="form-label fw-semibold">Học kỳ</label>
-                            <select id="hocKy" class="form-select" required>
+                            <label for="hocKy_Insert" class="form-label fw-semibold">Học kỳ</label>
+                            <select id="hocKy_Insert" class="form-select" required>
                                 <option selected disabled>-- Chọn học kỳ --</option>
 
                                 @foreach (var hk in ViewBag.HocKyList)
@@ -139,24 +141,28 @@
                                     </option>
                                 }
                             </select>
+                            <small class="text-danger error-msg" id="err_hocKy"></small>
                         </div>
 
                         <!-- Link Phòng học online -->
                         <div class="col-md-6">
-                            <label for="linkHocOnline" class="form-label fw-semibold">Link Google Meet (nếu có)</label>
-                            <input type="text" id="linkHocOnline" class="form-control" placeholder="Nhập link google meet (nếu có)" required>
+                            <label for="linkHocOnline_Insert" class="form-label fw-semibold">Link Google Meet (nếu có)</label>
+                            <input type="text" id="linkHocOnline_Insert" class="form-control" placeholder="Nhập link google meet (nếu có)" required>
+                            <small class="text-danger error-msg" id="err_link"></small>
                         </div>
 
                         <!-- Ảnh khóa học -->
                         <div class="col-md-6">
-                            <label for="anhKhoaHoc" class="form-label fw-semibold">Hình ảnh khóa học</label>
-                            <input type="file" id="anhKhoaHoc" class="form-control" accept="image/*">
+                            <label for="anhKhoaHoc_Insert" class="form-label fw-semibold">Hình ảnh khóa học</label>
+                            <input type="file" id="anhKhoaHoc_Insert" class="form-control" accept="image/*">
+                            <small class="text-danger error-msg" id="err_hocKy"></small>
                         </div>
 
                         <!-- Mật khẩu -->
                         <div class="col-md-6">
-                            <label for="matKhau" class="form-label fw-semibold">Mật khẩu (nếu cần)</label>
-                            <input type="password" id="matKhau" class="form-control" placeholder="Nhập mật khẩu (nếu có)">
+                            <label for="matKhau_Insert" class="form-label fw-semibold">Mật khẩu (nếu cần)</label>
+                            <input type="password" id="matKhau_Insert" class="form-control" placeholder="Nhập mật khẩu (nếu có)">
+                            <small class="text-danger error-msg" id="err_matKhau"></small>
                         </div>
 
                     </div>
@@ -165,11 +171,11 @@
 
             <!-- Footer -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="resetForm_ThemKhoaHoc()">
                     <i class="bi bi-x-circle me-1"></i>Hủy
                 </button>
 
-                <button type="submit" form="formThemKhoaHoc" class="btn btn-primary text-light">
+                <button type="button" class="btn btn-primary text-light" onclick="themKhoaHoc()">
                     <i class="bi bi-save me-1"></i>Lưu khóa học
                 </button>
             </div>
@@ -177,4 +183,5 @@
         </div>
     </div>
 </div>
+
 
