@@ -101,29 +101,45 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
         // Action DanhSach giữ nguyên
         public async Task<IActionResult> DanhSach(int khoaHocId)
         {
-            var userId = HttpContext.Session.GetInt32("UserId");
+            try
+            {
+                var userId = HttpContext.Session.GetInt32("UserId");
+
+                if (userId == null)
+                {
+                    TempData["Error"] = "Vui lòng đăng nhập!";
+                    return RedirectToAction("Index", "DangNhap", new { area = "Admin" });
+                }
+
+                var khoaHoc = await _context.KhoaHocs
+                    .Include(k => k.GiaoVien)
+                    .Include(k => k.Khoa)
+                    .Include(k => k.HocKy)
+                    .Include(k => k.ThamGiaKhoaHocs)
+                        .ThenInclude(t => t.SinhVien)
+                        .ThenInclude(sv => sv.Khoa)
+                    .FirstOrDefaultAsync(k => k.KhoaHocId == khoaHocId && k.GiaoVienId == userId);
+
+                if (khoaHoc == null)
+                {
+                    TempData["Error"] = "Không tìm thấy khóa học!";
+                    return RedirectToAction("Index");
+                }
+
+                ViewBag.KhoaList = await _context.Khoas
+                   .Select(k => new
+                   {
+                       k.KhoaId,
+                       k.TenKhoa
+                   }).ToListAsync();
+
+                return View("_DanhSachThamGia", khoaHoc);
+            }
+            catch(Exception)
+            {
+                return View("Error");
+            }
             
-            if (userId == null)
-            {
-                TempData["Error"] = "Vui lòng đăng nhập!";
-                return RedirectToAction("Index", "DangNhap", new { area = "Admin" });
-            }
-
-            var khoaHoc = await _context.KhoaHocs
-                .Include(k => k.GiaoVien)
-                .Include(k => k.Khoa)
-                .Include(k => k.HocKy)
-                .Include(k => k.ThamGiaKhoaHocs)
-                    .ThenInclude(t => t.SinhVien)
-                .FirstOrDefaultAsync(k => k.KhoaHocId == khoaHocId && k.GiaoVienId == userId);
-
-            if (khoaHoc == null)
-            {
-                TempData["Error"] = "Không tìm thấy khóa học!";
-                return RedirectToAction("Index");
-            }
-
-            return View("_DanhSachThamGia", khoaHoc);
         }
     }
 }

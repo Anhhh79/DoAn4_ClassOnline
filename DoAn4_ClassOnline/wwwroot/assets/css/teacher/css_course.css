@@ -20,3 +20,20 @@
 .image-cuser {
     cursor: pointer;
 }
+
+/*css thông báo*/
+/* Giới hạn chiều rộng toast và cho phép xuống dòng */
+.swal2-popup.swal2-toast {
+    max-width: 350px !important; /* toast không quá rộng */
+    width: auto !important;
+    white-space: normal !important; /* bắt buộc xuống dòng */
+    text-align: left !important; /* text dễ đọc */
+    padding-right: 20px !important; /* tránh icon đè text */
+}
+
+/* Nếu muốn chữ dài xuống dòng đẹp hơn */
+.swal2-title {
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    word-break: break-word !important; /* tránh tràn chữ */
+}

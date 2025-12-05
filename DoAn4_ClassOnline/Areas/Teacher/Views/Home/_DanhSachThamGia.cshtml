@@ -1,6 +1,35 @@
 ﻿@{
     ViewData["Title"] = "Danh sách tham gia";
 }
+@model DoAn4_ClassOnline.Models.KhoaHoc
+
+@functions {
+    public string TimeAgo_Home(DateTime? time)
+    {
+        if (time == null) return "";
+
+        var ts = DateTime.Now - time.Value;
+
+        if (ts.TotalSeconds < 60)
+            return $"{(int)ts.TotalSeconds} giây trước";
+
+        if (ts.TotalMinutes < 60)
+            return $"{(int)ts.TotalMinutes} phút trước";
+
+        if (ts.TotalHours < 24)
+            return $"{(int)ts.TotalHours} giờ trước";
+
+        if (ts.TotalDays < 30)
+            return $"{(int)ts.TotalDays} ngày trước";
+
+        if (ts.TotalDays < 365)
+            return $"{(int)(ts.TotalDays / 30)} tháng trước";
+
+        return $"{(int)(ts.TotalDays / 365)} năm trước";
+    }
+}
+
+
 <div class="container">
 
     <!-- Header -->
@@ -11,7 +40,7 @@
 
         <div class="text-center flex-grow-1">
             <h4 class="fw-bold mb-0">Danh sách sinh viên tham gia</h4>
-            <div class="text-muted small">Khóa học: Phát triển ứng dụng IoT</div>
+            <div class="text-muted small">Khóa học: @Model.TenKhoaHoc</div>
         </div>
 
         <div style="width: 108px;"></div>
@@ -23,17 +52,19 @@
         <!-- Search -->
         <div class="input-group w-25 me-3">
             <span class="input-group-text"><i class="bi bi-search"></i></span>
-            <input type="text" class="form-control" placeholder="Tìm theo tên hoặc MSSV...">
+            <input type="text" class="form-control" id="searchSinhVien_DanhSach" placeholder="Tìm theo tên hoặc MSSV...">
         </div>
 
         <!-- Bộ lọc -->
         <div class="d-flex">
-            <select id="filterKhoa" class="form-select" style="width: 200px;">
-                <option value="">-- Chọn khoa --</option>
-                <option value="CNTT">Công nghệ thông tin</option>
-                <option value="QTKD">Quản trị kinh doanh</option>
-                <option value="CK">Cơ khí</option>
-                <option value="XDDD">Xây dựng</option>
+            <select id="filterKhoa_DanhSach" class="form-select" style="width: 250px;">
+                <option value="" selected >-- Tất cả --</option>
+                @foreach (var hk in ViewBag.KhoaList)
+                {
+                    <option value="@hk.KhoaId">
+                        @hk.TenKhoa
+                    </option>
+                }
             </select>
         </div>
     </div>
@@ -48,89 +79,114 @@
                     <th>Sinh viên</th>
                     <th style="width: 140px;">MSSV</th>
                     <th style="width: 250px;">Khoa</th>
-                    <th style="width: 120px;">Khóa</th>
                     <th style="width: 140px;">Giới tính</th>
                     <th style="width: 160px;">Truy cập</th>
                     <th class="text-center" style="width: 140px;">Hành động</th>
                 </tr>
             </thead>
-            <tbody>
-                <!-- Sinh viên -->
-                <tr>
-                    <td>1</td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <img src="~/assets/image/tải xuống.jpg"
-                                 class="rounded-circle me-3"
-                                 style="width: 45px; height: 45px; object-fit: cover;">
-                            <div>
-                                <div class="fw-semibold" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;" title="Nguyễn Văn A">Nguyễn Văn A</div>
+            <tbody id="danhSachSinhVien_Table_DanhSach">
+                @{
+                    int stt = 1;
+                }
+                @foreach (var tg in Model.ThamGiaKhoaHocs)
+                {
+                    <tr>
+                        <td>@stt</td>
+
+                        <td>
+                            <div class="d-flex align-items-center">
+
+                                <!-- Ảnh sinh viên -->
+                                <img src="@tg.SinhVien.Avatar"
+                                     class="rounded-circle me-3"
+                                     style="width: 45px; height: 45px; object-fit: cover;">
+
+                                <!-- Tên -->
+                                <div>
+                                    <div class="fw-semibold"
+                                         style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;"
+                                         title="@tg.SinhVien.FullName">
+                                        @tg.SinhVien.FullName
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                    <td class="fw-semibold">B2012001</td>
-                    <td class="fw-semibold" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;" title="Điện tử viễn thông">Điện tử viễn thông</td>
-                    <td class="fw-semibold">2021</td>
-                    <td class="fw-semibold">Nam</td>
-                    <td>2 ngày trước</td>
-                    <td class="text-center">
-                        <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#studentInfoModal" title="Xem hồ sơ">
-                            <i class="bi bi-eye"></i>
-                        </button>
-                        <button class="btn btn-outline-danger btn-sm" title="Xóa khỏi khóa học">
-                            <i class="bi bi-person-x"></i>
-                        </button>
-                    </td>
-                </tr>         
+                        </td>
+
+                        <!-- MSSV -->
+                        <td class="fw-semibold">@tg.SinhVien.MaSo</td>
+
+                        <!-- Ngành học -->
+                        <td class="fw-semibold"
+                            style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;"
+                            title="@tg.SinhVien.Khoa.TenKhoa">
+                            @tg.SinhVien.Khoa.TenKhoa
+                        </td>
+
+                        <!-- Giới tính -->
+                        <td class="fw-semibold">@tg.SinhVien.GioiTinh</td>
+
+                        <!-- Ngày tham gia -->
+                        <td>@TimeAgo_Home(tg.NgayThamGia)</td>
+
+                        <td class="text-center">
+                            <button class="btn btn-outline-secondary btn-sm" onclick="xemHoSoSinhVien_Home(@tg.SinhVienId)" title="Xem hồ sơ">
+                                <i class="bi bi-eye"></i>
+                            </button>
+
+                            <button class="btn btn-outline-danger btn-sm"
+                                    title="Xóa khỏi khóa học">
+                                <i class="bi bi-person-x"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    stt++;
+                }
+
+                   
             </tbody>
         </table>
     </div>
 
 </div>
 
-<!-- ✅ Modal Thông tin sinh viên -->
-<div class="modal fade" id="studentInfoModal" tabindex="-1" aria-labelledby="studentInfoModalLabel" aria-hidden="true">
+<!-- ✅ MODAL -->
+<div class="modal fade" id="studentInfoModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow">
 
             <div class="modal-header">
-                <h5 class="modal-title" id="studentInfoModalLabel">Thông tin sinh viên</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title">Thông tin sinh viên</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body p-4">
                 <div class="row g-3">
 
-                    <!-- Avatar + Tên + MSSV -->
                     <div class="col-md-4 text-center">
-                        <img src="~/assets/image/tải xuống.jpg"
+                        <img id="modal_avatar_Home" src="~/assets/image/tải xuống.jpg"
                              class="rounded-circle border shadow-sm mb-3"
                              style="width:140px;height:140px;object-fit:cover;">
-                        <h5 class="fw-bold" id="modalFullName" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px;">Nguyễn Bảo Anh</h5>
-                        <small class="text-muted d-block" id="modalMSSV" title="MSSV">CNTT2211026</small>
+
+                        <h5 id="modal_fullname_Home" class="fw-bold" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">Nguyễn Văn A</h5>
+                        <small id="modal_maso_Home" class="text-muted d-block">CNTT2211026</small>
                     </div>
 
-                    <!-- Info -->
                     <div class="col-md-8">
                         <dl class="row mb-0">
                             <dt class="col-sm-4">Giới tính</dt>
-                            <dd class="col-sm-8" id="modalGender">Nam</dd>
+                            <dd id="modal_gioitinh_Home" class="col-sm-8">Nam</dd>
 
                             <dt class="col-sm-4">Ngày sinh</dt>
-                            <dd class="col-sm-8" id="modalDOB">01/01/2003</dd>
+                            <dd id="modal_ngaysinh_Home" class="col-sm-8">01/01/2003</dd>
 
                             <dt class="col-sm-4">Email</dt>
-                            <dd class="col-sm-8" id="modalEmail">vana@example.com</dd>
+                            <dd id="modal_email_Home" class="col-sm-8">vana@example.com</dd>
 
                             <dt class="col-sm-4">Số điện thoại</dt>
-                            <dd class="col-sm-8" id="modalPhone">0123 456 789</dd>
+                            <dd id="modal_phone_Home" class="col-sm-8">0123 456 789</dd>
 
                             <dt class="col-sm-4">Khoa</dt>
-                            <dd class="col-sm-8" id="modalFaculty">Công nghệ thông tin</dd>
-
-                            <dt class="col-sm-4">Khóa</dt>
-                            <dd class="col-sm-8" id="modalCourse">K17</dd>
+                            <dd id="modal_khoa_Home" class="col-sm-8">Công nghệ thông tin</dd>
                         </dl>
                     </div>
 
@@ -140,4 +196,98 @@
         </div>
     </div>
 </div>
+<!-- ✅ JS: Xem hồ sơ sinh viên -->
+<script>
+     // hiển thị thông tin sinh viên lên modal
+        // ✅ FUNCTION XEM HỒ SƠ SINH VIÊN (ĐÃ SỬA LỖI TYPO)
+    async function xemHoSoSinhVien_Home(id) {
+        try {
+            const res = await fetch(`/Teacher/QuanLyKhoaHoc/ThongTinSinhVien?id=${id}`);
 
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+            const result = await res.json();
+
+            if (result.success) {
+                const d = result.sinhVien;
+                document.getElementById('modal_avatar_Home').src = d.avatar || '/assets/image/tải xuống.jpg';
+                document.getElementById('modal_fullname_Home').textContent = d.fullName || 'Chưa cập nhật';
+                document.getElementById('modal_maso_Home').textContent = d.maSo || 'Chưa có mã số';
+                document.getElementById('modal_gioitinh_Home').textContent = d.gioiTinh || 'Chưa cập nhật';
+                document.getElementById('modal_ngaysinh_Home').textContent = d.ngaySinh || 'Chưa cập nhật';
+                document.getElementById('modal_email_Home').textContent = d.email || 'Chưa cập nhật';
+                document.getElementById('modal_phone_Home').textContent = d.phoneNumber || 'Chưa cập nhật';
+                document.getElementById('modal_khoa_Home').textContent = d.tenKhoa || 'Chưa cập nhật';
+                openModal('studentInfoModal');
+            } else {
+                showError_tc(result.message || 'Không thể tải thông tin sinh viên.');
+            }
+        } catch (error) {
+            console.error('Lỗi:', error); // ✅ ĐÃ SỬA: console thay vì consoole
+           showError_tc('Không thể tải thông tin sinh viên!');
+        }
+    }
+
+         //// Tìm kiếm sinh viên theo tên, mã số hoặc khoa
+    const searchInput = document.getElementById('searchSinhVien_DanhSach');
+    const tableBody = document.getElementById('danhSachSinhVien_Table_DanhSach');
+    const rows = Array.from(tableBody.querySelectorAll('tr'));
+    const select_Khoa = document.getElementById('filterKhoa_DanhSach');
+
+    searchInput.addEventListener('input', function () {
+        filterStudents();
+    });
+
+    select_Khoa.addEventListener('change', function () {
+        filterStudents();
+    });
+
+    function filterStudents() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        const selectedKhoa = select_Khoa.value; // value = KhoaId hoặc ""
+        let visibleCount = 0;
+
+        rows.forEach(function (row) {
+
+            const tenSinhVien =
+                row.querySelector('td:nth-child(2) .fw-semibold')?.textContent.toLowerCase() || '';
+
+            const maSoSinhVien =
+                row.querySelector('td:nth-child(3)')?.textContent.toLowerCase() || '';
+
+            const tenKhoa =
+                row.querySelector('td:nth-child(4)')?.textContent.toLowerCase() || '';
+
+            const matchSearch =
+                tenSinhVien.includes(searchTerm) ||
+                maSoSinhVien.includes(searchTerm) ||
+                tenKhoa.includes(searchTerm);
+
+            const matchKhoa =
+                selectedKhoa === "" || selectedKhoa === "0" || tenKhoa.includes(select_Khoa.options[select_Khoa.selectedIndex].text.toLowerCase());
+
+            if (matchSearch && matchKhoa) {
+                row.style.display = '';
+                visibleCount++;
+                row.querySelector('td:first-child').textContent = visibleCount;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Xóa thông báo cũ
+        const existingMessage = tableBody.querySelector('.no-results-message');
+        if (existingMessage) existingMessage.remove();
+
+        // Nếu không có dòng nào và có tìm kiếm
+        if (visibleCount === 0 && (searchTerm !== "" || selectedKhoa !== "")) {
+            const noResultRow = document.createElement('tr');
+            noResultRow.className = 'no-results-message';
+            noResultRow.innerHTML =
+                '<td colspan="7" class="text-center text-muted py-4"><i class="bi bi-search me-2"></i>Không tìm thấy sinh viên nào</td>';
+            tableBody.appendChild(noResultRow);
+        }
+    }
+
+       
+</script>

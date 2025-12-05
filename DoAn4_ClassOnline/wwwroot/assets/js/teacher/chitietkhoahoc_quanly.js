@@ -6,10 +6,8 @@
 
     if (togglePasswordBtn && passwordInput && togglePasswordIcon) {
         togglePasswordBtn.addEventListener('click', function () {
-            // Chuyển đổi type của input
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
-
             // Chuyển đổi icon
             if (type === 'password') {
                 togglePasswordIcon.classList.remove('bi-eye-slash');
@@ -31,7 +29,7 @@
             const linkValue = googleMeetLink.value.trim();
 
             if (!linkValue) {
-                alert('Không có link để copy!');
+                showWarning_tc('Không có link để copy!');
                 return;
             }
 
@@ -57,7 +55,7 @@
                 // Fallback cho trình duyệt cũ
                 googleMeetLink.select();
                 document.execCommand('copy');
-                alert('Đã copy link!');
+                showSuccess_tc("Đã sao chép link!")
             }
         });
     }

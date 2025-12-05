@@ -189,8 +189,7 @@
                                     </td>
                                     <td class="text-center">
                                         <button class="btn btn-outline-secondary btn-sm" title="Xem hồ sơ"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#studentInfoModal_QuanLy" onclick="xemHoSoSinhVien(@item.SinhVienId)">
+                                               onclick="xemHoSoSinhVien(@item.SinhVienId)">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                         <button class="btn btn-outline-danger btn-sm" title="Xóa khỏi khóa học">
@@ -272,7 +271,6 @@
 
             if (result.success) {
                 const d = result.sinhVien;
-                console.log('Dữ liệu sinh viên:', d); // ✅ ĐÃ SỬA: console thay vì consoole
                 document.getElementById('modal_avatar').src = d.avatar || '/assets/image/tải xuống.jpg';
                 document.getElementById('modal_fullname').textContent = d.fullName || 'Chưa cập nhật';
                 document.getElementById('modal_maso').textContent = d.maSo || 'Chưa có mã số';
@@ -281,12 +279,13 @@
                 document.getElementById('modal_email').textContent = d.email || 'Chưa cập nhật';
                 document.getElementById('modal_phone').textContent = d.phoneNumber || 'Chưa cập nhật';
                 document.getElementById('modal_khoa').textContent = d.tenKhoa || 'Chưa cập nhật';
+                openModal('studentInfoModal_QuanLy');
             } else {
-                alert(result.message || 'Không thể tải thông tin sinh viên.');
+                showWarning_tc(result.message || 'Không thể tải thông tin sinh viên!');
             }
         } catch (error) {
-            console.error('Lỗi:', error); // ✅ ĐÃ SỬA: console thay vì consoole
-            alert('Không thể tải thông tin sinh viên!');
+            console.error('Lỗi:', error); 
+            showError_tc('Lỗi hệ thống!');
         }
     }
 </script>
