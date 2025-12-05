@@ -11,22 +11,31 @@
         <h5 class="fw-bold mb-3">
             <i class="bi bi-ui-checks-grid me-2 text-primary"></i> Quản lý bài trắc nghiệm
         </h5>
-        <a asp-area="Teacher"
-           asp-controller="TracNghiem"
-           asp-action="ThemBaiTracNghiem"
-           asp-route-khoaHocId="@khoaHocId"
-           class="btn btn-success btn-sm text-light">
-            <i class="bi bi-plus-lg me-1"></i> Tạo trắc nghiệm
-        </a>
+        @if (khoaHocId.HasValue)
+        {
+            <a asp-area="Teacher"
+               asp-controller="TracNghiem"
+               asp-action="ThemBaiTracNghiem"
+               asp-route-khoaHocId="@khoaHocId"
+               class="btn btn-success btn-sm text-light">
+                <i class="bi bi-plus-lg me-1"></i> Tạo trắc nghiệm
+            </a>
+        }
+        else
+        {
+            <button class="btn btn-success btn-sm text-light" disabled title="Vui lòng chọn khóa học">
+                <i class="bi bi-plus-lg me-1"></i> Tạo trắc nghiệm
+            </button>
+        }
     </div>
 
     @if (Model != null && Model.Any())
     {
         int stt = 1;
-        @foreach (var baiTN in Model)
+        foreach (var baiTN in Model)
         {
             <!-- Bài trắc nghiệm -->
-            <div class="col-12">
+            <div class="col-12 bai-trac-nghiem-item" data-id="@baiTN.BaiTracNghiemId">
                 <div class="border px-3 rounded-3 mb-2 bg-body-tertiary d-flex justify-content-between align-items-center flex-wrap gap-2">
 
                     <!-- Tên bài -->
@@ -52,22 +61,6 @@
                             <i class="bi bi-info-circle me-1"></i> Chưa có hạn nộp
                         </div>
                     }
-
-                    <!-- Nút hành động -->
-                    <div>
-                        <a asp-area="Teacher"
-                           asp-controller="TracNghiem"
-                           asp-action="ChinhSua"
-                           asp-route-id="@baiTN.BaiTracNghiemId"
-                           class="btn btn-outline-primary btn-sm me-2">
-                            <i class="bi bi-pencil"></i> Sửa
-                        </a>
-                        <button class="btn btn-outline-danger btn-sm btn-xoa-tracnghiem"
-                                data-id="@baiTN.BaiTracNghiemId"
-                                data-khoa-hoc-id="@khoaHocId">
-                            <i class="bi bi-trash"></i> Xóa
-                        </button>
-                    </div>
                 </div>
             </div>
             stt++;
@@ -78,51 +71,20 @@
         <div class="col-12 text-center py-5">
             <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
             <p class="text-muted">Chưa có bài trắc nghiệm nào</p>
-            <a asp-area="Teacher"
-               asp-controller="TracNghiem"
-               asp-action="ThemBaiTracNghiem"
-               asp-route-khoaHocId="@khoaHocId"
-               class="btn btn-primary">
-                <i class="bi bi-plus-lg me-1"></i> Tạo bài trắc nghiệm đầu tiên
-            </a>
+            @if (khoaHocId.HasValue)
+            {
+                <a asp-area="Teacher"
+                   asp-controller="TracNghiem"
+                   asp-action="ThemBaiTracNghiem"
+                   asp-route-khoaHocId="@khoaHocId"
+                   class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-1"></i> Tạo bài trắc nghiệm đầu tiên
+                </a>
+            }
+            else
+            {
+                <p class="text-danger">Lỗi: Không xác định được khóa học</p>
+            }
         </div>
     }
 </div>
-
-@section Scripts {
-    <script>
-        // Xử lý xóa bài trắc nghiệm
-        document.querySelectorAll('.btn-xoa-tracnghiem').forEach(btn => {
-            btn.addEventListener('click', async function() {
-                const baiTracNghiemId = this.getAttribute('data-id');
-                const khoaHocId = this.getAttribute('data-khoa-hoc-id');
-                
-                if (!confirm('Bạn có chắc muốn xóa bài trắc nghiệm này?')) {
-                    return;
-                }
-
-                try {
-                    const response = await fetch('/Teacher/TracNghiem/XoaBaiTracNghiem', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ baiTracNghiemId, khoaHocId })
-                    });
-
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        alert('Xóa thành công!');
-                        location.reload();
-                    } else {
-                        alert('Lỗi: ' + result.message);
-                    }
-                } catch (error) {
-                    alert('Có lỗi xảy ra!');
-                    console.error(error);
-                }
-            });
-        });
-    </script>
-}

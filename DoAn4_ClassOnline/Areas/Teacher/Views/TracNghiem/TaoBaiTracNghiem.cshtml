@@ -1,4 +1,11 @@
-﻿
+﻿@model DoAn4_ClassOnline.Models.BaiTracNghiem
+
+@{
+    ViewData["Title"] = Model != null ? Model.TenBaiThi : "Chi tiết bài trắc nghiệm";
+    var soLuotLam = Model?.BaiLamTracNghiems?.Count ?? 0;
+    var soCauHoi = Model?.CauHois?.Count ?? 0;
+}
+    
 <div class="container mt-3">
 
     <!-- Header -->
@@ -20,22 +27,26 @@
                 <div class="d-flex align-items-start mb-3">
                     <i class="bi bi-file-earmark-text fs-3 text-primary me-2"></i>
                     <div>
-                        <strong>TracNghiem_C5.docx</strong>
-                        <div class="text-muted small">Ngày tạo: 06/11/2025</div>
-                        <div class="text-muted small">Người tạo: Quốc Bảo</div>
+                        <strong>@(Model?.TenBaiThi ?? "Chưa có tên")</strong>
+                        <div class="text-muted small">
+                            Ngày tạo: @(Model?.NgayTao?.ToString("dd/MM/yyyy") ?? "N/A")
+                        </div>
+                        <div class="text-muted small">
+                            Người tạo: @(Model?.KhoaHoc?.GiaoVien?.FullName ?? "N/A")
+                        </div>
                         <div class="text-muted small">
                             <i class="bi bi-clipboard-check me-1"></i>
-                            Số lượt làm: 0
+                            Số lượt làm: @soLuotLam
                         </div>
                     </div>
                 </div>
 
                 <!-- Nút Copy Link + QR -->
                 <div class="d-flex justify-content-between mb-3">
-                    <button class="btn btn-light border rounded-3">
+                    <button class="btn btn-light border rounded-3" onclick="copyLink()">
                         <i class="bi bi-link-45deg"></i> Copy Link
                     </button>
-                    <button class="btn btn-light border rounded-3">
+                    <button class="btn btn-light border rounded-3" onclick="showQR()">
                         <i class="bi bi-qr-code"></i>
                     </button>
                 </div>
@@ -44,24 +55,13 @@
                 <div class="border rounded-4 p-3 bg-body-tertiary">
                     <p class="text-muted fw-bold mb-3">Menu</p>
 
-                    <!-- Nút mở modal -->
                     <div class="d-flex align-items-center mb-2" data-bs-toggle="modal" data-bs-target="#settingModal" style="cursor: pointer;">
                         <i class="bi bi-gear-wide-connected me-2"></i> Cài đặt
                     </div>
-
-                    <div class="d-flex align-items-center mb-2" data-bs-toggle="modal" data-bs-target="#publishModal" style="cursor: pointer;">
-                        <i class="bi bi-upload me-2"></i> Xuất bản
+                    <div class="d-flex align-items-center text-danger" id="btnDeleteFile" style="cursor: pointer;" onclick="deleteBai(@Model?.BaiTracNghiemId)">
+                        <i class="bi bi-file-earmark-x me-2"></i> Xóa bài thi
                     </div>
-                    <div class="d-flex align-items-center mb-3" id="btnRecheck" style="cursor: pointer;">
-                        <i class="bi bi-arrow-repeat me-2"></i> Chấm lại điểm
-                    </div>
-
-                    <div class="d-flex align-items-center text-danger" id="btnDeleteFile" style="cursor: pointer;">
-                        <i class="bi bi-file-earmark-x me-2"></i> Xóa file
-                    </div>
-
                 </div>
-
 
                 <div class="mt-3">
                     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -70,10 +70,24 @@
                         <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal">
                             <i class="bi bi-pencil"></i> Sửa
                         </button>
-                        
                     </div>
                     <div class="border rounded-4 p-2 text-center bg-body-tertiary">
-                        Tất cả mọi người
+                        @if (Model?.GiaoBaiTracNghiems != null && Model.GiaoBaiTracNghiems.Any())
+                        {
+                            var soSinhVienDuocGiao = Model.GiaoBaiTracNghiems.Count(g => g.SinhVienId != null);
+                            if (soSinhVienDuocGiao == 0)
+                            {
+                                <text>Tất cả mọi người</text>
+                            }
+                            else
+                            {
+                                <text>Giao cho @soSinhVienDuocGiao sinh viên</text>
+                            }
+                        }
+                        else
+                        {
+                            <text>Chưa giao cho ai</text>
+                        }
                     </div>
                 </div>
 
@@ -81,7 +95,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="text-muted">Nội dung</span>
                         <div>
-                            <a class="text-primary text-decoration-none small me-3">Sửa</a>
+                            <a class="text-primary text-decoration-none small me-3" href="javascript:void(0)" onclick="editContent()">Sửa</a>
                             <!-- Nút Xem chi tiết -->
                             <a class="text-success text-decoration-none small" data-bs-toggle="modal" data-bs-target="#detailModal">
                                 Xem chi tiết
@@ -89,7 +103,7 @@
                         </div>
                     </div>
                     <div class="border rounded-4 p-2 text-center bg-body-tertiary">
-                        Trắc nghiệm 10 câu
+                        Trắc nghiệm @soCauHoi câu
                     </div>
                 </div>
             </div>
@@ -104,10 +118,10 @@
                         Kết quả làm bài trắc nghiệm
                     </h5>
                     <div>
-                        <button class="btn btn-outline-success btn-sm">
-                            <i class="bi bi-arrow-clockwise me-1"></i> Xuất file
+                        <button class="btn btn-outline-success btn-sm" onclick="exportResults()">
+                            <i class="bi bi-download me-1"></i> Xuất file
                         </button>
-                        <button class="btn btn-outline-primary btn-sm">
+                        <button class="btn btn-outline-primary btn-sm" onclick="refreshResults()">
                             <i class="bi bi-arrow-clockwise me-1"></i> Cập nhật
                         </button>
                     </div>
@@ -120,57 +134,109 @@
                                 <th style="width:60px;">STT</th>
                                 <th>Sinh viên</th>
                                 <th style="width:80px;">Điểm</th>
-                                <th style="width:110px;">Đúng / Sai</th>
-                                <th style="width:120px;">Thời gian</th>
+                                <th style="width:110px;">Số lần làm</th>
+                                <th style="width:120px;">Ngày nộp</th>
                                 <th style="width:130px;">Trạng thái</th>
                             </tr>
                         </thead>
-                        <tbody id="table-body">
-                            <!-- Data mẫu sẽ được thêm bằng JS -->
+                        <tbody>
+                            @if (Model?.BaiLamTracNghiems != null && Model.BaiLamTracNghiems.Any())
+                            {
+                                int stt = 1;
+                                foreach (var baiLam in Model.BaiLamTracNghiems.OrderByDescending(b => b.NgayNop))
+                                {
+                                    var diem = baiLam.Diem ?? 0;
+                                    var colorClass = diem >= 8 ? "text-success" : diem >= 5 ? "text-warning" : "text-danger";
+                                    
+                                    // ⭐ LOGIC: XÁC ĐỊNH TRẠNG THÁI
+                                    string trangThai;
+                                    string badgeClass;
+                                    string iconClass;
+                                    
+                                    if (baiLam.NgayNop.HasValue)
+                                    {
+                                        trangThai = "Đã Nộp";
+                                        badgeClass = "bg-success";
+                                        iconClass = "bi-check-circle-fill";
+                                    }
+                                    else if (baiLam.NgayBatDau.HasValue)
+                                    {
+                                        trangThai = "Đang Làm";
+                                        badgeClass = "bg-warning";
+                                        iconClass = "bi-clock-fill";
+                                    }
+                                    else
+                                    {
+                                        trangThai = "Không Làm";
+                                        badgeClass = "bg-secondary";
+                                        iconClass = "bi-x-circle-fill";
+                                    }
+                                    
+                                    <tr>
+                                        <td class="fw-semibold">@stt</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="@(baiLam.SinhVien?.Avatar ?? "/assets/image/tải xuống.jpg")" 
+                                                     class="rounded-circle me-3" 
+                                                     width="40" height="40" 
+                                                     alt="avatar"
+                                                     onerror="this.src='/assets/image/tải xuống.jpg'">
+                                                <span class="fw-semibold">@(baiLam.SinhVien?.FullName ?? "N/A")</span>
+                                            </div>
+                                        </td>
+                                        <td class="fw-bold @colorClass">
+                                            @if (baiLam.NgayNop.HasValue)
+                                            {
+                                                @diem.ToString("F1")
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">--</span>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            @(baiLam.SoLanLam ?? 0) lần
+                                        </td>
+                                        <td>
+                                            @if (baiLam.NgayNop.HasValue)
+                                            {
+                                                @baiLam.NgayNop.Value.ToString("dd/MM/yyyy HH:mm")
+                                            }
+                                            else if (baiLam.NgayBatDau.HasValue)
+                                            {
+                                                <span class="text-muted">Đang làm...</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Chưa làm</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="badge @badgeClass d-flex align-items-center justify-content-center gap-1" style="width: fit-content;">
+                                                <i class="bi @iconClass"></i>
+                                                @trangThai
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    stt++;
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-4">
+                                        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                        Chưa có sinh viên nào làm bài
+                                    </td>
+                                </tr>
+                            }
                         </tbody>
-
                     </table>
                 </div>
 
             </div>
         </div>
 
-        <script>
-            const students = [
-                { name: "Nguyễn Văn A", score: 9.0, correct: 18, wrong: 20, time: "12:30", status: "Hoàn thành", img: "@Url.Content("~/assets/image/tải xuống.jpg")" },
-                { name: "Trần Thị B", score: 7.5, correct: 15, wrong: 20, time: "15:10", status: "Hoàn thành", img: "@Url.Content("~/assets/image/tải xuống.jpg")" },
-                { name: "Lê Văn C", score: 4.0, correct: 08, wrong: 20, time: "20:01", status: "Chưa hoàn thành", img: "@Url.Content("~/assets/image/tải xuống.jpg")" }
-            ];
-
-            const tableBody = document.getElementById("table-body");
-
-            let index = 1;
-            for (let i = 0; i < 60; i++) {
-                const s = students[i % students.length];
-                tableBody.innerHTML += `
-                        <tr>
-                            <td class="fw-semibold">${index++}</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <img src="${s.img}" class="rounded-circle me-3" width="40" height="40" alt="avatar">
-                                    <span class="fw-semibold">${s.name}</span>
-                                </div>
-                            </td>
-                            <td class="fw-bold ${s.score >= 8 ? "text-success" : s.score >= 5 ? "text-warning" : "text-danger"}">
-                                ${s.score.toFixed(1)}
-                            </td>
-                            <td>${s.correct.toString().padStart(2, "0")} / ${s.wrong.toString().padStart(2, "0")}</td>
-
-                            <td>${s.time}</td>
-                            <td>
-                                <span class="badge ${s.status === "Hoàn thành" ? "bg-success" : "bg-secondary"}">
-                                    ${s.status}
-                                </span>
-                            </td>
-                        </tr>
-                    `;
-            }
-        </script>
         <!-- Modal Cài Đặt -->
         <div class="modal fade" id="settingModal" tabindex="-1" aria-labelledby="settingModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -183,52 +249,52 @@
                     </div>
 
                     <div class="modal-body">
-                        <form class="row g-3">
+                        <form class="row g-3" id="formSettings">
 
-                            <!-- Tên bài thi (mới thêm) -->
+                            <!-- Tên bài thi -->
                             <div class="col-12">
                                 <label class="fw-semibold">Tên bài thi:</label>
-                                <input type="text" class="form-control" placeholder="Nhập tên bài thi">
+                                <input type="text" class="form-control" id="tenBaiThi" placeholder="Nhập tên bài thi" value="@Model?.TenBaiThi">
                             </div>
 
                             <div class="col-12">
                                 <label class="fw-semibold">Loại bài:</label>
-                                <select class="form-select">
-                                    <option>Bài tập</option>
-                                    <option>Bài thi</option>
+                                <select class="form-select" id="loaiBai">
+                                    <option value="Bài tập" selected="@(Model?.LoaiBaiThi == "Bài tập")">Bài tập</option>
+                                    <option value="Bài thi" selected="@(Model?.LoaiBaiThi == "Bài thi")">Bài thi</option>
                                 </select>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="fw-semibold">Thời gian làm bài:</label>
-                                <input type="number" class="form-control" placeholder="Số phút">
+                                <label class="fw-semibold">Thời gian làm bài (phút):</label>
+                                <input type="number" class="form-control" id="thoiGianLamBai" placeholder="Số phút" value="@Model?.ThoiLuongLamBai" min="1">
                             </div>
 
                             <div class="col-md-6">
-                                <label class="fw-semibold">Mật khẩu truy cập:</label>
-                                <input type="text" class="form-control" placeholder="Không bắt buộc">
+                                <label class="fw-semibold">Số lần làm tối đa:</label>
+                                <input type="number" class="form-control" id="soLanLam" placeholder="0 = không giới hạn" value="@Model?.SoLanLamToiDa" min="0">
                             </div>
 
                             <div class="col-md-6">
-                                <label class="fw-semibold">Thời gian giao đề:</label>
-                                <input type="datetime-local" class="form-control">
+                                <label class="fw-semibold">Thời gian bắt đầu:</label>
+                                <input type="datetime-local" class="form-control" id="thoiGianBatDau" value="@(Model?.ThoiGianBatDau?.ToString("yyyy-MM-ddTHH:mm") ?? "")">
                             </div>
 
                             <div class="col-md-6">
                                 <label class="fw-semibold">Thời gian kết thúc:</label>
-                                <input type="datetime-local" class="form-control">
+                                <input type="datetime-local" class="form-control" id="thoiGianKetThuc" value="@(Model?.ThoiGianKetThuc?.ToString("yyyy-MM-ddTHH:mm") ?? "")">
                             </div>
 
                             <div class="col-12 d-flex align-items-center mt-2">
-                                <input class="form-check-input me-2" type="checkbox" id="shuffleQuestions">
-                                <label class="form-check-label fw-semibold" for="shuffleQuestions">
+                                <input class="form-check-input me-2" type="checkbox" id="tronCauHoi" @(Model?.TronCauHoi == true ? "checked" : "")>
+                                <label class="form-check-label fw-semibold" for="tronCauHoi">
                                     Đảo câu hỏi
                                 </label>
                             </div>
 
                             <div class="col-12 d-flex align-items-center mt-2">
-                                <input class="form-check-input me-2" type="checkbox" id="showResult">
-                                <label class="form-check-label fw-semibold" for="showResult">
+                                <input class="form-check-input me-2" type="checkbox" id="choXemKetQua" @(Model?.ChoXemKetQua == true ? "checked" : "")>
+                                <label class="form-check-label fw-semibold" for="choXemKetQua">
                                     Cho xem kết quả khi thi xong
                                 </label>
                             </div>
@@ -238,55 +304,13 @@
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger rounded-3" data-bs-dismiss="modal">Hủy</button>
-                        <button type="button" class="btn btn-success rounded-3">Lưu cài đặt</button>
+                        <button type="button" class="btn btn-success rounded-3" onclick="saveSettings()">Lưu cài đặt</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Modal Xuất Bản -->
-        <div class="modal fade" id="publishModal" tabindex="-1" aria-labelledby="publishModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-md modal-dialog-centered">
-                <div class="modal-content rounded-4">
-                    <div class="modal-header">
-                        <h5 class="modal-title fw-bold" id="publishModalLabel">
-                            <i class="bi bi-upload me-2"></i> Xuất bản bài thi
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        <form class="row g-3">
-
-                            <!-- Số lượng câu hỏi -->
-                            <div class="col-12">
-                                <label class="fw-semibold">Số câu hỏi:</label>
-                                <input type="number" class="form-control" id="questionCount" value="40" disabled>
-                            </div>
-
-                            <!-- Thời gian làm bài -->
-                            <div class="col-12">
-                                <label class="fw-semibold">Thời gian làm bài (phút):</label>
-                                <input type="number" class="form-control" id="timeLimit" disabled value="45">
-                            </div>
-
-                            <!-- Điểm mỗi câu -->
-                            <div class="col-12">
-                                <label class="fw-semibold">Điểm mỗi câu:</label>
-                                <input type="number" class="form-control" id="pointPerQuestion" disabled value="0.25">
-                            </div>
-                        </form>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-danger rounded-3" data-bs-dismiss="modal">Hủy</button>
-                        <button type="button" class="btn btn-success rounded-3">Xuất bản ngay</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal: Sửa -->
+        <!-- Modal: Sửa - Giao bài -->
         <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content rounded-4 shadow">
@@ -311,69 +335,26 @@
                                     <!-- Search -->
                                     <div class="input-group w-50">
                                         <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                        <input type="search" class="form-control form-control-sm"
-                                               placeholder="Tìm theo tên học sinh...">
+                                        <input type="search" class="form-control form-control-sm" id="searchStudent"
+                                               placeholder="Tìm theo tên học sinh..." onkeyup="filterStudents()">
                                     </div>
 
                                     <!-- Check all -->
                                     <div class="form-check ms-2">
-                                        <input class="form-check-input" type="checkbox" id="checkAllStudentsStatic">
-                                        <label class="form-check-label small" for="checkAllStudentsStatic">
-                                            Chọn tất cả
+                                        <input class="form-check-input" type="checkbox" id="checkAllStudents" onchange="toggleAllStudents()">
+                                        <label class="form-check-label small" for="checkAllStudents">
+                                            Chọn tất cả     
                                         </label>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Danh sách có thể cuộn -->
-                            <div class="student-list-container border rounded-3 p-2" style="max-height: 300px; overflow-y: auto;">
-
-                                <!-- Item -->
-                                <div class="student-item d-flex align-items-center gap-3 py-2 px-2 mb-1">
-                                    <div style="width:40px; height:40px; border-radius:8px; overflow:hidden;">
-                                        <img src="~/assets/image/tải xuống.jpg" alt="Avatar"
-                                             style="width:100%; height:100%; object-fit:cover;">
-                                    </div>
-                                    <div class="flex-grow-1 fw-semibold">Nguyễn Văn A</div>
-                                    <div class="form-check"><input class="form-check-input student-checkbox" type="checkbox" value="101"></div>
+                            <div class="student-list-container border rounded-3 p-2" id="studentList" style="max-height: 300px; overflow-y: auto;">
+                                <!-- Sẽ được load từ JavaScript -->
+                                <div class="text-center text-muted py-3">
+                                    <i class="bi bi-inbox"></i> Đang tải danh sách sinh viên...
                                 </div>
-
-                                <div class="student-item d-flex align-items-center gap-3 py-2 px-2 mb-1">
-                                    <div style="width:40px; height:40px; border-radius:8px; overflow:hidden;">
-                                        <img src="~/assets/image/tải xuống.jpg" alt="Avatar"
-                                             style="width:100%; height:100%; object-fit:cover;">
-                                    </div>
-                                    <div class="flex-grow-1 fw-semibold">Trần Thị B</div>
-                                    <div class="form-check"><input class="form-check-input student-checkbox" type="checkbox" value="102"></div>
-                                </div>
-
-                                <div class="student-item d-flex align-items-center gap-3 py-2 px-2 mb-1">
-                                    <div style="width:40px; height:40px; border-radius:8px; overflow:hidden;">
-                                        <img src="~/assets/image/tải xuống.jpg" alt="Avatar"
-                                             style="width:100%; height:100%; object-fit:cover;">
-                                    </div>
-                                    <div class="flex-grow-1 fw-semibold">Lê Văn C</div>
-                                    <div class="form-check"><input class="form-check-input student-checkbox" type="checkbox" value="103"></div>
-                                </div>
-
-                                <div class="student-item d-flex align-items-center gap-3 py-2 px-2 mb-1">
-                                    <div style="width:40px; height:40px; border-radius:8px; overflow:hidden;">
-                                        <img src="~/assets/image/tải xuống.jpg" alt="Avatar"
-                                             style="width:100%; height:100%; object-fit:cover;">
-                                    </div>
-                                    <div class="flex-grow-1 fw-semibold">Phạm Thị D</div>
-                                    <div class="form-check"><input class="form-check-input student-checkbox" type="checkbox" value="104"></div>
-                                </div>
-
-                                <div class="student-item d-flex align-items-center gap-3 py-2 px-2 mb-1">
-                                    <div style="width:40px; height:40px; border-radius:8px; overflow:hidden;">
-                                        <img src="~/assets/image/tải xuống.jpg" alt="Avatar"
-                                             style="width:100%; height:100%; object-fit:cover;">
-                                    </div>
-                                    <div class="flex-grow-1 fw-semibold">Hoàng Văn E</div>
-                                    <div class="form-check"><input class="form-check-input student-checkbox" type="checkbox" value="105"></div>
-                                </div>
-
                             </div>
                         </div>
                     </div>
@@ -381,88 +362,72 @@
                     <!-- Footer -->
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                        <button type="button" class="btn btn-primary">Lưu thay đổi</button>
+                        <button type="button" class="btn btn-primary" onclick="saveGiaoBai()">Lưu thay đổi</button>
                     </div>
 
                 </div>
             </div>
         </div>
 
-        <!-- Modal Xem chi tiết -->
+        <!-- Modal Xem chi tiết câu hỏi -->
         <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content rounded-4 shadow">
                     <div class="modal-header">
-                        <h5 class="modal-title fw-bold">Chi tiết bài trắc nghiệm</h5>
+                        <h5 class="modal-title fw-bold">Chi tiết bài trắc nghiệm (@soCauHoi câu)</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                     </div>
 
-                    <!-- Modal body có scroll -->
                     <div class="modal-body bg-white" style="max-height: 75vh; overflow-y: auto;">
-
-                        <!-- Câu hỏi 1 -->
-                        <div class="mb-4">
-                            <div class="fw-bold">Câu 1 <span class="text-muted small">ID: 43777953</span></div>
-                            <div class="fw-semibold mt-1 mb-2">Shell là gì trong Linux?</div>
-                            <div>A. Một chương trình thuộc kernel</div>
-                            <div>B. Một loại trình duyệt</div>
-                            <div>C. Một bộ thông dịch lệnh (Đáp án đúng)</div>
-                            <div>D. Một phần mềm đồ họa</div>
-                            <div class="text-success mt-2 fw-semibold">Đáp án: C</div>
-                            <hr>
-                        </div>
-
-                        <!-- Câu hỏi 2 -->
-                        <div class="mb-4">
-                            <div class="fw-bold">Câu 2 <span class="text-muted small">ID: 43777954</span></div>
-                            <div class="fw-semibold mt-1 mb-2">Lệnh nào dùng để xem shell hiện tại đang dùng?</div>
-                            <div>A. cat /etc/shells</div>
-                            <div>B. echo $SHELL (Đáp án đúng)</div>
-                            <div>C. whoami</div>
-                            <div>D. pwd</div>
-                            <div class="text-success mt-2 fw-semibold">Đáp án: B</div>
-                            <hr>
-                        </div>
-
-                        <!-- Câu hỏi 2 -->
-                        <div class="mb-4">
-                            <div class="fw-bold">Câu 2 <span class="text-muted small">ID: 43777954</span></div>
-                            <div class="fw-semibold mt-1 mb-2">Lệnh nào dùng để xem shell hiện tại đang dùng?</div>
-                            <div>A. cat /etc/shells</div>
-                            <div>B. echo $SHELL (Đáp án đúng)</div>
-                            <div>C. whoami</div>
-                            <div>D. pwd</div>
-                            <div class="text-success mt-2 fw-semibold">Đáp án: B</div>
-                            <hr>
-                        </div>
-
-                        <!-- Câu hỏi 2 -->
-                        <div class="mb-4">
-                            <div class="fw-bold">Câu 2 <span class="text-muted small">ID: 43777954</span></div>
-                            <div class="fw-semibold mt-1 mb-2">Lệnh nào dùng để xem shell hiện tại đang dùng?</div>
-                            <div>A. cat /etc/shells</div>
-                            <div>B. echo $SHELL (Đáp án đúng)</div>
-                            <div>C. whoami</div>
-                            <div>D. pwd</div>
-                            <div class="text-success mt-2 fw-semibold">Đáp án: B</div>
-                            <hr>
-                        </div>
-
-                        <!-- Câu hỏi 2 -->
-                        <div class="mb-4">
-                            <div class="fw-bold">Câu 2 <span class="text-muted small">ID: 43777954</span></div>
-                            <div class="fw-semibold mt-1 mb-2">Lệnh nào dùng để xem shell hiện tại đang dùng?</div>
-                            <div>A. cat /etc/shells</div>
-                            <div>B. echo $SHELL (Đáp án đúng)</div>
-                            <div>C. whoami</div>
-                            <div>D. pwd</div>
-                            <div class="text-success mt-2 fw-semibold">Đáp án: B</div>
-                            <hr>
-                        </div>
-
-                        <!-- Thêm nhiều câu hỏi tại đây -->
-                        <!-- ... -->
-
+                        @if (Model?.CauHois != null && Model.CauHois.Any())
+                        {
+                            int cauSo = 1;
+                            foreach (var cauHoi in Model.CauHois.OrderBy(c => c.ThuTu ?? c.CauHoiId))
+                            {
+                                <div class="mb-4">
+                                    <div class="fw-bold">
+                                        Câu @cauSo 
+                                    </div>
+                                    <div class="fw-semibold mt-1 mb-2">@cauHoi.NoiDungCauHoi</div>
+                                    
+                                    @if (cauHoi.DapAns != null && cauHoi.DapAns.Any())
+                                    {
+                                        char dapAnChar = 'A';
+                                        foreach (var dapAn in cauHoi.DapAns.OrderBy(d => d.ThuTu ?? d.DapAnId))
+                                        {
+                                            var isDung = dapAn.LaDapAnDung == true;
+                                            <div class="@(isDung ? "text-success fw-semibold" : "")">
+                                                @dapAnChar. @dapAn.NoiDungDapAn @(isDung ? "(Đáp án đúng)" : "")
+                                            </div>
+                                            dapAnChar++;
+                                        }
+                                        
+                                        var dapAnDung = cauHoi.DapAns.FirstOrDefault(d => d.LaDapAnDung == true);
+                                        if (dapAnDung != null)
+                                        {
+                                            var danhSachDapAn = cauHoi.DapAns.OrderBy(d => d.ThuTu ?? d.DapAnId).ToList();
+                                            var viTri = danhSachDapAn.IndexOf(dapAnDung);
+                                            <div class="text-success mt-2 fw-semibold">
+                                                Đáp án: @((char)('A' + viTri))
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="text-danger small">Chưa có đáp án</div>
+                                    }
+                                    <hr>
+                                </div>
+                                cauSo++;
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center text-muted py-4">
+                                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                Chưa có câu hỏi nào
+                            </div>
+                        }
                     </div>
 
                     <div class="modal-footer bg-light">
@@ -473,3 +438,73 @@
         </div>
     </div>
 </div>
+
+<!-- ⭐ LOAD FILE JS RIÊNG ⭐ -->
+<script src="~/assets/js/teacher/JS_QuanLyTracNghiem.js"></script>
+
+<!-- ⭐ KHỞI TẠO VỚI DỮ LIỆU TỪ MODEL ⭐ -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const baiTracNghiemId = @(Model?.BaiTracNghiemId ?? 0);
+        const khoaHocId = @(Model?.KhoaHocId ?? 0);
+        
+        // ⭐ KHỞI TẠO - GỌI FUNCTION initTaoBaiTracNghiem ⭐
+        if (typeof initTaoBaiTracNghiem === 'function') {
+            initTaoBaiTracNghiem(baiTracNghiemId, khoaHocId);
+        }
+
+        // ⭐ LOAD DANH SÁCH SINH VIÊN KHI MỞ MODAL GIAO BÀI ⭐
+        const editModal = document.getElementById('editModal');
+        if (editModal) {
+            editModal.addEventListener('shown.bs.modal', function () {
+                console.log('Edit modal opened, loading student list...');
+                if (typeof loadDanhSachSinhVien === 'function') {
+                    loadDanhSachSinhVien();
+                }
+            });
+        }
+
+        // ⭐ EVENT LISTENER CHO CHECKBOXES ĐỂ CẬP NHẬT "CHỌN TẤT CẢ" ⭐
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('student-checkbox')) {
+                const checkAllBox = document.getElementById('checkAllStudents');
+                const checkboxes = document.querySelectorAll('.student-checkbox');
+                const checkedCount = document.querySelectorAll('.student-checkbox:checked').length;
+                
+                if (checkedCount === 0) {
+                    checkAllBox.checked = false;
+                    checkAllBox.indeterminate = false;
+                } else if (checkedCount === checkboxes.length) {
+                    checkAllBox.checked = true;
+                    checkAllBox.indeterminate = false;
+                } else {
+                    checkAllBox.checked = false;
+                    checkAllBox.indeterminate = true;
+                }
+            }
+        });
+    });
+</script>
+
+<!-- ⭐ CSS BỔ SUNG ⭐ -->
+<style>
+    .hover-bg-light:hover {
+        background-color: #f8f9fa !important;
+        transition: background-color 0.2s ease;
+    }
+    
+    .student-item {
+        transition: all 0.2s ease;
+    }
+    
+    .student-item:hover {
+        background-color: #f8f9fa;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    /* Style cho checkbox indeterminate */
+    input[type="checkbox"]:indeterminate {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+</style>

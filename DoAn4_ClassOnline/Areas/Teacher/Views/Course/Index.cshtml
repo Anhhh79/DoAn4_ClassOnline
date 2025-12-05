@@ -3,8 +3,8 @@
     var khoaHoc = ViewBag.KhoaHoc as DoAn4_ClassOnline.Models.KhoaHoc;
 }
 
-<!-- Section chức năng -->
-<div class="container">
+<!-- ⭐ THÊM DATA ATTRIBUTE ĐỂ JAVASCRIPT LẤY ĐƯỢC ⭐ -->
+<div class="container" data-khoa-hoc-id="@(khoaHoc?.KhoaHocId)">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <!-- Nút quay lại -->
         <a class="btn border-0" asp-controller="Home" asp-action="Index">
@@ -77,9 +77,9 @@
             <div>
                 <div class="card custom-card text-center p-2 h-95 border-0 rounded-4 bg-body-tertiary">
                     <div class="icon mb-2"><img src="/assets/image/meet.png" style="width:50px" alt="" /></div>
-                        <button class="btn btn-success text-white px-4 rounded-pill" style="background-color:#0055ff" data-bs-toggle="modal" data-bs-target="#joinMeetModal">
-                            <i class="bi bi-camera-video me-1"></i> Tạo phòng
-                        </button>
+                    <button class="btn btn-success text-white px-4 rounded-pill" style="background-color:#0055ff" data-bs-toggle="modal" data-bs-target="#joinMeetModal">
+                        <i class="bi bi-camera-video me-1"></i> Tạo phòng
+                    </button>
                 </div>
             </div>
         </div>

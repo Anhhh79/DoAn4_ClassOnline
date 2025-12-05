@@ -3,7 +3,7 @@
 // ===============================
 const toastBase = {
     toast: true,
-    position: 'top',
+    position: 'top-end',  // ⭐ THAY ĐổI TỪ 'top' THÀNH 'top-end' ĐỂ HIỂN THỊ GÓC PHẢI
     showConfirmButton: false,
     timerProgressBar: true,
     showClass: {

@@ -1,7 +1,30 @@
-﻿//Load nội dung cho tab Thông báo, Tài liệu, Bài tập
+﻿
 document.addEventListener("DOMContentLoaded", () => {
 
+    // ⭐ LẤY KHOAHOCID TỪ DATA ATTRIBUTE ⭐
+    function getKhoaHocId() {
+        const container = document.querySelector('.container[data-khoa-hoc-id]');
+        if (container) {
+            const khoaHocId = container.getAttribute('data-khoa-hoc-id');
+            console.log('KhoaHocId from data attribute:', khoaHocId);
+            return khoaHocId;
+        }
+        
+        // Fallback: lấy từ URL
+        const pathSegments = window.location.pathname.split('/');
+        const indexPath = pathSegments.indexOf('Index');
+        if (indexPath !== -1 && pathSegments[indexPath + 1]) {
+            const id = pathSegments[indexPath + 1];
+            console.log('KhoaHocId from URL:', id);
+            return id;
+        }
+        
+        console.error('Cannot find KhoaHocId');
+        return null;
+    }
+
     function loadNoiDung_Tc(url) {
+        console.log('Loading content from:', url);
         fetch(url)
             .then(res => res.text())
             .then(html => {
@@ -60,12 +83,24 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Khi bấm Trắc nghiệm
+    // ⭐ KHI BẤM TRẮC NGHIỆM - SỬ DỤNG KHOAHOCID TỪ DATA ATTRIBUTE ⭐
     const btnTracNghiem = document.getElementById("btnTracNghiem");
     if (btnTracNghiem) {
         btnTracNghiem.addEventListener("click", function (e) {
             e.preventDefault();
-            loadNoiDung_Tc('/Teacher/TracNghiem/Index');
+            console.log('Trắc nghiệm button clicked');
+            
+            const khoaHocId = getKhoaHocId();
+            console.log('Using khoaHocId:', khoaHocId);
+            
+            if (khoaHocId) {
+                const url = `/Teacher/TracNghiem/Index?khoaHocId=${khoaHocId}`;
+                console.log('Loading TracNghiem with URL:', url);
+                loadNoiDung_Tc(url);
+            } else {
+                console.error('khoaHocId is null');
+                alert('Lỗi: Không xác định được ID khóa học!');
+            }
             setActiveButton(this);
         });
     }
@@ -137,7 +172,3 @@ window.startMeeting = async function () {
         alert("Đã xảy ra lỗi khi mở link. Kiểm tra console để biết chi tiết.");
     }
 };
-
-
-
-
