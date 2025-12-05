@@ -102,7 +102,8 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
                         TenKhoa = k.Khoa.TenKhoa,
                         TenHocKy = k.HocKy.TenHocKy,
                         NamHoc = k.HocKy.NamHoc,
-                        SoLuongSinhVien = k.ThamGiaKhoaHocs.Count
+                        SoLuongSinhVien = k.ThamGiaKhoaHocs.Count,
+                        k.TrangThaiKhoaHoc
                     })
                     .ToListAsync();
 
@@ -299,8 +300,6 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
-
-
 
     }
 }

@@ -63,7 +63,15 @@
 
                             <div class="d-flex justify-content-between text-secondary small mb-3 mt-2">
                                 <span>@item.ThamGiaKhoaHocs.Count() SV đã tham gia</span>
-                                <span>Tất cả mọi người</span>
+                                @if(item.TrangThaiKhoaHoc == "DangKhoa")
+                                {
+                                    <span class="text-danger">Đang bị khóa</span>
+                                }
+                                else
+                                {
+                                   <span>Đang hoạt động</span>
+                                }
+                                
                             </div>
 
                             <div class="text-start">

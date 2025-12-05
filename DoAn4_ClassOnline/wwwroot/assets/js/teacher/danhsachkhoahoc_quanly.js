@@ -68,38 +68,45 @@ function renderKhoaHoc(khoaHocs) {
     $("#noResult").hide();
 
     khoaHocs.forEach(function (item) {
+        let trangThaiHtml = '';
+        if (item.trangThaiKhoaHoc === "DangKhoa") {
+            trangThaiHtml = '<span class="text-danger">Đang bị khóa</span>';
+        } else {
+            trangThaiHtml = '<span>Đang hoạt động</span>';
+        }
+
         let html = `
-            <div class="col-12 col-md-3 khoaHocItem" 
-                data-hockyid="${item.hocKyId}" 
-                data-namhoc="${item.namHoc}">
-                <div class="card shadow border-0 rounded-4 overflow-hidden h-100">
-                    <a href="/Teacher/QuanLyKhoaHoc/QuanLyKhoaHoc/${item.khoaHocId}">
-                        <div class="card-header p-0 border-0 bg-white image-cuser">
-                            <img src="${item.hinhAnh}" class="w-100" alt="${item.tenKhoaHoc}" 
-                                 style="height: 130px; object-fit: cover;">
-                        </div>
-                    </a>
-                    <div class="card-body text-start">
-                        <h6 class="fw-bold mb-2 text-truncate" title="${item.tenKhoaHoc}">
-                            ${item.tenKhoaHoc}
-                        </h6>
-                        <span class="text-truncate">Giảng viên: ${item.giaoVienName}</span><br />
-                        <span class="text-truncate">${item.tenKhoa}</span><br />
-                        <span>${item.tenHocKy} / ${item.namHoc}</span>
-                        <div class="d-flex justify-content-between text-secondary small mb-3 mt-2">
-                            <span>${item.soLuongSinhVien} SV đã tham gia</span>
-                            <span>Tất cả mọi người</span>
-                        </div>
-                        <div class="text-start">
-                            <a class="btn btn-light w-100 border rounded-3" 
-                               href="/Teacher/QuanLyKhoaHoc/QuanLyKhoaHoc/${item.khoaHocId}">
-                                Quản lý khóa học
-                            </a>
-                        </div>
+        <div class="col-12 col-md-3 khoaHocItem" 
+            data-hockyid="${item.hocKyId}" 
+            data-namhoc="${item.namHoc}">
+            <div class="card shadow border-0 rounded-4 overflow-hidden h-100">
+                <a href="/Teacher/QuanLyKhoaHoc/QuanLyKhoaHoc/${item.khoaHocId}">
+                    <div class="card-header p-0 border-0 bg-white image-cuser">
+                        <img src="${item.hinhAnh}" class="w-100" alt="${item.tenKhoaHoc}" 
+                             style="height: 130px; object-fit: cover;">
+                    </div>
+                </a>
+                <div class="card-body text-start">
+                    <h6 class="fw-bold mb-2 text-truncate" title="${item.tenKhoaHoc}">
+                        ${item.tenKhoaHoc}
+                    </h6>
+                    <span class="text-truncate">Giảng viên: ${item.giaoVienName}</span><br />
+                    <span class="text-truncate">${item.tenKhoa}</span><br />
+                    <span>${item.tenHocKy} / ${item.namHoc}</span>
+                    <div class="d-flex justify-content-between text-secondary small mb-3 mt-2">
+                        <span>${item.soLuongSinhVien} SV đã tham gia</span>
+                        ${trangThaiHtml}
+                    </div>
+                    <div class="text-start">
+                        <a class="btn btn-light w-100 border rounded-3" 
+                           href="/Teacher/QuanLyKhoaHoc/QuanLyKhoaHoc/${item.khoaHocId}">
+                            Quản lý khóa học
+                        </a>
                     </div>
                 </div>
             </div>
-        `;
+        </div>
+    `;
         container.append(html);
     });
 }
@@ -121,7 +128,6 @@ function themKhoaHoc() {
     if (file) {
         formData.append("AnhKhoaHoc", file);
     }
-    console.log(...formData); // Kiểm tra dữ liệu gửi đi
     $.ajax({
         type: "POST",
         url: "/Teacher/QuanLyKhoaHoc/ThemKhoaHoc",

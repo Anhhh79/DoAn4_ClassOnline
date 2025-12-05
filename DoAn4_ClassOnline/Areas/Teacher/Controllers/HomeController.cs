@@ -35,7 +35,7 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
 
                 // Query lấy khóa học
                 var query = _context.KhoaHocs
-                    .Where(k => k.GiaoVienId == userId)
+                    .Where(k => k.GiaoVienId == userId && k.TrangThaiKhoaHoc == "DangMo")
                     .Include(k => k.GiaoVien)
                     .Include(k => k.Khoa)
                     .Include(k => k.HocKy)
