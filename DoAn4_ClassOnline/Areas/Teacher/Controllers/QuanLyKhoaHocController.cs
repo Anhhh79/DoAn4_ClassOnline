@@ -301,5 +301,50 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
             }
         }
 
+        // khóa khóa học
+        [HttpPost]
+        public async Task<IActionResult> KhoaKhoaHoc(int khoaHocId)
+        {
+            try
+            {
+                if (khoaHocId <= 0)
+                    return Json(new { success = false, message = "ID khóa học không hợp lệ!" });
+
+                var khoaHoc = await _context.KhoaHocs.FindAsync(khoaHocId);
+                if (khoaHoc == null)
+                    return Json(new { success = false, message = "Không tìm thấy khóa học!" });
+
+                khoaHoc.TrangThaiKhoaHoc = "DangKhoa";
+
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "Khóa khóa học thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+
+        }
+
+        // mở khóa học
+        [HttpPost]
+        public async Task<IActionResult> MoKhoaKhoaHoc(int khoaHocId)
+        {
+            try
+            {
+                if (khoaHocId <= 0)
+                    return Json(new { success = false, message = "ID khóa học không hợp lệ!" });
+                var khoaHoc = await _context.KhoaHocs.FindAsync(khoaHocId);
+                if (khoaHoc == null)
+                    return Json(new { success = false, message = "Không tìm thấy khóa học!" });
+                khoaHoc.TrangThaiKhoaHoc = "DangMo";
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "Mở khóa khóa học thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
     }
 }

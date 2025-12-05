@@ -228,3 +228,70 @@ function resetForm_ThemKhoaHoc() {
     $("#formThemKhoaHoc")[0].reset();
     clearFieldErrors();
 }
+
+// khóa khóa học
+function khoaKhoaHoc(khoaHocId) {
+    showConfirm_tc("Bạn có chắc chắn muốn khóa khóa học này?")
+        .then((result) => {
+            if (result.isConfirmed) {
+                // Người dùng nhấn Đồng ý
+                $.ajax({
+                    url: '/Teacher/QuanLyKhoaHoc/KhoaKhoaHoc',
+                    type: 'POST',
+                    data: { khoaHocId: khoaHocId },
+                    success: function (response) {
+                        if (response.success) {
+                            showSuccess_tc(response.message);
+                            // Cập nhật nút ngay lập tức
+                            let btn = $(`#btn-khoa-${khoaHocId}`);
+                            btn.removeClass("btn-danger").addClass("btn-primary");
+                            btn.text("Mở khóa học");
+                            btn.off("click").on("click", function () {
+                                moKhoaKhoaHoc(khoaHocId);
+                            });
+                        } else {
+                            showError_tc(response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        showError_tc("Đã xảy ra lỗi khi khóa khóa học!");
+                        console.error(error);
+                    }
+                });
+            }
+        });
+}
+
+// mở khóa khóa học
+function moKhoaKhoaHoc(khoaHocId) {
+    showConfirm_tc("Bạn có chắc chắn muốn mở khóa khóa học này?")
+        .then((result) => {
+            if (result.isConfirmed) {
+                // Người dùng nhấn Đồng ý
+                $.ajax({
+                    url: '/Teacher/QuanLyKhoaHoc/MoKhoaKhoaHoc',
+                    type: 'POST',
+                    data: { khoaHocId: khoaHocId },
+                    success: function (response) {
+                        if (response.success) {
+                            showSuccess_tc(response.message);
+                            // Cập nhật nút ngay lập tức
+                            let btn = $(`#btn-khoa-${khoaHocId}`);
+                            btn.removeClass("btn-primary").addClass("btn-danger");
+                            btn.text("Khóa khóa học");
+                            btn.off("click").on("click", function () {
+                                khoaKhoaHoc(khoaHocId);
+                            });
+                        } else {
+                            showError_tc(response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        showError_tc("Đã xảy ra lỗi khi mở khóa khóa học!");
+                        console.error(error);
+                    }
+                });
+            }
+        });
+}
+
