@@ -1,5 +1,6 @@
 ﻿using DoAn4_ClassOnline.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
 {
@@ -14,24 +15,39 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetUserInfo()
+        public async Task<IActionResult> GetUserInfo()
         {
             try
             {
+                var userId = HttpContext.Session.GetInt32("UserId");
+
+                if (!userId.HasValue)
+                {
+                    return Json(new { success = false, message = "Phiên đăng nhập đã hết hạn!" });
+                }
+
+                // ⭐ LẤY TÊN KHOA TRỰC TIẾP TỪ DATABASE ⭐
+                var userWithKhoa = await _context.Users
+                    .Include(u => u.Khoa)
+                    .FirstOrDefaultAsync(u => u.UserId == userId.Value);
+
+                var tenKhoa = userWithKhoa?.Khoa?.TenKhoa ?? "Chưa có khoa";
+
                 var user = new
                 {
-                    userId = HttpContext.Session.GetInt32("UserId"),
+                    userId = userId.Value,
                     username = HttpContext.Session.GetString("Username") ?? "",
                     email = HttpContext.Session.GetString("Email") ?? "",
                     fullName = HttpContext.Session.GetString("FullName") ?? "",
-                    avatar = HttpContext.Session.GetString("Avatar") ?? "/assets/image/logo.png",
+                    avatar = HttpContext.Session.GetString("Avatar") ?? "/assets/image/tải xuống.jpg",
                     phoneNumber = HttpContext.Session.GetString("PhoneNumber") ?? "",
                     maSo = HttpContext.Session.GetString("MaSo") ?? "",
                     gioiTinh = HttpContext.Session.GetString("GioiTinh") ?? "",
                     ngaySinh = HttpContext.Session.GetString("NgaySinh") ?? "",
                     diaChi = HttpContext.Session.GetString("DiaChi") ?? "",
                     roleId = HttpContext.Session.GetInt32("RoleId"),
-                    roleName = HttpContext.Session.GetString("RoleName") ?? ""
+                    roleName = HttpContext.Session.GetString("RoleName") ?? "",
+                    tenKhoa = tenKhoa  // ⭐ TÊN KHOA ⭐
                 };
 
                 return Json(new { success = true, user });
@@ -95,7 +111,21 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
                 HttpContext.Session.SetString("NgaySinh", user.NgaySinh?.ToString("dd/MM/yyyy") ?? "");
                 HttpContext.Session.SetString("DiaChi", user.DiaChi ?? "");
 
-                return Json(new { success = true, message = "Cập nhật thành công!" });
+                // ⭐ TRẢ VỀ THÔNG TIN USER SAU KHI CẬP NHẬT ⭐
+                return Json(new
+                {
+                    success = true,
+                    message = "Cập nhật thành công!",
+                    user = new
+                    {
+                        fullName = user.FullName,
+                        email = user.Email,
+                        phoneNumber = user.PhoneNumber,
+                        gioiTinh = user.GioiTinh,
+                        ngaySinh = user.NgaySinh?.ToString("dd/MM/yyyy"),
+                        diaChi = user.DiaChi
+                    }
+                });
             }
             catch (Exception ex)
             {

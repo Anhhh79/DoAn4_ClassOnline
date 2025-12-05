@@ -94,6 +94,9 @@ function populateProfileData(user) {
     setInputValue('phone_InforGiaoVien', user.phoneNumber);
     setInputValue('MSSV_InforGiaoVien', user.maSo);
     setInputValue('diaChi_InforGiaoVien', user.diaChi);
+    
+    // ⭐ THÊM TÊN KHOA VÀO INPUT READONLY ⭐
+    setInputValue('khoaName_InforGiaoVien', user.tenKhoa || 'Chưa có khoa');
 
     // Giới tính
     if (user.gioiTinh) {

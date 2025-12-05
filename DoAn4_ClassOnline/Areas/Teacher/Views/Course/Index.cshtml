@@ -1,6 +1,8 @@
 ﻿@{
     ViewData["Title"] = "Chi tiết khóa học";
+    var khoaHoc = ViewBag.KhoaHoc as DoAn4_ClassOnline.Models.KhoaHoc;
 }
+
 <!-- Section chức năng -->
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -9,9 +11,18 @@
             <i class="bi bi-chevron-left"></i> Quay lại
         </a>
 
-        <!-- Tiêu đề -->
-        <h3 class="fw-bold text-center flex-grow-1 mb-0">
-            Phát triển ứng dụng IoT - Nguyễn Đình Tứ
+        <!-- Tiêu đề động với ID để có thể cập nhật -->
+        <h3 class="fw-bold text-center flex-grow-1 mb-0" id="courseTitle">
+            @if (khoaHoc != null)
+            {
+                <span id="courseName">@khoaHoc.TenKhoaHoc</span>
+                <text> - </text>
+                <span id="teacherName">@khoaHoc.GiaoVien.FullName</span>
+            }
+            else
+            {
+                <span class="text-muted">Không tìm thấy khóa học</span>
+            }
         </h3>
 
         <!-- Chỗ trống bên phải để cân đối -->
@@ -19,8 +30,6 @@
     </div>
 
     <div class="row row-cols-2 row-cols-md-5 g-4">
-
-        
         <!-- Card 2 -->
         <div class="col">
             <a id="btnThongBao" style="text-decoration: none;">
@@ -32,7 +41,6 @@
                 </div>
             </a>
         </div>
-
 
         <!-- Card 3 -->
         <div class="col">
@@ -57,26 +65,26 @@
         <!-- Card 5 -->
         <div class="col">
             <a id="btnBaiTap" style="text-decoration: none;">
-            <div class="card custom-card text-center p-2 h-95 border-0 rounded-4 bg-body-tertiary">
-                <div class="icon mb-2"><i class="bi bi-file-arrow-up fs-1"></i></div>
-                <h6 class="fw-bold mb-2">Bài tập</h6>
-            </div>
+                <div class="card custom-card text-center p-2 h-95 border-0 rounded-4 bg-body-tertiary">
+                    <div class="icon mb-2"><i class="bi bi-file-arrow-up fs-1"></i></div>
+                    <h6 class="fw-bold mb-2">Bài tập</h6>
+                </div>
             </a>
         </div>
 
-        <!-- Card 1 -->
+        <!-- Card 1 - Google Meet -->
         <div class="col">
             <div>
                 <div class="card custom-card text-center p-2 h-95 border-0 rounded-4 bg-body-tertiary">
                     <div class="icon mb-2"><img src="/assets/image/meet.png" style="width:50px" alt="" /></div>
-                    <a class="btn btn-success text-white px-4 rounded-pill" style="background-color:#0055ff" data-bs-toggle="modal"
-                       data-bs-target="#joinMeetModal">
-                        <i class="bi bi-camera-video me-1"></i> Tạo phòng 
-                    </a>
+                        <button class="btn btn-success text-white px-4 rounded-pill" style="background-color:#0055ff" data-bs-toggle="modal" data-bs-target="#joinMeetModal">
+                            <i class="bi bi-camera-video me-1"></i> Tạo phòng
+                        </button>
                 </div>
             </div>
         </div>
     </div>
+
     <!-- Modal nhập link Meet -->
     <div class="modal fade" id="joinMeetModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
@@ -87,7 +95,7 @@
                 </div>
                 <div class="modal-body mb-2">
                     <label class="form-label">Nhập link Google Meet:</label>
-                    <input type="text" id="meetLink" class="form-control" placeholder="https://meet.google.com/...">
+                    <input type="text" id="meetLink" class="form-control" placeholder="https://meet.google.com/..." value="@(khoaHoc?.LinkHocOnline ?? "")">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
@@ -99,12 +107,24 @@
         </div>
     </div>
 
-
-
     <!-- Khu vực load nội dung -->
     <div id="noiDungContainer" class="mt-4">
-        @await Html.PartialAsync("_ThongBaoPartial");
+        @await Html.PartialAsync("_ThongBaoPartial")
     </div>
 </div>
+
+<script>
+    // Lắng nghe sự kiện cập nhật profile
+    document.addEventListener('profileUpdated', function(e) {
+        console.log('Profile updated event received:', e.detail);
+        
+        // Cập nhật tên giáo viên trong tiêu đề
+        const teacherNameElement = document.getElementById('teacherName');
+        if (teacherNameElement && e.detail.userInfo && e.detail.userInfo.fullName) {
+            teacherNameElement.textContent = e.detail.userInfo.fullName;
+            console.log('Teacher name updated to:', e.detail.userInfo.fullName);
+        }
+    });
+</script>
 
 
