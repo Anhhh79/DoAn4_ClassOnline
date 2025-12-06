@@ -15,6 +15,13 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
+    // ⭐ NGĂN CHẶN KHỞI TẠO NHIỀU LẦN ⭐
+    if (window.chinhSuaTracNghiemInitialized) {
+        console.log('⚠️ ChinhSuaTracNghiem already initialized, skipping...');
+        return;
+    }
+    window.chinhSuaTracNghiemInitialized = true;
+
     // Bảo đảm mọi thứ chỉ chạy khi DOM đã sẵn sàng
     (function () {
         "use strict";
@@ -50,6 +57,13 @@ document.addEventListener("DOMContentLoaded", () => {
         function init() {
             // ⭐ XÓA LOCALSTORAGE ĐỂ BẮT ĐẦU SẠCH ⭐
             localStorage.removeItem(STORAGE_KEY);
+            
+            // ⭐ KIỂM TRA XEM ĐÃ CÓ CÂU HỎI CHƯA - NGĂN TẠO TRÙNG ⭐
+            const existingQuestions = document.querySelectorAll('.question-block');
+            if (existingQuestions.length > 0) {
+                console.log('⚠️ Questions already exist, skipping addQuestion()');
+                return;
+            }
             
             // ⭐ CHỈ TẠO 1 CÂU MẶC ĐỊNH ⭐
             addQuestion();
