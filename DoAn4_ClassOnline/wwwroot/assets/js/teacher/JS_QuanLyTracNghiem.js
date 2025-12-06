@@ -115,7 +115,7 @@ async function deleteBai(id) {
         focusCancel: true,
         customClass: {
             confirmButton: 'btn btn-danger px-4',
-            cancelButton: 'btn btn-secondary ms-3 px-4'
+            cancelButton: 'btn btn-success me-3 px-4'
         },
         buttonsStyling: false
     });
