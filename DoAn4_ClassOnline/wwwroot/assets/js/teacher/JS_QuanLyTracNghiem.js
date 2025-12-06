@@ -292,7 +292,7 @@ function refreshResults() {
     }
 }
 
-// ⭐ LƯU CÀI ĐẶT - HOÀN CHỈNH VỚI API ⭐
+// ⭐ LƯU CÀI ĐẶT - HOÀN CHỈNH VỚI API + KIỂM TRA TÊN TRÙNG ⭐
 async function saveSettings() {
     // Validation
     const tenBaiThi = document.getElementById('tenBaiThi')?.value?.trim();
@@ -300,6 +300,36 @@ async function saveSettings() {
         alert('Vui lòng nhập tên bài thi!');
         document.getElementById('tenBaiThi')?.focus();
         return;
+    }
+
+    // ⭐ KIỂM TRA TÊN TRÙNG (CHỈ KHI SỬA BÀI) ⭐
+    try {
+        const checkResponse = await fetch(`/Teacher/TracNghiem/KiemTraTenTrung?tenBaiThi=${encodeURIComponent(tenBaiThi)}&khoaHocId=${khoaHocId}&baiTracNghiemId=${baiTracNghiemId}`);
+        const checkData = await checkResponse.json();
+        
+        if (checkData.success && checkData.trung) {
+            showWarning_tc('Tên bài thi đã tồn tại trong khóa học này! Vui lòng chọn tên khác.');
+            document.getElementById('tenBaiThi')?.focus();
+            return;
+        }
+    } catch (error) {
+        console.error('Error checking duplicate name:', error);
+        // Tiếp tục lưu nếu không kiểm tra được
+    }
+
+    // ⭐ KIỂM TRA TÊN TRÙNG (CHỈ KHI SỬA BÀI) ⭐
+    try {
+        const checkResponse = await fetch(`/Teacher/TracNghiem/KiemTraTenTrung?tenBaiThi=${encodeURIComponent(tenBaiThi)}&khoaHocId=${khoaHocId}&baiTracNghiemId=${baiTracNghiemId}`);
+        const checkData = await checkResponse.json();
+        
+        if (checkData.success && checkData.trung) {
+            showWarning_tc('Tên bài thi đã tồn tại trong khóa học này! Vui lòng chọn tên khác.');
+            document.getElementById('tenBaiThi')?.focus();
+            return;
+        }
+    } catch (error) {
+        console.error('Error checking duplicate name:', error);
+        // Tiếp tục lưu nếu không kiểm tra được
     }
 
     const thoiGianLamBai = parseInt(document.getElementById('thoiGianLamBai')?.value);

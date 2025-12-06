@@ -784,6 +784,62 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
                 _logger.LogError(ex, $"Error deleting image: {imageUrl}");
             }
         }
+
+        // ⭐ THÊM API KIỂM TRA TÊN BÀI THI TRÙNG ⭐
+        [HttpGet]
+        public async Task<IActionResult> KiemTraTenTrung(string tenBaiThi, int khoaHocId, int? baiTracNghiemId = null)
+        {
+            try
+            {
+                var userId = HttpContext.Session.GetInt32("UserId");
+                
+                if (userId == null)
+                {
+                    return Json(new { success = false, message = "Phiên đăng nhập đã hết hạn!" });
+                }
+
+                // Kiểm tra quyền truy cập khóa học
+                var khoaHoc = await _context.KhoaHocs
+                    .FirstOrDefaultAsync(k => k.KhoaHocId == khoaHocId && k.GiaoVienId == userId);
+
+                if (khoaHoc == null)
+                {
+                    return Json(new { success = false, message = "Bạn không có quyền truy cập khóa học này!" });
+                }
+
+                // Chuẩn hóa tên bài thi để so sánh (bỏ khoảng trắng thừa, chuyển thành chữ thường)
+                var tenBaiThiNormalized = tenBaiThi?.Trim().ToLower();
+                
+                if (string.IsNullOrWhiteSpace(tenBaiThiNormalized))
+                {
+                    return Json(new { success = true, trung = false });
+                }
+
+                // Kiểm tra trùng trong cùng khóa học
+                var query = _context.BaiTracNghiems
+                    .Where(b => b.KhoaHocId == khoaHocId);
+
+                // Nếu đang sửa bài thi, loại trừ chính bài đó
+                if (baiTracNghiemId.HasValue && baiTracNghiemId.Value > 0)
+                {
+                    query = query.Where(b => b.BaiTracNghiemId != baiTracNghiemId.Value);
+                }
+
+                var daTonTai = await query
+                    .AnyAsync(b => b.TenBaiThi.Trim().ToLower() == tenBaiThiNormalized);
+
+                return Json(new { 
+                    success = true, 
+                    trung = daTonTai,
+                    message = daTonTai ? "Tên bài thi đã tồn tại trong khóa học này!" : ""
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error checking duplicate quiz name");
+                return Json(new { success = false, message = "Lỗi khi kiểm tra tên bài thi!" });
+            }
+        }
     }
 
     // ⭐ MODEL REQUEST CẬP NHẬT CÀI ĐẶT ⭐

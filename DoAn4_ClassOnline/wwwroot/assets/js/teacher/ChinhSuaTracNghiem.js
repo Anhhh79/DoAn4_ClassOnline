@@ -247,6 +247,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            // ⭐ KIỂM TRA TÊN TRÙNG TRƯỚC KHI LƯU ⭐
+            const khoaHocId = window.khoaHocIdGlobal || parseInt(document.getElementById('khoaHocId')?.value) || 0;
+            
+            try {
+                const checkResponse = await fetch(`/Teacher/TracNghiem/KiemTraTenTrung?tenBaiThi=${encodeURIComponent(tenBaiThi)}&khoaHocId=${khoaHocId}`);
+                const checkData = await checkResponse.json();
+                
+                if (checkData.success && checkData.trung) {
+                    showWarning_tc('Tên bài thi đã tồn tại trong khóa học này! Vui lòng chọn tên khác.');
+                    document.getElementById('tenBaiThi')?.focus();
+                    return;
+                }
+            } catch (error) {
+                console.error('Error checking duplicate name:', error);
+                // Tiếp tục lưu nếu không kiểm tra được
+            }
+
             const thoiGianBatDau = document.getElementById('thoiGianBatDau')?.value;
             if (!thoiGianBatDau) {
                 showWarning_tc('Vui lòng chọn thời gian bắt đầu!');
@@ -297,8 +314,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             try {
-                const khoaHocId = window.khoaHocIdGlobal || parseInt(document.getElementById('khoaHocId')?.value) || 0;
-
                 const requestData = {
                     khoaHocId: khoaHocId,
                     tenBaiThi: tenBaiThi,
