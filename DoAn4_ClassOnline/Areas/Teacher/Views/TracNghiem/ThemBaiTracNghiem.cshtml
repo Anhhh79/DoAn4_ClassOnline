@@ -1,19 +1,21 @@
-﻿<div class="container mt-4">
-    <div class="d-flex">
+﻿@{
+    ViewData["Title"] = "Thêm bài trắc nghiệm";
+    var khoaHocId = ViewBag.KhoaHocId ?? 0;
+}
+
+<div class="container mt-4">
+    <div class="d-flex align-items-center mb-4">
         <!-- Nút quay lại -->
         <a class="btn border-0" href="javascript:history.back()">
             <i class="bi bi-chevron-left"></i> Quay lại
         </a>
-        <h4 class="fw-bold mb-4" style="margin-left:400px">Tạo đề mới</h4>
+        <h4 class="fw-bold mb-0 ms-auto me-auto">Tạo đề mới</h4>
     </div>
-    
 
     <div class="row g-4">
-
         <!-- LEFT UPLOAD AREA -->
         <div class="col-md-8">
             <div class="border rounded-4 bg-white text-center p-5 shadow-sm">
-
                 <div class="mb-3">
                     <i class="bi bi-cloud-arrow-up fs-1 text-primary"></i>
                 </div>
@@ -48,15 +50,18 @@
             </div>
         </div>
 
-
         <!-- RIGHT FEATURE MENU -->
         <div class="col-md-4">
             <div class="bg-white border rounded-4 shadow-sm">
-
                 <div class="p-4 border-bottom">
                     <h6 class="fw-bold mb-3">Online</h6>
 
-                    <a asp-action="ChinhSuaTracNghiem" asp-controller="TracNghiem" asp-area="Teacher" class="text-decoration-none">
+                    <!-- ⭐ TRUYỀN khoaHocId VÀO LINK ⭐ -->
+                    <a asp-action="ChinhSuaTracNghiem" 
+                       asp-controller="TracNghiem" 
+                       asp-area="Teacher" 
+                       asp-route-khoaHocId="@khoaHocId" 
+                       class="text-decoration-none">
                         <div class="p-3 border rounded-3 hover-box mb-3" style="cursor:pointer;">
                             <div class="d-flex align-items-center">
                                 <i class="bi bi-pencil-square fs-4 text-primary me-3"></i>
@@ -73,9 +78,7 @@
                             <i class="bi bi-controller fs-4 text-primary me-3"></i>
                             <div>
                                 <strong>Tạo đề tương tác <span class="badge bg-danger">Mới</span></strong>
-                                <p class="small text-muted mb-0">
-                                    Trò chơi học tập trực tuyến
-                                </p>
+                                <p class="small text-muted mb-0">Trò chơi học tập trực tuyến</p>
                             </div>
                         </div>
                     </div>
@@ -99,13 +102,14 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
-
     </div>
 </div>
+
+<!-- Hidden input để JavaScript có thể lấy khoaHocId nếu cần -->
+<input type="hidden" id="khoaHocId" value="@khoaHocId" />
 
 <style>
     .hover-box:hover {
@@ -114,3 +118,9 @@
         transition: .2s;
     }
 </style>
+
+<script>
+    // Truyền khoaHocId cho JavaScript (nếu cần)
+    window.khoaHocIdGlobal = @khoaHocId;
+    console.log('✅ Khóa học ID:', window.khoaHocIdGlobal);
+</script>

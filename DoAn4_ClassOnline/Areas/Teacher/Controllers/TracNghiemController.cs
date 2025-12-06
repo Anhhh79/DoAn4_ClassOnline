@@ -100,13 +100,29 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
             return View();
         }
 
-        public IActionResult ThemBaiTracNghiem()
+        public IActionResult ThemBaiTracNghiem(int? khoaHocId)
         {
+            if (!khoaHocId.HasValue)
+            {
+                TempData["Error"] = "Vui lòng chọn khóa học!";
+                return RedirectToAction("Index", "QuanLyKhoaHoc");
+            }
+
+            ViewBag.KhoaHocId = khoaHocId.Value;
             return View();
         }
 
-        public IActionResult ChinhSuaTracNghiem()
+        public IActionResult ChinhSuaTracNghiem(int? khoaHocId, int? baiTracNghiemId)
         {
+            if (!khoaHocId.HasValue)
+            {
+                TempData["Error"] = "Thiếu thông tin khóa học!";
+                return RedirectToAction("Index", "QuanLyKhoaHoc");
+            }
+
+            ViewBag.KhoaHocId = khoaHocId.Value;
+            ViewBag.BaiTracNghiemId = baiTracNghiemId; // null nếu tạo mới
+            
             return View();
         }
 
@@ -152,12 +168,22 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
                 // Kiểm tra quyền
                 var baiTN = await _context.BaiTracNghiems
                     .Include(b => b.KhoaHoc)
+                    .Include(b => b.CauHois)  // ⭐ THÊM INCLUDE CauHois ⭐
                     .FirstOrDefaultAsync(b => b.BaiTracNghiemId == request.BaiTracNghiemId 
                         && b.KhoaHoc.GiaoVienId == userId);
 
                 if (baiTN == null)
                 {
                     return Json(new { success = false, message = "Không tìm thấy bài trắc nghiệm!" });
+                }
+
+                // ⭐ XÓA TẤT CẢ HÌNH ẢNH CỦA CÁC CÂU HỎI ⭐
+                foreach (var cauHoi in baiTN.CauHois)
+                {
+                    if (!string.IsNullOrEmpty(cauHoi.HinhAnh))
+                    {
+                        DeleteImageFromServer(cauHoi.HinhAnh);
+                    }
                 }
 
                 _context.BaiTracNghiems.Remove(baiTN);
@@ -167,6 +193,7 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error deleting BaiTracNghiem");
                 return Json(new { success = false, message = ex.Message });
             }
         }
@@ -487,6 +514,276 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
                 return StatusCode(500, "Có lỗi xảy ra khi xuất file Excel");
             }
         }
+
+        // ⭐ API LƯU BÀI TRẮC NGHIỆM MỚI ⭐
+        [HttpPost]
+        public async Task<IActionResult> LuuBaiTracNghiem([FromBody] LuuBaiTracNghiemRequest request)
+        {
+            try
+            {
+                var userId = HttpContext.Session.GetInt32("UserId");
+
+                if (userId == null)
+                {
+                    return Json(new { success = false, message = "Phiên đăng nhập đã hết hạn!" });
+                }
+
+                // ⭐ LOG REQUEST DATA ⭐
+                _logger.LogInformation($"Received request: KhoaHocId={request.KhoaHocId}, TenBaiThi={request.TenBaiThi}, Questions={request.CauHois?.Count}");
+
+                if (string.IsNullOrWhiteSpace(request.TenBaiThi))
+                {
+                    return Json(new { success = false, message = "Vui lòng nhập tên bài thi!" });
+                }
+
+                if (request.CauHois == null || !request.CauHois.Any())
+                {
+                    return Json(new { success = false, message = "Vui lòng thêm ít nhất một câu hỏi!" });
+                }
+
+                if (request.KhoaHocId <= 0)
+                {
+                    return Json(new { success = false, message = "Khóa học không hợp lệ!" });
+                }
+
+                var khoaHoc = await _context.KhoaHocs
+                    .FirstOrDefaultAsync(k => k.KhoaHocId == request.KhoaHocId && k.GiaoVienId == userId);
+
+                if (khoaHoc == null)
+                {
+                    _logger.LogWarning($"User {userId} attempted to create quiz for unauthorized course {request.KhoaHocId}");
+                    return Json(new { 
+                        success = false, 
+                        message = "Bạn không có quyền tạo bài trắc nghiệm cho khóa học này!" 
+                    });
+                }
+
+                // ⭐ KIỂM TRA THỜI GIAN ⭐
+                if (request.ThoiGianBatDau.HasValue && request.ThoiGianKetThuc.HasValue)
+                {
+                    if (request.ThoiGianKetThuc.Value <= request.ThoiGianBatDau.Value)
+                    {
+                        return Json(new { success = false, message = "Thời gian kết thúc phải sau thời gian bắt đầu!" });
+                    }
+                }
+
+                var baiTracNghiem = new BaiTracNghiem
+                {
+                    KhoaHocId = khoaHoc.KhoaHocId,
+                    TenBaiThi = request.TenBaiThi.Trim(),
+                    LoaiBaiThi = request.LoaiBaiThi ?? "Bài tập",
+                    NgayTao = DateTime.Now,
+                    ThoiLuongLamBai = request.ThoiLuongLamBai,
+                    SoLanLamToiDa = request.SoLanLamToiDa,
+                    ThoiGianBatDau = request.ThoiGianBatDau,
+                    ThoiGianKetThuc = request.ThoiGianKetThuc,
+                    TronCauHoi = request.TronCauHoi,
+                    ChoXemKetQua = request.ChoXemKetQua
+                };
+
+                _context.BaiTracNghiems.Add(baiTracNghiem);
+                
+                // ⭐ LƯU TRƯỚC KHI THÊM CÂU HỎI ⭐
+                try
+                {
+                    await _context.SaveChangesAsync();
+                    _logger.LogInformation($"✅ Created BaiTracNghiem ID: {baiTracNghiem.BaiTracNghiemId}");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "❌ Error saving BaiTracNghiem");
+                    return Json(new { success = false, message = $"Lỗi khi tạo bài thi: {ex.InnerException?.Message ?? ex.Message}" });
+                }
+
+                // ⭐ THÊM CÂU HỎI - CẬP NHẬT XỬ LÝ HÌNH ẢNH ⭐
+                foreach (var cauHoiReq in request.CauHois)
+                {
+                    // ⭐ XỬ LÝ HÌNH ẢNH - LƯU VÀO SERVER ⭐
+                    string? imageUrl = null;
+                    if (!string.IsNullOrEmpty(cauHoiReq.Image))
+                    {
+                        if (cauHoiReq.Image.StartsWith("data:image"))
+                        {
+                            // Nếu là base64, lưu vào server
+                            imageUrl = await SaveImageToServer(cauHoiReq.Image);
+                            _logger.LogInformation($"Converted base64 to URL: {imageUrl}");
+                        }
+                        else if (cauHoiReq.Image.StartsWith("/uploads/questions/"))
+                        {
+                            // Nếu đã là URL (trường hợp edit), giữ nguyên
+                            imageUrl = cauHoiReq.Image;
+                        }
+                    }
+
+                    var cauHoi = new CauHoi
+                    {
+                        BaiTracNghiemId = baiTracNghiem.BaiTracNghiemId,
+                        NoiDungCauHoi = cauHoiReq.Text,
+                        LoaiCauHoi = "TracNghiem",
+                        Diem = cauHoiReq.Point,
+                        ThuTu = cauHoiReq.ThuTu,
+                        HinhAnh = imageUrl  // ⭐ LƯU URL THAY VÌ BASE64 ⭐
+                    };
+
+                    _context.CauHois.Add(cauHoi);
+                    
+                    try
+                    {
+                        await _context.SaveChangesAsync();
+                        _logger.LogInformation($"✅ Created CauHoi ID: {cauHoi.CauHoiId} with image: {imageUrl ?? "none"}");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, $"❌ Error saving CauHoi for question '{cauHoiReq.Text}'");
+                        
+                        // ⭐ NẾU LƯU THẤT BẠI, XÓA HÌNH ẢNH ĐÃ UPLOAD ⭐
+                        if (!string.IsNullOrEmpty(imageUrl))
+                        {
+                            DeleteImageFromServer(imageUrl);
+                        }
+                        
+                        return Json(new { success = false, message = $"Lỗi khi lưu câu hỏi: {ex.InnerException?.Message ?? ex.Message}" });
+                    }
+
+                    // Thêm đáp án (giữ nguyên)
+                    for (int i = 0; i < cauHoiReq.Options.Count; i++)
+                    {
+                        var dapAn = new DapAn
+                        {
+                            CauHoiId = cauHoi.CauHoiId,
+                            NoiDungDapAn = cauHoiReq.Options[i],
+                            LaDapAnDung = cauHoiReq.Answer == GetOptionLetter(i),
+                            ThuTu = i + 1
+                        };
+
+                        _context.DapAns.Add(dapAn);
+                    }
+                }
+
+                // ⭐ LƯU TẤT CẢ ĐÁP ÁN ⭐
+                try
+                {
+                    await _context.SaveChangesAsync();
+                    _logger.LogInformation($"✅ Saved all answers");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "❌ Error saving answers");
+                    return Json(new { success = false, message = $"Lỗi khi lưu đáp án: {ex.InnerException?.Message ?? ex.Message}" });
+                }
+
+                _logger.LogInformation($"🎉 Successfully created BaiTracNghiem ID: {baiTracNghiem.BaiTracNghiemId} with {request.CauHois.Count} questions");
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Lưu bài trắc nghiệm thành công!",
+                    baiTracNghiemId = baiTracNghiem.BaiTracNghiemId
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "💥 FATAL ERROR in LuuBaiTracNghiem");
+                return Json(new { 
+                    success = false, 
+                    message = $"Lỗi nghiêm trọng: {ex.InnerException?.Message ?? ex.Message}",
+                    stackTrace = ex.StackTrace
+                });
+            }
+        }
+
+        // Helper method
+        private string GetOptionLetter(int index)
+        {
+            return ((char)('A' + index)).ToString();
+        }
+
+        // ⭐ THÊM HELPER METHOD LƯU HÌNH ẢNH ⭐
+        private async Task<string?> SaveImageToServer(string? base64Image)
+        {
+            if (string.IsNullOrEmpty(base64Image) || !base64Image.StartsWith("data:image"))
+            {
+                return null;
+            }
+
+            try
+            {
+                // Tách phần base64 data
+                var base64Data = base64Image.Split(',');
+                if (base64Data.Length != 2)
+                {
+                    return null;
+                }
+
+                // Lấy extension từ MIME type
+                var mimeType = base64Data[0]; // data:image/jpeg;base64
+                var extension = ".jpg"; // default
+                
+                if (mimeType.Contains("image/png"))
+                    extension = ".png";
+                else if (mimeType.Contains("image/gif"))
+                    extension = ".gif";
+                else if (mimeType.Contains("image/webp"))
+                    extension = ".webp";
+
+                // Convert base64 sang byte array
+                var imageBytes = Convert.FromBase64String(base64Data[1]);
+
+                // Tạo tên file unique
+                var fileName = $"{Guid.NewGuid()}{extension}";
+                
+                // Đường dẫn thư mục upload
+                var uploadFolder = Path.Combine("wwwroot", "uploads", "questions");
+                
+                // Tạo thư mục nếu chưa có
+                if (!Directory.Exists(uploadFolder))
+                {
+                    Directory.CreateDirectory(uploadFolder);
+                    _logger.LogInformation($"Created directory: {uploadFolder}");
+                }
+
+                // Đường dẫn file đầy đủ
+                var filePath = Path.Combine(uploadFolder, fileName);
+                
+                // Lưu file
+                await System.IO.File.WriteAllBytesAsync(filePath, imageBytes);
+                
+                _logger.LogInformation($"Saved image: {fileName}, Size: {imageBytes.Length} bytes");
+
+                // Trả về URL tương đối (để hiển thị trong web)
+                return $"/uploads/questions/{fileName}";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error saving image to server");
+                return null;
+            }
+        }
+
+        // ⭐ HELPER METHOD XÓA HÌNH ẢNH CŨ (khi xóa câu hỏi) ⭐
+        private void DeleteImageFromServer(string? imageUrl)
+        {
+            if (string.IsNullOrEmpty(imageUrl) || !imageUrl.StartsWith("/uploads/questions/"))
+            {
+                return;
+            }
+
+            try
+            {
+                var fileName = Path.GetFileName(imageUrl);
+                var filePath = Path.Combine("wwwroot", "uploads", "questions", fileName);
+                
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                    _logger.LogInformation($"Deleted image: {fileName}");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error deleting image: {imageUrl}");
+            }
+        }
     }
 
     // ⭐ MODEL REQUEST CẬP NHẬT CÀI ĐẶT ⭐
@@ -517,4 +814,35 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
         public bool TatCaSinhVien { get; set; }
         public List<int>? DanhSachSinhVienId { get; set; }
     }
+
+    // ⭐ CẬP NHẬT REQUEST MODEL ⭐
+    public class LuuBaiTracNghiemRequest
+    {
+        public int KhoaHocId { get; set; }
+        public string TenBaiThi { get; set; } = "";
+        public string? LoaiBaiThi { get; set; }
+        
+        // ⭐ THÊM CÁC THUỘC TÍNH CÀI ĐẶT ⭐
+        public int? ThoiLuongLamBai { get; set; }
+        public int? SoLanLamToiDa { get; set; }
+        public DateTime? ThoiGianBatDau { get; set; }
+        public DateTime? ThoiGianKetThuc { get; set; }
+        public bool TronCauHoi { get; set; }
+        public bool ChoXemKetQua { get; set; }
+        
+        public List<CauHoiRequest> CauHois { get; set; } = new();
+    }
+
+    // ⭐ THÊM CLASS CauHoiRequest ⭐
+    public class CauHoiRequest
+    {
+        public string Text { get; set; } = "";
+        public string? Image { get; set; }
+        public List<string> Options { get; set; } = new();
+        public string Answer { get; set; } = "";
+        public decimal Point { get; set; }
+        public int ThuTu { get; set; }
+    }
 }
+
+

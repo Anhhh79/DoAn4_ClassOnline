@@ -10,6 +10,8 @@
     <Folder Include="Areas\Admin\Models\" />
     <Folder Include="Areas\Student\Models\" />
     <Folder Include="wwwroot\assets\css\admin\" />
+    <Folder Include="wwwroot\assets\image\question\" />
+    <Folder Include="wwwroot\uploads\questions\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -75,34 +75,74 @@ async function recheckAll() {
     }, 1500);
 }
 
-// ⭐ XÓA BÀI THI - SỬ DỤNG THÔNG BÁO ĐẸP ⭐
+// ⭐ XÓA BÀI THI - DÙNG SWEETALERT2 ĐẸP ⭐
 async function deleteBai(id) {
+    console.log('🗑️ deleteBai called with ID:', id);
+    console.log('📍 Current khoaHocId:', khoaHocId);
+    
     if (!id || id === 0) {
-        showError_tc('Không xác định được ID bài thi');
+        Swal.fire({
+            icon: 'error',
+            title: 'Lỗi!',
+            text: 'Không xác định được ID bài thi',
+            confirmButtonText: 'Đóng'
+        });
         return;
     }
 
-    // ⭐ SỬ DỤNG showDeleteConfirm_tc
-    const result = await showDeleteConfirm_tc(
-        'Bài trắc nghiệm này sẽ bị xóa vĩnh viễn. Hành động này không thể hoàn tác!',
-        'Xác nhận xóa bài trắc nghiệm'
-    );
+    // ⭐ DÙNG SWEETALERT2 ĐẸP ⭐
+    const result = await Swal.fire({
+        title: '<strong>Xác nhận xóa bài trắc nghiệm</strong>',
+        html: `
+            <div class="text-start">
+                <p class="mb-3">Bạn có chắc chắn muốn xóa bài trắc nghiệm này?</p>
+                <div class="alert alert-danger mb-0">
+                    <ul class="mb-0">
+                        <li>Tất cả câu hỏi sẽ bị xóa</li>
+                        <li>Kết quả của sinh viên sẽ bị xóa</li>
+                        <li><strong>Hành động này không thể hoàn tác!</strong></li>
+                    </ul>
+                </div>
+            </div>
+        `,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: '<i class="bi bi-trash"></i> Xóa',
+        cancelButtonText: '<i class="bi bi-x-circle"></i> Hủy',
+        reverseButtons: true,
+        focusCancel: true,
+        customClass: {
+            confirmButton: 'btn btn-danger px-4',
+            cancelButton: 'btn btn-secondary ms-3 px-4'
+        },
+        buttonsStyling: false
+    });
+
+    console.log('Dialog result:', result);
 
     if (!result.isConfirmed) {
+        console.log('❌ User cancelled');
         return;
     }
+
+    console.log('✅ User confirmed - deleting...');
 
     // Hiển thị loading
     Swal.fire({
         title: 'Đang xóa...',
-        text: 'Vui lòng đợi',
+        html: '<div class="spinner-border text-danger mb-3" role="status"></div><p>Vui lòng đợi...</p>',
         allowOutsideClick: false,
+        showConfirmButton: false,
         didOpen: () => {
             Swal.showLoading();
         }
     });
 
     try {
+        console.log('📤 Sending delete request...');
+        
         const response = await fetch('/Teacher/TracNghiem/XoaBaiTracNghiem', {
             method: 'POST',
             headers: { 
@@ -114,29 +154,59 @@ async function deleteBai(id) {
             })
         });
 
+        console.log('📥 Response status:', response.status);
+
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorText = await response.text();
+            console.error('❌ Response error:', errorText);
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
         }
 
         const data = await response.json();
+        console.log('📥 Response data:', data);
         
         Swal.close();
 
         if (data.success) {
-            // ⭐ SỬ DỤNG showSuccess_tc
-            showSuccess_tc('Xóa bài trắc nghiệm thành công!');
+            console.log('✅ Delete successful!');
             
-            // Chờ 2s rồi chuyển hướng
-            setTimeout(() => {
-                window.location.href = `/Teacher/Course/Index/${khoaHocId}`;
-            }, 2000);
+            // Hiển thị thông báo thành công
+            await Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: 'Đã xóa bài trắc nghiệm thành công!',
+                timer: 2000,
+                showConfirmButton: false,
+                timerProgressBar: true
+            });
+            
+            // Chuyển hướng về trang trước
+            console.log('🔄 Redirecting back...');
+            window.history.back();
         } else {
-            showError_tc(data.message || 'Không thể xóa bài thi');
+            console.error('❌ Delete failed:', data.message);
+            
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: data.message || 'Không thể xóa bài thi',
+                confirmButtonText: 'Đóng'
+            });
         }
     } catch (error) {
-        console.error('Delete error:', error);
+        console.error('❌ Delete error:', error);
+        
         Swal.close();
-        showError_tc('Có lỗi xảy ra khi xóa bài thi: ' + error.message);
+        
+        Swal.fire({
+            icon: 'error',
+            title: 'Lỗi!',
+            html: `
+                <p>Có lỗi xảy ra khi xóa bài thi:</p>
+                <code class="d-block bg-light p-2 rounded mt-2">${error.message}</code>
+            `,
+            confirmButtonText: 'Đóng'
+        });
     }
 }
 

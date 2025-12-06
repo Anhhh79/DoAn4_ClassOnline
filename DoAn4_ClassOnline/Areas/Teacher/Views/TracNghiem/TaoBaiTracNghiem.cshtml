@@ -390,6 +390,19 @@
                                     </div>
                                     <div class="fw-semibold mt-1 mb-2">@cauHoi.NoiDungCauHoi</div>
                                     
+                                    <!-- ⭐ THÊM HIỂN THỊ HÌNH ẢNH ⭐ -->
+                                    @if (!string.IsNullOrEmpty(cauHoi.HinhAnh))
+                                    {
+                                        var imagePath = cauHoi.HinhAnh.StartsWith("/") ? cauHoi.HinhAnh : "/" + cauHoi.HinhAnh;
+                                        <div class="text-center my-3">
+                                            <img src="@imagePath" 
+                                                 alt="Hình ảnh câu @cauSo" 
+                                                 class="img-fluid rounded border shadow-sm"
+                                                 style="max-width: 100%; max-height: 400px; object-fit: contain;"
+                                                 onerror="this.style.display='none'; console.error('Failed to load: @imagePath');">
+                                        </div>
+                                    }
+                                    
                                     @if (cauHoi.DapAns != null && cauHoi.DapAns.Any())
                                     {
                                         char dapAnChar = 'A';
