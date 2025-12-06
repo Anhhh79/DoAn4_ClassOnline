@@ -105,7 +105,22 @@
                     </div>
 
                     <div class="col-12 d-flex justify-content-between mt-3">
-                        <button type="button" class="btn btn-danger rounded-3">Xóa khóa học</button>
+                        @if (Model.TrangThaiKhoaHoc == "DangKhoa")
+                        {
+                            <button type="button" class="btn btn-primary rounded-3"
+                                    id="btn-khoa-@Model.KhoaHocId"
+                                    onclick="moKhoaKhoaHoc(@Model.KhoaHocId)">
+                                Mở khóa học
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-danger rounded-3"
+                                    id="btn-khoa-@Model.KhoaHocId"
+                                    onclick="khoaKhoaHoc(@Model.KhoaHocId)">
+                                Khóa khóa học
+                            </button>
+                        }
                         <button type="reset" class="btn btn-secondary rounded-3 text-light">Đặt lại</button>
                         <button type="submit" class="btn btn-success rounded-3">Lưu thay đổi</button>
                     </div>

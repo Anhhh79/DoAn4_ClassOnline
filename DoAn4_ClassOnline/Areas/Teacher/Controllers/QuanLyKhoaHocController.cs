@@ -1,6 +1,8 @@
-﻿using DoAn4_ClassOnline.Models;
+﻿using DoAn4_ClassOnline.Areas.Teacher.Models;
+using DoAn4_ClassOnline.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 
 namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
 {
@@ -23,15 +25,15 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
                 // Lấy UserId từ Session
                 var userId = HttpContext.Session.GetInt32("UserId");
 
-                //if (userId == null)
-                //{
-                //    TempData["Error"] = "Vui lòng đăng nhập!";
-                //    return RedirectToAction("Index", "DangNhap", new { area = "Admin" });
-                //}
+                if (userId == null)
+                {
+                    TempData["Error"] = "Vui lòng đăng nhập!";
+                    return RedirectToAction("Index", "DangNhap", new { area = "Admin" });
+                }
 
                 // Lấy danh sách khóa học của giảng viên
                 var khoaHocs = await _context.KhoaHocs
-                    .Where(k => k.GiaoVienId == 2)
+                    .Where(k => k.GiaoVienId == userId)
                     .Include(k => k.GiaoVien)
                     .Include(k => k.Khoa)
                     .Include(k => k.HocKy)
@@ -67,6 +69,52 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
 
         }
 
+        // Load lại danh sách khóa học (trả về JSON cho AJAX)
+        [HttpGet]
+        public async Task<IActionResult> DanhSachKhoaHoc()
+        {
+            try
+            {
+                // Lấy UserId từ Session
+                var userId = HttpContext.Session.GetInt32("UserId");
+
+                if (userId == null)
+                {
+                    TempData["Error"] = "Vui lòng đăng nhập!";
+                    return RedirectToAction("Index", "DangNhap", new { area = "Admin" });
+                }
+
+                // Lấy danh sách khóa học của giảng viên
+                var khoaHocs = await _context.KhoaHocs
+                    .Where(k => k.GiaoVienId == userId)
+                    .Include(k => k.GiaoVien)
+                    .Include(k => k.Khoa)
+                    .Include(k => k.HocKy)
+                    .Include(k => k.ThamGiaKhoaHocs)
+                    .OrderByDescending(k => k.CreatedAt)
+                    .Select(k => new
+                    {
+                        k.KhoaHocId,
+                        k.TenKhoaHoc,
+                        k.HinhAnh,
+                        GiaoVienName = k.GiaoVien.FullName,
+                        k.HocKyId,
+                        TenKhoa = k.Khoa.TenKhoa,
+                        TenHocKy = k.HocKy.TenHocKy,
+                        NamHoc = k.HocKy.NamHoc,
+                        SoLuongSinhVien = k.ThamGiaKhoaHocs.Count,
+                        k.TrangThaiKhoaHoc
+                    })
+                    .ToListAsync();
+
+                return Json(new { success = true, data = khoaHocs });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+            }
+        }
+
         //lấy thông tin khóa học theo id
         [HttpGet]
         public async Task<IActionResult> QuanLyKhoaHoc(int? id)
@@ -76,11 +124,11 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
                 // Lấy UserId từ Session
                 var userId = HttpContext.Session.GetInt32("UserId");
 
-                //if (userId == null)
-                //{
-                //    TempData["Error"] = "Vui lòng đăng nhập!";
-                //    return RedirectToAction("Index", "DangNhap", new { area = "Admin" });
-                //}
+                if (userId == null)
+                {
+                    TempData["Error"] = "Vui lòng đăng nhập!";
+                    return RedirectToAction("Index", "DangNhap", new { area = "Admin" });
+                }
                 // Lấy thông tin khóa học 
                 if (id == null)
                     return NotFound();
@@ -147,11 +195,11 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
             {
                 // Lấy UserId từ Session
                 var userId = HttpContext.Session.GetInt32("UserId");
-                //if (userId == null)
-                //{
-                //    TempData["Error"] = "Vui lòng đăng nhập!";
-                //    return RedirectToAction("Index", "DangNhap", new { area = "Admin" });
-                //}
+                if (userId == null)
+                {
+                    TempData["Error"] = "Vui lòng đăng nhập!";
+                    return RedirectToAction("Index", "DangNhap", new { area = "Admin" });
+                }
 
                 // Kiểm tra id
                 if (id == null)
@@ -185,6 +233,117 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
             catch (Exception ex)
             {
                 return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+            }
+        }
+
+        // thêm kho học mới
+        [HttpPost]
+        public async Task<IActionResult> ThemKhoaHoc([FromForm] ThongTinKhoaHoc vm)
+        {
+            try
+            {
+                var userId = HttpContext.Session.GetInt32("UserId");
+                if (userId == null)
+                    return Json(new { success = false, message = "Vui lòng đăng nhập!" });
+
+                if (!ModelState.IsValid)
+                    return Json(new { success = false, message = "Dữ liệu không hợp lệ!" });
+
+                string imgPath = "/assets/image/default.jpg";
+
+                // SAVE FILE
+                if (vm.AnhKhoaHoc != null)
+                {
+                    string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/assets/image");
+
+                    if (!Directory.Exists(folderPath))
+                        Directory.CreateDirectory(folderPath);
+
+                    // Giữ nguyên tên file người dùng upload
+                    string fileName = vm.AnhKhoaHoc.FileName;
+                    string fullPath = Path.Combine(folderPath, fileName);
+
+                    // Nếu file chưa tồn tại thì mới lưu
+                    if (!System.IO.File.Exists(fullPath))
+                    {
+                        using (var stream = new FileStream(fullPath, FileMode.Create))
+                        {
+                            await vm.AnhKhoaHoc.CopyToAsync(stream);
+                        }
+                    }
+
+                    // Đường dẫn lưu vào DB
+                    imgPath = "/assets/image/" + fileName;
+                }
+
+                var model = new KhoaHoc
+                {
+                    TenKhoaHoc = vm.TenKhoaHoc,
+                    MoTa = vm.MoTa,
+                    KhoaId = vm.KhoaId,
+                    HocKyId = vm.HocKyId,
+                    LinkHocOnline = vm.LinkHocOnline,
+                    MatKhau = vm.MatKhau,
+                    GiaoVienId = (int)userId,
+                    HinhAnh = imgPath,
+                    TrangThaiKhoaHoc = vm.TrangThaiKhoaHoc ?? "DangMo",
+                    CreatedAt = DateTime.Now
+                };
+
+                _context.KhoaHocs.Add(model);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Thêm khóa học thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        // khóa khóa học
+        [HttpPost]
+        public async Task<IActionResult> KhoaKhoaHoc(int khoaHocId)
+        {
+            try
+            {
+                if (khoaHocId <= 0)
+                    return Json(new { success = false, message = "ID khóa học không hợp lệ!" });
+
+                var khoaHoc = await _context.KhoaHocs.FindAsync(khoaHocId);
+                if (khoaHoc == null)
+                    return Json(new { success = false, message = "Không tìm thấy khóa học!" });
+
+                khoaHoc.TrangThaiKhoaHoc = "DangKhoa";
+
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "Khóa khóa học thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+
+        }
+
+        // mở khóa học
+        [HttpPost]
+        public async Task<IActionResult> MoKhoaKhoaHoc(int khoaHocId)
+        {
+            try
+            {
+                if (khoaHocId <= 0)
+                    return Json(new { success = false, message = "ID khóa học không hợp lệ!" });
+                var khoaHoc = await _context.KhoaHocs.FindAsync(khoaHocId);
+                if (khoaHoc == null)
+                    return Json(new { success = false, message = "Không tìm thấy khóa học!" });
+                khoaHoc.TrangThaiKhoaHoc = "DangMo";
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "Mở khóa khóa học thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
             }
         }
     }
