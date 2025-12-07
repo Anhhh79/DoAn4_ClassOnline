@@ -1,56 +1,149 @@
-﻿<!-- BẮT ĐẦU: phần chèn trong div.row ... -->
-<!-- Header + controls -->
-<!-- Thay thế phần header cũ bằng khối này -->
-<div class="position-relative d-flex align-items-center mb-3" style="min-height:48px;">
-    <!-- Nút Quay lại (bên trái) -->
-    <a class="btn border-0" href="javascript:history.back()">
-        <i class="bi bi-chevron-left me-1"></i> Quay lại
-    </a>
+﻿@{
+    ViewData["Title"] = "Chỉnh sửa trắc nghiệm";
+    var khoaHocId = ViewBag.KhoaHocId ?? 0;
+    var baiTracNghiemId = ViewBag.BaiTracNghiemId ?? 0;
+}
 
-    <!-- Tiêu đề căn giữa (sử dụng vị trí tuyệt đối để luôn nằm giữa) -->
-    <h5 class="fw-bold mb-0 text-center"
-        style="position:absolute; left:50%; transform:translateX(-50%); pointer-events:none; z-index:1;">
-        Tạo / Chỉnh sửa bài thi
-    </h5>
+<div class="container mt-4">
+    <!-- Header + controls -->
+    <!-- Thay thế phần header cũ bằng khối này -->
+    <div class="position-relative d-flex align-items-center mb-3" style="min-height:48px;">
+        <!-- Nút Quay lại (bên trái) -->
+        <a class="btn border-0" href="javascript:history.back()">
+            <i class="bi bi-chevron-left me-1"></i> Quay lại
+        </a>
 
-    <!-- Nhóm nút ở bên phải -->
-    <div class="btn-group ms-auto">
-        <button id="btnAdd" type="button" class="btn btn-success btn-sm">+ Thêm câu hỏi</button>
-        <button id="btnPreview" type="button" class="btn btn-outline-secondary btn-sm">Xem trước</button>
-        <button id="btnExport" type="button" class="btn btn-outline-primary btn-sm">Xuất Word</button>
-        <button id="btnImport" type="button" class="btn btn-outline-warning btn-sm">Nhập Word</button>
+        <!-- Tiêu đề căn giữa (sử dụng vị trí tuyệt đối để luôn nằm giữa) -->
+        <h5 class="fw-bold mb-0 text-center"
+            style="position:absolute; left:50%; transform:translateX(-50%); pointer-events:none; z-index:1;">
+            Tạo / Chỉnh sửa bài thi
+        </h5>
+
+        <!-- Nhóm nút ở bên phải -->
+        <div class="btn-group ms-auto">
+            <button id="btnAdd" type="button" class="btn btn-success btn-sm">+ Thêm câu hỏi</button>
+            <button id="btnPreview" type="button" class="btn btn-outline-secondary btn-sm">Xem trước</button>
+            <button id="btnExport" type="button" class="btn btn-outline-primary btn-sm">Xuất Word</button>
+            <button id="btnImport" type="button" class="btn btn-outline-warning btn-sm">Nhập Word</button>
+        </div>
     </div>
-</div>
 
-<!-- Form chứa câu hỏi -->
-<form id="testForm" class="w-100">
-    <div id="questionContainer"></div>
+    <!-- Form chứa câu hỏi -->
+    <form id="testForm" class="w-100">
+        <div id="questionContainer"></div>
 
-    <div class="d-flex justify-content-end mt-3">
-        <button id="btnSave" type="submit" class="btn btn-primary">Lưu bài thi</button>
-    </div>
-</form>
+        <div class="d-flex justify-content-end mt-3">
+            <button id="btnSave" class="btn btn-success">
+                <i class="bi bi-cloud-arrow-up me-1"></i> Lưu bài thi
+            </button>
+        </div>
+    </form>
 
-<!-- Input file ẩn dùng để import JSON -->
-<input type="file" id="fileImport" accept="application/json" style="display:none" />
+    <!-- Input file ẩn dùng để import JSON -->
+    <input type="file" id="fileImport" accept="application/json" style="display:none" />
 
-<!-- Modal xem trước (bootstrap modal structure - nếu bạn đã load bootstrap js thì modal hoạt động) -->
-<div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Xem trước bài thi</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="previewBody" style="min-height:200px"></div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+    <!-- Modal xem trước (bootstrap modal structure - nếu bạn đã load bootstrap js thì modal hoạt động) -->
+    <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Xem trước bài thi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="previewBody" style="min-height:200px"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Template JS và logic -->
-<script>
-    
-</script>
+    <!-- Modal Cài Đặt trước khi lưu -->
+    <div class="modal fade" id="settingModal" tabindex="-1" aria-labelledby="settingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content rounded-4">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="settingModalLabel">
+                        <i class="bi bi-gear-wide-connected me-2"></i> Cài đặt bài thi trước khi lưu
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form class="row g-3" id="formSettings">
+                        <!-- Tên bài thi -->
+                        <div class="col-12">
+                            <label class="fw-semibold">Tên bài thi:</label>
+                            <input type="text" class="form-control" id="tenBaiThi" placeholder="Nhập tên bài thi">
+                        </div>
+
+                        <!-- Loại bài -->
+                        <div class="col-12">
+                            <label class="fw-semibold">Loại bài:</label>
+                            <select class="form-select" id="loaiBai">
+                                <option value="Bài tập" selected>Bài tập</option>
+                                <option value="Bài thi">Bài thi</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="fw-semibold">Thời gian làm bài (phút):</label>
+                            <input type="number" class="form-control" id="thoiGianLamBai" placeholder="Số phút" value="45" min="1">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="fw-semibold">Số lần làm tối đa:</label>
+                            <input type="number" class="form-control" id="soLanLam" placeholder="0 = không giới hạn" value="1" min="0">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="fw-semibold">Thời gian bắt đầu:</label>
+                            <input type="datetime-local" class="form-control" id="thoiGianBatDau">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="fw-semibold">Thời gian kết thúc:</label>
+                            <input type="datetime-local" class="form-control" id="thoiGianKetThuc">
+                        </div>
+
+                        <div class="col-12 d-flex align-items-center mt-2">
+                            <input class="form-check-input me-2" type="checkbox" id="tronCauHoi">
+                            <label class="form-check-label fw-semibold" for="tronCauHoi">
+                                Đảo câu hỏi
+                            </label>
+                        </div>
+
+                        <div class="col-12 d-flex align-items-center mt-2">
+                            <input class="form-check-input me-2" type="checkbox" id="choXemKetQua" checked>
+                            <label class="form-check-label fw-semibold" for="choXemKetQua">
+                                Cho xem kết quả khi thi xong
+                            </label>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-success" onclick="confirmSaveBaiTracNghiem()">
+                        <i class="bi bi-save me-1"></i> Xác nhận lưu
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script khởi tạo -->
+    <script src="~/assets/js/teacher/ChinhSuaTracNghiem.js"></script>
+    <script>
+        // Truyền khoaHocId từ server sang JavaScript
+        window.khoaHocIdGlobal = @(ViewBag.KhoaHocId ?? 0);
+        
+        // Khóa không cho thay đổi
+        Object.defineProperty(window, 'khoaHocIdGlobal', {
+            writable: false,
+            configurable: false
+        });
+        
+        console.log('✅ Khóa học ID:', window.khoaHocIdGlobal);
+    </script>
+</div>

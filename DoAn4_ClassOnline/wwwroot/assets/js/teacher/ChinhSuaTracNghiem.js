@@ -15,6 +15,13 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
+    // ⭐ NGĂN CHẶN KHỞI TẠO NHIỀU LẦN ⭐
+    if (window.chinhSuaTracNghiemInitialized) {
+        console.log('⚠️ ChinhSuaTracNghiem already initialized, skipping...');
+        return;
+    }
+    window.chinhSuaTracNghiemInitialized = true;
+
     // Bảo đảm mọi thứ chỉ chạy khi DOM đã sẵn sàng
     (function () {
         "use strict";
@@ -37,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        // Gán sự kiện (an toàn vì đã kiểm tra null)
+        // Gán sự kiện
         btnAdd.onclick = () => addQuestion();
         btnPreview.onclick = preview;
         btnSave.onclick = (e) => { e.preventDefault(); saveLocal(); };
@@ -48,18 +55,20 @@ document.addEventListener("DOMContentLoaded", () => {
         init();
 
         function init() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                try {
-                    const data = JSON.parse(saved);
-                    if (Array.isArray(data.questions)) {
-                        data.questions.reverse().forEach(q => addQuestion(q, false, true));
-                        updateOrder();
-                        return;
-                    }
-                } catch { /* ignore */ }
+            // ⭐ XÓA LOCALSTORAGE ĐỂ BẮT ĐẦU SẠCH ⭐
+            localStorage.removeItem(STORAGE_KEY);
+            
+            // ⭐ KIỂM TRA XEM ĐÃ CÓ CÂU HỎI CHƯA - NGĂN TẠO TRÙNG ⭐
+            const existingQuestions = document.querySelectorAll('.question-block');
+            if (existingQuestions.length > 0) {
+                console.log('⚠️ Questions already exist, skipping addQuestion()');
+                return;
             }
-            addQuestion(); 
+            
+            // ⭐ CHỈ TẠO 1 CÂU MẶC ĐỊNH ⭐
+            addQuestion();
+            
+            console.log('✅ INIT: Đã xóa localStorage, tạo 1 câu mới');
         }
 
         function addQuestion(data = null, scroll = true, isInit = false) {
@@ -201,17 +210,173 @@ document.addEventListener("DOMContentLoaded", () => {
         function saveLocal() {
             try {
                 const data = collect();
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-                alert("✅ Đã lưu!");
+                if (data.questions.length === 0) {
+                    showWarning_tc('Vui lòng thêm ít nhất một câu hỏi!');
+                    return;
+                }
             } catch (e) {
-                alert(e.message);
+                showWarning_tc(e.message);
+                return;
+            }
+
+            const settingModalEl = document.getElementById('settingModal');
+            if (settingModalEl) {
+                const modal = new bootstrap.Modal(settingModalEl);
+                modal.show();
+            } else {
+                alert('Không tìm thấy modal cài đặt!');
             }
         }
 
+        async function confirmSaveBaiTracNghiem() {
+            const settingModalEl = document.getElementById('settingModal');
+            if (settingModalEl) {
+                const modal = bootstrap.Modal.getInstance(settingModalEl);
+                if (modal) {
+                    modal.hide();
+                }
+            }
+            await saveToDatabase();
+        }
+
+        async function saveToDatabase() {
+            const tenBaiThi = document.getElementById('tenBaiThi')?.value?.trim();
+            if (!tenBaiThi) {
+                showWarning_tc('Vui lòng nhập tên bài thi!');
+                document.getElementById('tenBaiThi')?.focus();
+                return;
+            }
+
+            // ⭐ KIỂM TRA TÊN TRÙNG TRƯỚC KHI LƯU ⭐
+            const khoaHocId = window.khoaHocIdGlobal || parseInt(document.getElementById('khoaHocId')?.value) || 0;
+            
+            try {
+                const checkResponse = await fetch(`/Teacher/TracNghiem/KiemTraTenTrung?tenBaiThi=${encodeURIComponent(tenBaiThi)}&khoaHocId=${khoaHocId}`);
+                const checkData = await checkResponse.json();
+                
+                if (checkData.success && checkData.trung) {
+                    showWarning_tc('Tên bài thi đã tồn tại trong khóa học này! Vui lòng chọn tên khác.');
+                    document.getElementById('tenBaiThi')?.focus();
+                    return;
+                }
+            } catch (error) {
+                console.error('Error checking duplicate name:', error);
+                // Tiếp tục lưu nếu không kiểm tra được
+            }
+
+            const thoiGianBatDau = document.getElementById('thoiGianBatDau')?.value;
+            if (!thoiGianBatDau) {
+                showWarning_tc('Vui lòng chọn thời gian bắt đầu!');
+                document.getElementById('thoiGianBatDau')?.focus();
+                return;
+            }
+
+            const thoiGianKetThuc = document.getElementById('thoiGianKetThuc')?.value;
+            if (!thoiGianKetThuc) {
+                showWarning_tc('Vui lòng chọn thời gian kết thúc!');
+                document.getElementById('thoiGianKetThuc')?.focus();
+                return;
+            }
+
+            if (new Date(thoiGianKetThuc) <= new Date(thoiGianBatDau)) {
+                showWarning_tc('Thời gian kết thúc phải sau thời gian bắt đầu!');
+                document.getElementById('thoiGianKetThuc')?.focus();
+                return;
+            }
+
+            const thoiGianLamBai = parseInt(document.getElementById('thoiGianLamBai')?.value);
+            if (!thoiGianLamBai || thoiGianLamBai < 1) {
+                showWarning_tc('Thời gian làm bài phải lớn hơn 0!');
+                document.getElementById('thoiGianLamBai')?.focus();
+                return;
+            }
+
+            const loaiBai = document.getElementById('loaiBai')?.value || 'Bài tập';
+            const soLanLam = parseInt(document.getElementById('soLanLam')?.value) || 1;
+            const tronCauHoi = document.getElementById('tronCauHoi')?.checked || false;
+            const choXemKetQua = document.getElementById('choXemKetQua')?.checked || false;
+
+            let data;
+            try {
+                data = collect();
+            } catch (e) {
+                showWarning_tc(e.message);
+                return;
+            }
+
+            Swal.fire({
+                title: 'Đang lưu...',
+                text: 'Vui lòng đợi',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            try {
+                const requestData = {
+                    khoaHocId: khoaHocId,
+                    tenBaiThi: tenBaiThi,
+                    loaiBaiThi: loaiBai,
+                    thoiLuongLamBai: thoiGianLamBai,
+                    soLanLamToiDa: soLanLam,
+                    thoiGianBatDau: new Date(thoiGianBatDau).toISOString(),
+                    thoiGianKetThuc: new Date(thoiGianKetThuc).toISOString(),
+                    tronCauHoi: tronCauHoi,
+                    choXemKetQua: choXemKetQua,
+                    cauHois: data.questions.map((q, index) => ({
+                        text: q.text,
+                        image: q.image,
+                        options: q.options,
+                        answer: q.answer,
+                        point: q.point,
+                        thuTu: index + 1
+                    }))
+                };
+
+                console.log('Sending request:', requestData);
+
+                const response = await fetch('/Teacher/TracNghiem/LuuBaiTracNghiem', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const responseData = await response.json();
+
+                Swal.close();
+
+                if (responseData.success) {
+                    showSuccess_tc('Lưu bài trắc nghiệm thành công!');
+
+                    setTimeout(() => {
+                        window.location.href = `/Teacher/TracNghiem/ChiTiet/${responseData.baiTracNghiemId}`;
+                    }, 2000);
+                } else {
+                    showError_tc(responseData.message || 'Không thể lưu bài trắc nghiệm');
+                }
+            } catch (error) {
+                console.error('Save error:', error);
+                Swal.close();
+                showError_tc('Có lỗi xảy ra khi lưu: ' + error.message);
+            }
+        }
+
+        window.confirmSaveBaiTracNghiem = confirmSaveBaiTracNghiem;
+
         function exportJSON() {
             let data;
-            try { data = collect(); }
-            catch (e) { return alert(e.message); }
+            try { 
+                data = collect(); 
+            } catch (e) { 
+                return alert(e.message); 
+            }
 
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
             const url = URL.createObjectURL(blob);
@@ -225,6 +390,7 @@ document.addEventListener("DOMContentLoaded", () => {
         function handleImport(e) {
             const file = e.target.files[0];
             if (!file) return;
+            
             const reader = new FileReader();
             reader.onload = () => {
                 try {
