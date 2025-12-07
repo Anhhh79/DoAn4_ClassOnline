@@ -1,1 +1,166 @@
-﻿
+﻿<div class="main" id="content">
+    <nav class="navbar navbar-expand px-4 py-3">
+        <div class="container-fluid">
+            <div class="navbar-collapse collapse">
+                <ul class="navbar-nav justify-content-between w-100 flex-wrap">
+                    <li>
+                        <h2 class="fw-bold">Quản lý khoa</h2>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="content px-3 py-3">
+        <div class="container-fluid">
+
+            <!-- Thanh tìm kiếm & nút thêm khoa -->
+            <div class="row align-items-center justify-content-between mx-1 mb-4">
+
+                <div class="col-12 col-md-8">
+                    <div class="row g-2 align-items-center">
+
+                        <!-- Ô tìm kiếm -->
+                        <div class="col-12 col-md-8">
+                            <div class="input-group align-items-center border border-dark rounded w-100">
+                                <i class="fa-solid fa-magnifying-glass fa-1x ms-2"></i>
+                                <input type="text" id="timKiemKhoa" class="form-control input-border border-0"
+                                       placeholder="Tìm kiếm tên khoa">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nút thêm khoa -->
+                <div class="col-12 col-md-auto mt-2 mt-md-0">
+                    <button type="button" class="btn btn-success w-100 w-md-auto"
+                            data-bs-toggle="modal" data-bs-target="#modalThemKhoa">
+                        <i class="fa-solid fa-plus"></i> Thêm khoa
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Bảng danh sách khoa -->
+            <div class="row mt-2">
+                <div class="col-12">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead style="background: #0e2238;">
+                                <tr>
+                                    <th scope="col" class="col-1">#</th>
+                                    <th scope="col" class="col-4">Tên khoa</th>
+                                    <th scope="col" class="col-2">Mã khoa</th>
+                                    <th scope="col" class="col-2">Số giảng viên</th>
+                                    <th scope="col" class="col-2">Số sinh viên</th>
+                                    <th scope="col" class="col-1">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableKhoa">
+
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <td>Khoa Công Nghệ Thông Tin</td>
+                                    <td>CNTT2211</td>
+                                    <td>5</td>
+                                    <td>20</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#modalSuaKhoa">Sửa</button>
+                                        <button class="btn btn-sm btn-danger">Xóa</button>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th scope="row">2</th>
+                                    <td>Khoa Điện - Điện tử</td>
+                                    <td>DTVT2211</td>
+                                    <td>8</td>
+                                    <td>36</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-warning">Sửa</button>
+                                        <button class="btn btn-sm btn-danger">Xóa</button>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th scope="row">3</th>
+                                    <td>Khoa Kinh Tế</td>
+                                    <td>KTTT2211</td>
+                                    <td>4</td>
+                                    <td>23</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-warning">Sửa</button>
+                                        <button class="btn btn-sm btn-danger">Xóa</button>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+<!-- Modal Thêm Khoa -->
+<div class="modal fade" id="modalThemKhoa" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content rounded-4">
+
+            <div class="modal-header d-flex justify-content-center text-center">
+                <h5 class="fw-bold">Thêm khoa mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body px-4">
+
+                <div class="mb-2">
+                    <label class="form-label fw-semibold">Tên khoa</label>
+                    <input type="text" class="form-control" id="tenKhoa_Them" placeholder="Nhập tên khoa">
+                    <span class="text-danger" id="errorTenKhoa_Them"></span>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-success px-4" onclick="ThemKhoa()">
+                    <i class="fa-solid fa-plus me-1"></i> Thêm
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal Sửa Khoa -->
+<div class="modal fade" id="modalSuaKhoa" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content rounded-4">
+
+            <div class="modal-header d-flex justify-content-center text-center">
+                <h5 class="fw-bold">Cập nhật thông tin khoa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body px-4">
+
+                <!-- hidden id -->
+                <input type="hidden" id="idKhoa_Sua">
+
+                <div class="mb-2">
+                    <label class="form-label fw-semibold">Tên khoa</label>
+                    <input type="text" class="form-control" id="tenKhoa_Sua">
+                    <span class="text-danger" id="errorTenKhoa_Sua"></span>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-primary px-4" onclick="CapNhatKhoa()">
+                    <i class="fa-solid fa-pen-to-square me-1"></i> Lưu thay đổi
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+

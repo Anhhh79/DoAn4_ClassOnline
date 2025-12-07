@@ -92,7 +92,8 @@
                                         Ghi nhớ đăng nhập
                                     </label>
                                 </div>
-                                <a href="#" class="text-decoration-none small">Quên mật khẩu?</a>
+                                <a href="#" class="text-decoration-none small" data-bs-toggle="modal"
+                                   data-bs-target="#forgotPasswordModal">Quên mật khẩu?</a>
                             </div>
 
                             <div class="d-grid">
@@ -106,6 +107,128 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Quên Mật Khẩu -->
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content rounded-3">
+                <div class="modal-body">
+
+                    <div class="text-end">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <h5 class="text-center fw-bold">QUÊN MẬT KHẨU</h5>
+
+                    <div class="mt-3">
+                        <label for="emailFogetPassword" class="fw-semibold">Nhập Email đã đăng ký tài khoản:</label>
+                        <input type="text"
+                               class="form-control mt-2 border-dark"
+                               id="emailFogetPassword"
+                               placeholder="example@gmail.com"
+                               style="border-radius: 10px; font-size: large;">
+                        <span class="text-danger small" id="emailFogetPasswordError"></span>
+
+                        <div class="mt-2 small">Chúng tôi sẽ gửi mã xác nhận đến email của bạn.</div>
+                    </div>
+
+                    <div class="mt-3">
+                        <button type="button"
+                                class="btn text-light w-100"
+                                style="background-color: rgb(20,34,56); border-radius: 10px;"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalCodeXacNhan">
+                            Gửi Yêu Cầu
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Nhập Mã Xác Nhận -->
+    <div class="modal fade" id="modalCodeXacNhan" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content rounded-3">
+
+                <div class="modal-header border-0 justify-content-center">
+                    <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body pb-4">
+                    <div class="text-center">
+
+                        <h4 class="fw-bold">Nhập mã xác nhận</h4>
+                        <p class="small">Mã xác nhận đã được gửi qua email của bạn.</p>
+
+                        <div class="d-flex justify-content-center gap-2 my-3">
+                            <input type="text" maxlength="1" class="otp-input text-center" inputmode="numeric">
+                            <input type="text" maxlength="1" class="otp-input text-center" inputmode="numeric">
+                            <input type="text" maxlength="1" class="otp-input text-center" inputmode="numeric">
+                            <input type="text" maxlength="1" class="otp-input text-center" inputmode="numeric">
+                            <input type="text" maxlength="1" class="otp-input text-center" inputmode="numeric">
+                            <input type="text" maxlength="1" class="otp-input text-center" inputmode="numeric">
+                        </div>
+
+                        <div id="otpError" class="text-danger small"></div>
+
+                        <button class="btn text-light w-50 mt-2"
+                                style="background-color: rgb(20,34,56); border-radius: 10px;"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalNhapmatkhaumoi">
+                            Xác Nhận
+                        </button>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Nhập Mật Khẩu Mới -->
+    <div class="modal fade" id="modalNhapmatkhaumoi" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content rounded-3">
+
+                <div class="modal-body">
+
+                    <div class="text-end">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <h5 class="text-center fw-bold">MẬT KHẨU MỚI</h5>
+
+                    <div class="mt-3">
+                        <input type="password"
+                               class="form-control border-dark"
+                               id="matKhauMoi_QMK"
+                               placeholder="Nhập mật khẩu mới"
+                               style="border-radius: 10px; font-size: large;">
+                        <span class="text-danger small" id="matKhauMoi_QMKError"></span>
+                    </div>
+
+                    <div class="mt-3">
+                        <input type="password"
+                               class="form-control border-dark"
+                               id="xacNhanMatKhauMoi_QMK"
+                               placeholder="Xác nhận mật khẩu"
+                               style="border-radius: 10px; font-size: large;">
+                        <span class="text-danger small" id="xacNhanMatKhauMoi_QMKError"></span>
+                    </div>
+
+                    <button class="btn w-100 text-light mt-4"
+                            style="background-color: rgb(20,34,56); border-radius: 10px;">
+                        Xác Nhận
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
