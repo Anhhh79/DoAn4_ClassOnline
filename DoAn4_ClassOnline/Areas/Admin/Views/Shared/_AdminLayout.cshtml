@@ -27,6 +27,11 @@
    <!-- Toastr CSS -->
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    <!-- Theme đẹp hơn -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
 
     <!-- Css -->
     <link rel="stylesheet" href="~/assets/css/admin/css_admin.css">
@@ -51,11 +56,18 @@
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" asp-controller="QuanLyDatSan" asp-action="Index">
-                        <i class="lni lni-agenda"></i>
+                    <a class="sidebar-link" asp-area="Admin" asp-controller="QuanLyKhoa" asp-action="Index">
+                        <i class="lni lni-apartment"></i>
                         <span>Quản lý khoa</span>
                     </a>
                 </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" asp-area="Admin" asp-controller="QuanLyHocKy" asp-action="Index">
+                        <i class="lni lni-calendar"></i>
+                        <span>Quản lý học kỳ</span>
+                    </a>
+                </li>
+
             </ul>
         </div>
         @RenderBody()
@@ -82,8 +94,33 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     <script src="~/assets/js/admin/Js_QuanLyKhoa.js"></script>
-    
+
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 </body>
 
 </html>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        flatpickr("#batDau_Them", {
+            dateFormat: "d/m/Y",
+            allowInput: true
+        });
+
+        flatpickr("#ketThuc_Them", {
+            dateFormat: "d/m/Y",
+            allowInput: true
+        });
+
+        flatpickr("#batDau_Sua", {
+            dateFormat: "d/m/Y",
+            allowInput: true
+        });
+
+        flatpickr("#ketThuc_Sua", {
+            dateFormat: "d/m/Y",
+            allowInput: true
+        });
+    });
+</script>
