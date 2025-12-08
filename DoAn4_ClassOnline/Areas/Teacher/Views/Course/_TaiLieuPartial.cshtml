@@ -67,7 +67,7 @@
     <div class="modal fade" id="editTaiLieuModal" tabindex="-1" aria-labelledby="editTaiLieuModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
-                <form asp-controller="TaiLieu" asp-action="Edit" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                <form enctype="multipart/form-data" class="needs-validation" novalidate>
                     <div class="modal-header">
                         <h5 class="modal-title fw-bold" id="editTaiLieuModalLabel">
                             <i class="bi bi-pencil-square me-2 text-primary"></i> Sửa tài liệu
@@ -84,14 +84,14 @@
                             <div class="col-12">
                                 <label class="form-label">Tên tài liệu</label>
                                 <input type="text" id="editTenTaiLieu" name="TenTaiLieu" class="form-control" required />
-                                <div class="invalid-feedback">Vui lòng nhập tên tài liệu!</div>
+                                <small id="err_editTenTaiLieu" class="text-danger d-none"></small>
                             </div>
-
+                            <input type="number" class="form-control" name="ThuTu" id="editThuTu" value="1" hidden />
                             <!-- Mô tả -->
                             <div class="col-12">
                                 <label class="form-label">Mô tả</label>
                                 <textarea id="editMoTa" name="MoTa" class="form-control" rows="4" required></textarea>
-                                <div class="invalid-feedback">Vui lòng nhập mô tả!</div>
+                                <small id="err_editMoTa" class="text-danger d-none"></small>
                             </div>
 
                             <!-- File hiện có -->
@@ -140,7 +140,8 @@
                             <!-- Upload file mới -->
                             <div class="col-12">
                                 <label class="form-label mt-2">Thêm hoặc thay file mới (tùy chọn)</label>
-                                <input type="file" class="form-control" name="Files" multiple />
+                                <input type="file" id="editFiles" class="form-control" name="Files" multiple />
+                                <small id="err_editFiles" class="text-danger d-none"></small>
                                 <div class="form-text small">Nếu không chọn, hệ thống sẽ giữ nguyên các file hiện có.</div>
                             </div>
                         </div>
@@ -148,7 +149,7 @@
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
-                        <button type="submit" class="btn btn-primary text-light">
+                        <button type="button" class="btn btn-primary text-light" onclick="updateTaiLieu()">
                             <i class="bi bi-save me-1"></i> Cập nhật
                         </button>
                     </div>

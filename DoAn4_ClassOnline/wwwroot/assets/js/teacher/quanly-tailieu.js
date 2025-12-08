@@ -61,7 +61,7 @@
             <!-- Action -->
             <div class="text-end">
                 <button class="btn btn-outline-secondary btn-sm me-2" data-bs-toggle="modal"
-                    data-bs-target="#editTaiLieuModal" onclick="openEdit(${tl.taiLieuId})">
+                    data-bs-target="#editTaiLieuModal" onclick="loadTaiLieuForEdit(${tl.taiLieuId})">
                     <i class="bi bi-pencil"></i> Sửa
                 </button>
 
@@ -288,6 +288,195 @@ function deleteTaiLieu(taiLieuId) {
             }
         }); 
 }
+
+function loadTaiLieuForEdit(taiLieuId) {
+    $.ajax({
+        url: '/Teacher/TaiLieu/GetTaiLieuForEdit',
+        type: 'GET',
+        data: { taiLieuId: taiLieuId },
+        success: function (res) {
+            if (!res.success) {
+                showError_tc(res.message);
+                return;
+            }
+
+            const data = res.data;
+            console.log("=== Dữ liệu tải về để sửa tài liệu ===");
+            console.log(data);
+            // Set input
+            $("#editTaiLieuId").val(data.taiLieuId);
+            $("#editTenTaiLieu").val(data.tenTaiLieu);
+            $("#editMoTa").val(data.moTa);
+            $("#editThuTu").val(data.thuTu);
+
+            renderCurrentFiles(data.danhSachFile);
+            closeModal("editTaiLieuModal");
+        },
+        error: function () {
+            showError_tc("Lỗi hệ thống.");
+        }
+    });
+}
+function renderCurrentFiles(files) {
+    let container = $("#currentFilesContainer");
+    container.empty();
+
+    if (files.length === 0) {
+        container.append(`<p class="text-muted fst-italic">Không có tệp đính kèm.</p>`);
+        return;
+    }
+
+    files.forEach(f => {
+        let icon = getFileIcon(f.loaiFile);
+
+        let html = `
+            <div class="d-flex justify-content-between align-items-center border rounded-2 p-2 mb-1 bg-white">
+                <div class="d-flex align-items-center">
+                    ${icon}
+                    <a href="${f.duongDan}" target="_blank" class="text-decoration-none text-dark">
+                        ${f.tenFile}
+                    </a>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger"
+                    onclick="deleteFile(${f.fileId}, this)">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        `;
+
+        container.append(html);
+    });
+}
+function getFileIcon(type) {
+    if (!type) return `<i class="bi bi-file-earmark fs-5 me-2"></i>`;
+
+    if (type.includes("pdf")) return `<i class="bi bi-file-earmark-pdf text-danger fs-5 me-2"></i>`;
+    if (type.includes("word") || type.includes("doc")) return `<i class="bi bi-file-earmark-word text-primary fs-5 me-2"></i>`;
+    if (type.includes("excel") || type.includes("sheet") || type.includes("xlsx")) return `<i class="bi bi-file-earmark-excel text-success fs-5 me-2"></i>`;
+    if (type.includes("image")) return `<i class="bi bi-file-earmark-image text-info fs-5 me-2"></i>`;
+
+    return `<i class="bi bi-file-earmark fs-5 me-2"></i>`;
+}
+
+function deleteFile(fileId, btnElement) {
+    showDeleteConfirm_tc("Bạn có chắc chắn muốn xóa tài liệu này?")
+        .then((result) => {
+            if (result.isConfirmed) {
+
+                $.ajax({
+                    url: '/Teacher/TaiLieu/DeleteFile',
+                    type: 'POST',
+                    data: { fileId: fileId },
+                    success: function (res) {
+                        if (res.success) {
+                            $(btnElement).closest("div.d-flex").remove();
+                            loadTaiLieu_ChiTiet($("#khoaHocId_ChiTiet").val());
+                        } else {
+                            showError_tc(res.message);
+                        }
+                    },
+                    error: function () {
+                        showError_tc("Lỗi hệ thống.");
+                    }
+                });
+            }
+        }); 
+}
+
+function updateTaiLieu() {
+    if (!validateTaiLieuEdit()) {
+        return; // stop nếu lỗi
+    }
+
+    let formData = new FormData();
+
+    // Lấy dữ liệu từ input
+    formData.append("taiLieuId", $("#editTaiLieuId").val());
+    formData.append("TenTaiLieu", $("#editTenTaiLieu").val().trim());
+    formData.append("MoTa", $("#editMoTa").val().trim());
+    formData.append("ThuTu", $("#editThuTu").val());
+
+    // Lấy file mới (nếu có)
+    let files = $("#editFiles")[0].files;
+    if (files && files.length > 0) {
+        for (let f of files) {
+            formData.append("Files", f);
+        }
+    }
+    console.log("=== FormData gửi lên edit ===");
+    for (var pair of formData.entries()) {
+        console.log(pair[0] + ": ", pair[1]);
+    }
+    $.ajax({
+        url: '/Teacher/TaiLieu/UpdateTaiLieu',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (res) {
+            if (!res.success) {
+                showError_tc(res.message);
+                return;
+            }
+
+            showSuccess_tc("Cập nhật tài liệu thành công!");
+
+            // Reload danh sách tài liệu chi tiết
+            loadTaiLieu_ChiTiet($("#khoaHocId_ChiTiet").val());
+
+            // Đóng modal
+            closeModal("editTaiLieuModal");
+
+            // Reset input file sau khi cập nhật
+            $("#editFiles").val("");
+        },
+        error: function () {
+            showError_tc("Lỗi hệ thống khi cập nhật tài liệu!");
+        }
+    });
+}
+
+function validateTaiLieuEdit() {
+    let isValid = true;
+
+    // Reset lỗi cũ
+    $("#err_editTenTaiLieu").text("").addClass("d-none");
+    $("#err_editMoTa").text("").addClass("d-none");
+    $("#err_editFiles").text("").addClass("d-none");
+
+    let ten = $("#editTenTaiLieu").val().trim();
+    let moTa = $("#editMoTa").val().trim();
+    let thuTu = $("#editThuTu").val().trim();
+
+    // Validate tên tài liệu
+    if (ten === "") {
+        $("#err_editTenTaiLieu").text("Tên tài liệu không được để trống.").removeClass("d-none");
+        isValid = false;
+    } else if (ten.length < 3) {
+        $("#err_editTenTaiLieu").text("Tên tài liệu phải có ít nhất 3 ký tự.").removeClass("d-none");
+        isValid = false;
+    }
+
+    // Validate mô tả
+    if (moTa === "") {
+        $("#err_editMoTa").text("Mô tả không được để trống.").removeClass("d-none");
+        isValid = false;
+    }
+
+    // --- Validate file ---
+    let currentFiles = $("#currentFilesContainer .d-flex"); // file hiện tại trong modal
+    let fileInput = $("#editFiles");
+    let newFiles = fileInput.length > 0 ? fileInput[0].files : [];
+
+    if (currentFiles.length === 0 && (!newFiles || newFiles.length === 0)) {
+        $("#err_editFiles").text("Hiện tại không có file, bạn phải chọn ít nhất 1 file mới.").removeClass("d-none");
+        isValid = false;
+    }
+
+    return isValid;
+}
+
+
 
 
 

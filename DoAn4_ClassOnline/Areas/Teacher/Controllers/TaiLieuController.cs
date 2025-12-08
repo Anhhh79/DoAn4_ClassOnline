@@ -192,5 +192,115 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
             }
         }
 
+        // hàm đưa dữ liệu tài liệu lên form chỉnh sửa
+        [HttpGet]
+        public async Task<IActionResult> GetTaiLieuForEdit(int taiLieuId)
+        {
+            try
+            {
+                var taiLieu = await _context.TaiLieus
+                    .Include(tl => tl.TaiLieuFiles)
+                    .FirstOrDefaultAsync(tl => tl.TaiLieuId == taiLieuId);
+
+                if (taiLieu == null)
+                    return Json(new { success = false, message = "Tài liệu không tồn tại!" });
+
+                // Lấy base URL
+                var request = HttpContext.Request;
+                string baseUrl = $"{request.Scheme}://{request.Host}";
+
+                var data = new
+                {
+                    taiLieuId = taiLieu.TaiLieuId,
+                    tenTaiLieu = taiLieu.TenTaiLieu,
+                    moTa = taiLieu.MoTa,
+                    thuTu = taiLieu.ThuTu,
+                    danhSachFile = taiLieu.TaiLieuFiles.Select(f => new
+                    {
+                        fileId = f.FileId,
+                        tenFile = f.TenFile,
+                        duongDan = baseUrl + f.DuongDan, // FULL URL
+                        kichThuoc = f.KichThuoc,
+                        loaiFile = f.LoaiFile,
+                        ngayUpload = f.NgayUpload
+                    })
+                };
+
+                return Json(new { success = true, data });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteFile(int fileId)
+        {
+            var file = await _context.TaiLieuFiles.FindAsync(fileId);
+            if (file == null)
+                return Json(new { success = false, message = "File không tồn tại!" });
+
+            string fullPath = Path.Combine(_env.WebRootPath, file.DuongDan.TrimStart('/'));
+
+            if (System.IO.File.Exists(fullPath))
+                System.IO.File.Delete(fullPath);
+
+            _context.TaiLieuFiles.Remove(file);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateTaiLieu([FromForm] ThongTinTaiLieu model, int taiLieuId)
+        {
+            var taiLieu = await _context.TaiLieus.FindAsync(taiLieuId);
+            if (taiLieu == null)
+                return Json(new { success = false, message = "Tài liệu không tồn tại!" });
+
+            // ----------- Cập nhật thông tin cơ bản -----------
+            taiLieu.TenTaiLieu = model.TenTaiLieu;
+            taiLieu.MoTa = model.MoTa;
+            taiLieu.ThuTu = model.ThuTu;
+
+            // ----------- Thêm file mới nếu có upload -----------
+            if (model.Files != null && model.Files.Any())
+            {
+                var uploadFolder = Path.Combine(_env.WebRootPath, "assets", "tailieu");
+                if (!Directory.Exists(uploadFolder))
+                    Directory.CreateDirectory(uploadFolder);
+
+                foreach (var file in model.Files)
+                {
+                    if (file == null || file.Length == 0) continue;
+
+                    var ext = Path.GetExtension(file.FileName);
+                    var newName = Guid.NewGuid().ToString("N") + ext;
+                    var filePath = Path.Combine(uploadFolder, newName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    _context.TaiLieuFiles.Add(new TaiLieuFile
+                    {
+                        TaiLieuId = taiLieu.TaiLieuId,
+                        TenFile = file.FileName,
+                        DuongDan = "/assets/tailieu/" + newName,
+                        KichThuoc = file.Length,
+                        LoaiFile = ext,
+                        NgayUpload = DateTime.Now
+                    });
+                }
+            }
+
+            // ----------- Lưu thay đổi -----------
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Cập nhật tài liệu thành công!" });
+        }
+
     }
 }
