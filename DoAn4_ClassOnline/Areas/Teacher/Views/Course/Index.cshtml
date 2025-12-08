@@ -79,9 +79,14 @@
             <div>
                 <div class="card custom-card text-center p-2 h-95 border-0 rounded-4 bg-body-tertiary">
                     <div class="icon mb-2"><img src="/assets/image/meet.png" style="width:50px" alt="" /></div>
-                    <button class="btn btn-success text-white px-4 rounded-pill" style="background-color:#0055ff" data-bs-toggle="modal" data-bs-target="#joinMeetModal">
+                    <button class="btn btn-success text-white px-4 rounded-pill"
+                            onclick='GetLinkGGMeet("@(khoaHoc?.LinkHocOnline ?? "")")'
+                            style="background-color:#0055ff"
+                            data-bs-toggle="modal"
+                            data-bs-target="#joinMeetModal">
                         <i class="bi bi-camera-video me-1"></i> Tạo phòng
                     </button>
+
                 </div>
             </div>
         </div>
@@ -127,6 +132,14 @@
             console.log('Teacher name updated to:', e.detail.userInfo.fullName);
         }
     });
+        function GetLinkGGMeet(existingLink = '') {
+        const meetLinkInput = document.getElementById('meetLink');
+        if (!meetLinkInput) {
+            console.warn("Không tìm thấy input #meetLink");
+            return;
+        }
+        meetLinkInput.value = existingLink;
+    }
 </script>
 <script src="~/assets/js/teacher/quanly-thongbao.js"></script>
 <script src="~/assets/js/teacher/quanly-tailieu.js"></script>
