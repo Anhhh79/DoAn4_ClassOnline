@@ -85,7 +85,7 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
             }
         }
 
-
+        // Hàm thêm tài liệu mới
         [HttpPost]
         public async Task<IActionResult> CreateTaiLieu([FromForm] ThongTinTaiLieu model)
         {
@@ -140,6 +140,57 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
             return Json(new { success = true, message = "Thêm tài liệu thành công!" });
         }
 
+        // Hàm xóa tài liệu
+        [HttpPost]
+        public async Task<IActionResult> DeleteTaiLieu(int taiLieuId)
+        {
+            try
+            {
+                var taiLieu = await _context.TaiLieus
+                    .Include(tl => tl.TaiLieuFiles)
+                    .FirstOrDefaultAsync(tl => tl.TaiLieuId == taiLieuId);
+
+                if (taiLieu == null)
+                    return Json(new { success = false, message = "Tài liệu không tồn tại!" });
+
+                // ========== 1. XÓA FILE VẬT LÝ ==========
+                foreach (var file in taiLieu.TaiLieuFiles)
+                {
+                    // Chuẩn hóa đường dẫn
+                    string relativePath = file.DuongDan
+                        .Replace("\\", "/")        // chuyển hết sang /
+                        .TrimStart('/');           // bỏ dấu / đầu nếu có
+
+                    string filePath = Path.Combine(_env.WebRootPath, relativePath);
+
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        try
+                        {
+                            System.IO.File.Delete(filePath);
+                        }
+                        catch (IOException ioEx)
+                        {
+                            // Không throw luôn → cho phép xóa tiếp file khác
+                            Console.WriteLine("Lỗi khi xóa file: " + ioEx.Message);
+                        }
+                    }
+                    Console.WriteLine("Path delete: " + filePath);
+                }
+
+                // ========== 2. XÓA RECORD DB ==========
+                _context.TaiLieuFiles.RemoveRange(taiLieu.TaiLieuFiles);
+                _context.TaiLieus.Remove(taiLieu);
+
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Xóa tài liệu thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
 
     }
 }

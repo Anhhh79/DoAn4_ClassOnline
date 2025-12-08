@@ -262,6 +262,33 @@ function resetAddTaiLieuForm() {
     $("#fileErrorMsg").remove();
 }
 
+// hàm xóa tài liệu
+function deleteTaiLieu(taiLieuId) {
+    
+    showDeleteConfirm_tc("Bạn có chắc chắn muốn xóa tài liệu này?")
+        .then((result) => {
+            if (result.isConfirmed) {
+
+                $.ajax({
+                    url: `/Teacher/TaiLieu/DeleteTaiLieu?taiLieuId=${taiLieuId}`,
+                    method: "POST",
+                    success: function (res) {
+                        if (res.success) {
+                            showSuccess_tc("Xóa tài liệu thành công!");
+                            // Load lại danh sách tài liệu
+                            loadTaiLieu_ChiTiet($("#khoaHocId_ChiTiet").val());
+                        } else {
+                            showError_tc(res.message || "Không thể xóa tài liệu!");
+                        }
+                    },
+                    error: function () {
+                        showError_tc("Đã xảy ra lỗi khi xóa tài liệu!");
+                    }
+                });
+            }
+        }); 
+}
+
 
 
 
