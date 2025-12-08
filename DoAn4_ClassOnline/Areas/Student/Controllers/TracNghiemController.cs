@@ -141,5 +141,136 @@ namespace DoAn4_ClassOnline.Areas.Student.Controllers
                 }
             });
         }
+
+        // ⭐ ACTION XEM KẾT QUẢ BÀI LÀM ⭐
+        public async Task<IActionResult> XemKetQua(int baiTracNghiemId)
+        {
+            _logger.LogInformation($"🔍 XemKetQua - baiTracNghiemId: {baiTracNghiemId}");
+
+            // Kiểm tra đăng nhập
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                TempData["Error"] = "Vui lòng đăng nhập!";
+                return RedirectToAction("Index", "DangNhap", new { area = "Admin" });
+            }
+
+            // Lấy thông tin bài làm MỚI NHẤT của sinh viên
+            var baiLam = await _context.BaiLamTracNghiems
+                .Where(bl => bl.BaiTracNghiemId == baiTracNghiemId && bl.SinhVienId == userId && bl.NgayNop != null)
+                .OrderByDescending(bl => bl.NgayNop)
+                .Include(bl => bl.BaiTracNghiem)
+                    .ThenInclude(bt => bt.CauHois)
+                        .ThenInclude(ch => ch.DapAns)
+                .Include(bl => bl.TraLoiSinhViens)
+                    .ThenInclude(tl => tl.DapAn)
+                .Include(bl => bl.SinhVien)
+                .FirstOrDefaultAsync();
+
+            if (baiLam == null)
+            {
+                TempData["Error"] = "Không tìm thấy bài làm hoặc bạn chưa nộp bài!";
+                return RedirectToAction("Index", "TracNghiem", new { khoaHocId = baiLam?.BaiTracNghiem.KhoaHocId });
+            }
+
+            // Kiểm tra quyền xem kết quả
+            if (baiLam.BaiTracNghiem.ChoXemKetQua != true)
+            {
+                TempData["Error"] = "Giảng viên chưa cho phép xem kết quả!";
+                return RedirectToAction("Index", "TracNghiem", new { khoaHocId = baiLam.BaiTracNghiem.KhoaHocId });
+            }
+
+            // Truyền dữ liệu sang View
+            ViewBag.BaiTracNghiemId = baiTracNghiemId;
+            ViewBag.BaiLamId = baiLam.BaiLamId;
+            ViewBag.TenBaiThi = baiLam.BaiTracNghiem.TenBaiThi;
+            ViewBag.TenSinhVien = baiLam.SinhVien.FullName;
+            ViewBag.MaSinhVien = baiLam.SinhVien.MaSo;
+            ViewBag.SoCauHoi = baiLam.BaiTracNghiem.CauHois.Count;
+            ViewBag.Diem = baiLam.Diem ?? 0;
+            ViewBag.DiemToiDa = baiLam.BaiTracNghiem.DiemToiDa ?? 10;
+            ViewBag.NgayNop = baiLam.NgayNop?.ToString("dd/MM/yyyy HH:mm");
+
+            return View();
+        }
+
+        // ⭐ API LẤY CHI TIẾT BÀI LÀM VỚI ĐÁP ÁN ĐÚNG/SAI ⭐
+        [HttpGet]
+        public async Task<IActionResult> GetChiTietBaiLam(int baiLamId)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(new { success = false, message = "Vui lòng đăng nhập!" });
+            }
+
+            try
+            {
+                var baiLam = await _context.BaiLamTracNghiems
+                    .Where(bl => bl.BaiLamId == baiLamId && bl.SinhVienId == userId)
+                    .Include(bl => bl.BaiTracNghiem)
+                        .ThenInclude(bt => bt.CauHois)
+                            .ThenInclude(ch => ch.DapAns)
+                    .Include(bl => bl.TraLoiSinhViens)
+                    .FirstOrDefaultAsync();
+
+                if (baiLam == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy bài làm!" });
+                }
+
+                // Xử lý dữ liệu câu hỏi với trả lời của sinh viên
+                var cauHois = baiLam.BaiTracNghiem.CauHois.OrderBy(ch => ch.ThuTu).Select(ch =>
+                {
+                    // Lấy trả lời của sinh viên
+                    var traLoi = baiLam.TraLoiSinhViens.FirstOrDefault(tl => tl.CauHoiId == ch.CauHoiId);
+                    var dapAnChon = traLoi?.DapAnId;
+
+                    // Tìm đáp án đúng
+                    var dapAnDung = ch.DapAns.FirstOrDefault(da => da.LaDapAnDung == true);
+                    var dapAnDungId = dapAnDung?.DapAnId;
+
+                    // Kiểm tra trả lời đúng/sai
+                    bool? laDung = null;
+                    if (dapAnChon.HasValue && dapAnDungId.HasValue)
+                    {
+                        laDung = dapAnChon.Value == dapAnDungId.Value;
+                    }
+
+                    // Lấy list đáp án
+                    var dapAns = ch.DapAns.OrderBy(da => da.ThuTu).Select((da, index) => new
+                    {
+                        dapAnId = da.DapAnId,
+                        noiDung = da.NoiDungDapAn,
+                        key = ((char)('A' + index)).ToString(),
+                        laDapAnDung = da.LaDapAnDung == true,
+                        duocChon = da.DapAnId == dapAnChon
+                    }).ToList();
+
+                    return new
+                    {
+                        cauHoiId = ch.CauHoiId,
+                        noiDung = ch.NoiDungCauHoi,
+                        hinhAnh = ch.HinhAnh,
+                        diem = ch.Diem,
+                        dapAns = dapAns,
+                        dapAnChon = dapAnChon.HasValue ? dapAns.FirstOrDefault(da => da.dapAnId == dapAnChon)?.key : null,
+                        dapAnDung = dapAnDungId.HasValue ? dapAns.FirstOrDefault(da => da.dapAnId == dapAnDungId)?.key : null,
+                        laDung = laDung
+                    };
+                }).ToList();
+
+                return Json(new
+                {
+                    success = true,
+                    cauHois = cauHois
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading chi tiet bai lam");
+                return Json(new { success = false, message = "Có lỗi xảy ra!" });
+            }
+        }
     }
 }

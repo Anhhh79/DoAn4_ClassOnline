@@ -1,0 +1,316 @@
+﻿@{
+    ViewData["Title"] = "Xem lại bài làm";
+    var baiTracNghiemId = ViewBag.BaiTracNghiemId ?? 0;
+    var baiLamId = ViewBag.BaiLamId ?? 0;
+    var tenBaiThi = ViewBag.TenBaiThi ?? "Bài trắc nghiệm";
+    var tenSinhVien = ViewBag.TenSinhVien ?? "Sinh viên";
+    var maSinhVien = ViewBag.MaSinhVien ?? "";
+    var soCauHoi = ViewBag.SoCauHoi ?? 0;
+    var diem = ViewBag.Diem ?? 0;
+    var diemToiDa = ViewBag.DiemToiDa ?? 10;
+    var ngayNop = ViewBag.NgayNop ?? "";
+}
+
+<!-- ⭐ HEADER ⭐ -->
+<div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+    <a class="btn border-0" href="javascript:history.back()">
+        <i class="bi bi-chevron-left me-1"></i> Quay lại
+    </a>
+
+    <div class="text-center flex-grow-1">
+        <h5 class="fw-bold mb-0">Xem lại bài làm: @tenBaiThi</h5>
+        <div class="text-muted small">Thí sinh: @tenSinhVien (@maSinhVien)</div>
+    </div>
+
+    <div class="text-end">
+        <div class="fw-bold text-success fs-4">@diem / @diemToiDa điểm</div>
+        <div class="text-muted small">Nộp lúc: @ngayNop</div>
+    </div>
+</div>
+
+<!-- ⭐ THỐNG KÊ NHANH ⭐ -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card border-success">
+            <div class="card-body text-center">
+                <i class="bi bi-check-circle text-success fs-2"></i>
+                <div class="fw-bold fs-4" id="soCauDung">0</div>
+                <div class="text-muted small">Câu đúng</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-danger">
+            <div class="card-body text-center">
+                <i class="bi bi-x-circle text-danger fs-2"></i>
+                <div class="fw-bold fs-4" id="soCauSai">0</div>
+                <div class="text-muted small">Câu sai</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-warning">
+            <div class="card-body text-center">
+                <i class="bi bi-dash-circle text-warning fs-2"></i>
+                <div class="fw-bold fs-4" id="soCauBoQua">0</div>
+                <div class="text-muted small">Câu bỏ qua</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-primary">
+            <div class="card-body text-center">
+                <i class="bi bi-list-ol text-primary fs-2"></i>
+                <div class="fw-bold fs-4">@soCauHoi</div>
+                <div class="text-muted small">Tổng số câu</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- KHU VỰC CÂU HỎI -->
+    <div class="col-md-9" style="max-height: 70vh; overflow-y: auto;" id="questionList">
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Đang tải...</span>
+            </div>
+            <p class="mt-3 text-muted">Đang tải câu hỏi...</p>
+        </div>
+    </div>
+
+    <!-- DANH SÁCH CÂU HỎI -->
+    <div class="col-md-3">
+        <div class="bg-white border rounded-4 p-3 question-nav shadow-sm sticky-top" style="top: 20px;">
+            <h6 class="fw-bold mb-3">Danh sách câu hỏi</h6>
+            <div id="questionNav" class="d-flex flex-wrap gap-2"></div>
+            
+            <!-- CHÚ THÍCH MÀU -->
+            <div class="mt-3 border-top pt-3">
+                <div class="small mb-2"><span class="badge bg-success me-2">✓</span>Đúng</div>
+                <div class="small mb-2"><span class="badge bg-danger me-2">✗</span>Sai</div>
+                <div class="small"><span class="badge bg-secondary me-2">-</span>Bỏ qua</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- ⭐ NHÚNG JAVASCRIPT VỚI IIFE ĐỂ TRÁNH CONFLICT ⭐ -->
+    <script>
+        (function() {
+            'use strict'; // ⭐ STRICT MODE ĐỂ BẮT LỖI SỚM ⭐
+            
+            console.log('🚀 [XemKetQua] START');
+            
+            // ⭐ LOCAL VARIABLES - KHÔNG BỊ CONFLICT ⭐
+            let baiLamId = 0;
+            let cauHois = [];
+            
+            // ⭐ KHỞI TẠO ⭐
+            function initXemKetQua(baiLamIdParam) {
+                baiLamId = baiLamIdParam;
+                console.log('🎯 [initXemKetQua] Init with baiLamId:', baiLamId);
+                loadCauHoi();
+            }
+            
+            // ⭐ LOAD CÂU HỎI ⭐
+            async function loadCauHoi() {
+                const questionList = document.getElementById('questionList');
+                
+                try {
+                    console.log('📡 Fetching chi tiet bai lam...');
+                    const response = await fetch(`/Student/TracNghiem/GetChiTietBaiLam?baiLamId=${baiLamId}`);
+                    console.log('📥 Response status:', response.status);
+                    
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    
+                    const data = await response.json();
+                    console.log('📥 Response data:', data);
+                    
+                    if (data.success && data.cauHois) {
+                        cauHois = data.cauHois;
+                        console.log('✅ Loaded', cauHois.length, 'questions');
+                        renderCauHois();
+                        updateThongKe();
+                    } else {
+                        showError('Không thể tải câu hỏi: ' + (data.message || 'Lỗi không xác định'));
+                    }
+                } catch (error) {
+                    console.error('❌ Error:', error);
+                    showError('Có lỗi xảy ra: ' + error.message);
+                }
+            }
+            
+            // ⭐ RENDER CÂU HỎI ⭐
+            function renderCauHois() {
+                const questionList = document.getElementById('questionList');
+                const questionNav = document.getElementById('questionNav');
+                
+                if (!questionList || !questionNav) {
+                    console.error('❌ Missing elements');
+                    return;
+                }
+                
+                questionList.innerHTML = '';
+                questionNav.innerHTML = '';
+                
+                cauHois.forEach((cauHoi, index) => {
+                    const cauSo = index + 1;
+                    
+                    let statusClass = 'secondary';
+                    let statusIcon = '-';
+                    let statusText = 'Bỏ qua';
+                    
+                    if (cauHoi.laDung === true) {
+                        statusClass = 'success';
+                        statusIcon = '✓';
+                        statusText = 'Đúng';
+                    } else if (cauHoi.laDung === false) {
+                        statusClass = 'danger';
+                        statusIcon = '✗';
+                        statusText = 'Sai';
+                    }
+                    
+                    const questionHtml = `
+                        <div class="card mb-3 border-${statusClass}" id="cau-${cauSo}">
+                            <div class="card-header bg-${statusClass} bg-opacity-10">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="fw-bold mb-0">
+                                        <span class="badge bg-${statusClass} me-2">${statusIcon}</span>
+                                        Câu ${cauSo}: ${statusText}
+                                    </h6>
+                                    <span class="text-muted small">Điểm: ${cauHoi.diem || 1}</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="fw-semibold mb-3">${escapeHtml(cauHoi.noiDung)}</div>
+                                
+                                ${cauHoi.hinhAnh ? `
+                                    <div class="text-center my-3">
+                                        <img src="${cauHoi.hinhAnh}" 
+                                             alt="Hình ảnh câu ${cauSo}" 
+                                             class="img-fluid rounded border shadow-sm"
+                                             style="max-width: 100%; max-height: 400px; object-fit: contain;">
+                                    </div>
+                                ` : ''}
+                                
+                                <div class="list-group">
+                                    ${cauHoi.dapAns.map(da => {
+                                        let itemClass = '';
+                                        let icon = '';
+                                        let badge = '';
+                                        
+                                        if (da.laDapAnDung) {
+                                            itemClass = 'list-group-item-success';
+                                            icon = '<i class="bi bi-check-circle-fill text-success me-2"></i>';
+                                            badge = '<span class="badge bg-success ms-2">Đáp án đúng</span>';
+                                        }
+                                        
+                                        if (da.duocChon && !da.laDapAnDung) {
+                                            itemClass = 'list-group-item-danger';
+                                            icon = '<i class="bi bi-x-circle-fill text-danger me-2"></i>';
+                                            badge = '<span class="badge bg-danger ms-2">Bạn đã chọn</span>';
+                                        }
+                                        
+                                        if (da.duocChon && da.laDapAnDung) {
+                                            badge = '<span class="badge bg-success ms-2">Bạn đã chọn đúng</span>';
+                                        }
+                                        
+                                        return `
+                                            <div class="list-group-item ${itemClass} d-flex align-items-center">
+                                                ${icon}
+                                                <span class="fw-bold me-2">${da.key}.</span>
+                                                <span class="flex-grow-1">${escapeHtml(da.noiDung)}</span>
+                                                ${badge}
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                               
+                            </div>
+                        </div>
+                    `;
+                    
+                    questionList.innerHTML += questionHtml;
+                    
+                    const navBtn = document.createElement('button');
+                    navBtn.className = `btn btn-${statusClass} btn-sm`;
+                    navBtn.textContent = cauSo;
+                    navBtn.onclick = () => scrollToCauHoi(cauSo);
+                    questionNav.appendChild(navBtn);
+                });
+                
+                console.log('✅ Rendered', cauHois.length, 'câu hỏi');
+            }
+            
+            // ⭐ CẬP NHẬT THỐNG KÊ ⭐
+            function updateThongKe() {
+                const soCauDung = cauHois.filter(ch => ch.laDung === true).length;
+                const soCauSai = cauHois.filter(ch => ch.laDung === false).length;
+                const soCauBoQua = cauHois.filter(ch => ch.laDung === null).length;
+                
+                const elDung = document.getElementById('soCauDung');
+                const elSai = document.getElementById('soCauSai');
+                const elBoQua = document.getElementById('soCauBoQua');
+                
+                if (elDung) elDung.textContent = soCauDung;
+                if (elSai) elSai.textContent = soCauSai;
+                if (elBoQua) elBoQua.textContent = soCauBoQua;
+                
+                console.log('📊 Stats:', { soCauDung, soCauSai, soCauBoQua });
+            }
+            
+            // ⭐ SCROLL ĐẾN CÂU HỎI ⭐
+            function scrollToCauHoi(cauSo) {
+                const element = document.getElementById(`cau-${cauSo}`);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    element.classList.add('border-primary', 'border-3');
+                    setTimeout(() => {
+                        element.classList.remove('border-primary', 'border-3');
+                    }, 1500);
+                }
+            }
+            
+            // ⭐ ESCAPE HTML ⭐
+            function escapeHtml(text) {
+                if (!text) return '';
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+            
+            // ⭐ HIỂN THỊ LỖI ⭐
+            function showError(message) {
+                const questionList = document.getElementById('questionList');
+                if (questionList) {
+                    questionList.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-circle me-2"></i>${message}
+                        </div>
+                    `;
+                }
+            }
+            
+            // ⭐ AUTO INIT - CHỈ CHẠY 1 LẦN ⭐
+            const baiLamIdFromView = @ViewBag.BaiLamId;
+            console.log('🎯 Auto-init with baiLamId:', baiLamIdFromView);
+            
+            // ⭐ ĐẢM BẢO CHỈ CHẠY 1 LẦN ⭐
+            if (!window.__xemKetQuaInitialized) {
+                window.__xemKetQuaInitialized = true;
+                
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', () => initXemKetQua(baiLamIdFromView));
+                } else {
+                    initXemKetQua(baiLamIdFromView);
+                }
+            } else {
+                console.warn('⚠️ XemKetQua already initialized, skipping...');
+            }
+            
+            console.log('✅ [XemKetQua] Script loaded');
+        })(); // ⭐ IIFE - TỰ ĐỘNG CHẠY VÀ KHÔNG POLLUTE GLOBAL SCOPE ⭐
+    </script>
+}
