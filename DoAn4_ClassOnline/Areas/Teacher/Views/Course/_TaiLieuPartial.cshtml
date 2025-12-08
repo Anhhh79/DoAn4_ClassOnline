@@ -5,7 +5,7 @@
         <h5 class="fw-bold mb-0">
             <i class="bi bi-file-earmark-text me-2 text-primary"></i> Tài liệu học tập
         </h5>
-        <button type="button" class="btn btn-success btn-sm text-light" data-bs-toggle="modal" data-bs-target="#addTaiLieuModal">
+        <button type="button" class="btn btn-success btn-sm text-light" data-bs-toggle="modal" data-bs-target="#addTaiLieuModal" onclick="resetAddTaiLieuForm();">
             <i class="bi bi-plus-lg me-1"></i> Thêm tài liệu
         </button>
     </div>
@@ -14,7 +14,7 @@
     <div class="modal fade" id="addTaiLieuModal" tabindex="-1" aria-labelledby="addTaiLieuModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
-                <form asp-controller="TaiLieu" asp-action="Create" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                <form id="formAddTaiLieu" enctype="multipart/form-data">
                     <div class="modal-header">
                         <h5 class="modal-title fw-bold" id="addTaiLieuModalLabel">
                             <i class="bi bi-file-earmark-plus me-2 text-primary"></i> Thêm tài liệu học tập
@@ -26,19 +26,20 @@
                         <div class="row g-3 px-3">
                             <div class="col-12">
                                 <label class="form-label">Tên tài liệu</label>
-                                <input type="text" class="form-control" maxlength="200" required />
+                                <input type="text" class="form-control" name="TenTaiLieu" id="tenTaiLieu_Add" required />
                                 <div class="invalid-feedback">Vui lòng nhập tên tài liệu!</div>
                             </div>
 
                             <div class="col-12">
                                 <label class="form-label">Mô tả</label>
-                                <textarea class="form-control" rows="4" required></textarea>
+                                <textarea class="form-control" name="MoTa" id="moTa_Add" rows="4" required></textarea>
                                 <div class="invalid-feedback">Vui lòng nhập mô tả tài liệu!</div>
                             </div>
+                            <input type="number" class="form-control" name="ThuTu" id="thuTu_Add" value="1" hidden />
 
                             <div class="col-12">
                                 <label class="form-label">Tệp đính kèm</label>
-                                <input type="file" class="form-control" name="Files" multiple required />
+                                <input type="file" class="form-control" name="Files" id="files_Add" multiple required />
                                 <div class="form-text small text-muted">
                                     Cho phép nhiều file (.pdf, .docx, .xlsx, .jpg, ...)
                                 </div>
@@ -48,7 +49,7 @@
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
-                        <button type="submit" class="btn btn-primary text-light">
+                        <button type="button" class="btn btn-primary text-light" onclick="createTaiLieu()">
                             <i class="bi bi-save me-1"></i> Lưu tài liệu
                         </button>
                     </div>
@@ -57,187 +58,10 @@
         </div>
     </div>
 
-    <!-- ====== TÀI LIỆU 1 ====== -->
-    <div class="col-12">
-        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary d-flex justify-content-between align-items-center flex-wrap gap-2">
-
-            <!-- Tiêu đề -->
-            <a class="text-decoration-none text-dark d-flex align-items-center flex-grow-1"
-               data-bs-toggle="collapse"
-               href="#collapseTaiLieu1"
-               role="button"
-               aria-expanded="false"
-               aria-controls="collapseTaiLieu1">
-                <strong class="me-1">Tài liệu 1:</strong>
-                Giáo trình Internet of Things – Chương 1
-            </a>
-
-            <!-- Thời gian -->
-            <div class="text-muted small d-flex align-items-center me-4">
-                <i class="bi bi-clock me-1"></i> 23/10/2025 - 08:30
-            </div>
-
-            <!-- Nút hành động -->
-            <div class="text-end">
-                <button class="btn btn-outline-secondary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#editTaiLieuModal">
-                    <i class="bi bi-pencil"></i> Sửa
-                </button>
-                <button class="btn btn-outline-danger btn-sm">
-                    <i class="bi bi-trash"></i> Xóa
-                </button>
-            </div>
-        </div>
-
-        <!-- Nội dung khi mở -->
-        <div class="collapse" id="collapseTaiLieu1">
-            <div class="p-3 border rounded-3 mb-3" style="background-color: rgba(243,246,248);">
-                <p class="mb-2">
-                    <strong>Mô tả:</strong> Tài liệu giới thiệu tổng quan về IoT, bao gồm kiến trúc hệ thống, giao thức và ví dụ thực tế.
-                </p>
-
-                <hr class="my-2">
-
-                <!-- Danh sách file -->
-                <div class="row gy-2 mt-2">
-                    <!-- PDF -->
-                    <div class="col-12">
-                        <a href="~/assets/tailieu/test_pdf.pdf" target="_blank"
-                           class="d-flex justify-content-between align-items-center border rounded-3 p-3 bg-white text-decoration-none shadow-sm"
-                           style="color: red;">
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-file-earmark-pdf fs-4 me-3"></i>
-                                <div><strong>PDF:</strong> Giới thiệu IoT</div>
-                            </div>
-                            <button class="btn btn-sm btn-outline-danger">
-                                <i class="bi bi-download me-1"></i> Tải xuống
-                            </button>
-                        </a>
-                    </div>
-
-                    <!-- Word -->
-                    <div class="col-12">
-                        <a href="~/assets/tailieu/test_word.docx" target="_blank"
-                           class="d-flex justify-content-between align-items-center border rounded-3 p-3 bg-white text-decoration-none shadow-sm"
-                           style="color: #2b579a;">
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-file-earmark-word fs-4 me-3"></i>
-                                <div><strong>Word:</strong> Bản hướng dẫn chi tiết</div>
-                            </div>
-                            <button class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-download me-1"></i> Tải xuống
-                            </button>
-                        </a>
-                    </div>
-
-                    <!-- Excel -->
-                    <div class="col-12">
-                        <a href="/uploads/DuLieu_CamBien.xlsx" download
-                           class="d-flex justify-content-between align-items-center border rounded-3 p-3 bg-white text-decoration-none shadow-sm"
-                           style="color: green;">
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-file-earmark-excel fs-4 me-3"></i>
-                                <div><strong>Excel:</strong> Dữ liệu cảm biến IoT</div>
-                            </div>
-                            <button class="btn btn-sm btn-outline-success">
-                                <i class="bi bi-download me-1"></i> Tải xuống
-                            </button>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div id="taiLieuContainer" class="row">
+        <!-- Danh sách tài liệu sẽ được hiển thị ở đây -->
     </div>
 
-    <!-- ====== TÀI LIỆU 2 ====== -->
-    <div class="col-12">
-        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary d-flex justify-content-between align-items-center flex-wrap gap-2">
-
-            <!-- Tiêu đề -->
-            <a class="text-decoration-none text-dark d-flex align-items-center flex-grow-1"
-               data-bs-toggle="collapse"
-               href="#collapseTaiLieu2"
-               role="button"
-               aria-expanded="false"
-               aria-controls="collapseTaiLieu2">
-                <strong class="me-1">Tài liệu 2:</strong>
-                Giáo trình Internet of Things – Chương 2
-            </a>
-
-            <!-- Thời gian -->
-            <div class="text-muted small d-flex align-items-center me-4">
-                <i class="bi bi-clock me-1"></i> 23/10/2025 - 08:30
-            </div>
-
-            <!-- Nút hành động -->
-            <div class="text-end">
-                <button class="btn btn-outline-secondary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#editTaiLieuModal">
-                    <i class="bi bi-pencil"></i> Sửa
-                </button>
-                <button class="btn btn-outline-danger btn-sm">
-                    <i class="bi bi-trash"></i> Xóa
-                </button>
-            </div>
-        </div>
-
-        <!-- Nội dung khi mở -->
-        <div class="collapse" id="collapseTaiLieu2">
-            <div class="p-3 border rounded-3 mb-3" style="background-color: rgba(243,246,248);">
-                <p class="mb-2">
-                    <strong>Mô tả:</strong> Tài liệu giới thiệu tổng quan về IoT, bao gồm kiến trúc hệ thống, giao thức và ví dụ thực tế.
-                </p>
-
-                <hr class="my-2">
-
-                <!-- Danh sách file -->
-                <div class="row gy-2 mt-2">
-                    <!-- PDF -->
-                    <div class="col-12">
-                        <a href="/uploads/TaiLieu_IoT.pdf" download
-                           class="d-flex justify-content-between align-items-center border rounded-3 p-3 bg-white text-decoration-none shadow-sm"
-                           style="color: red;">
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-file-earmark-pdf fs-4 me-3"></i>
-                                <div><strong>PDF:</strong> Giới thiệu IoT</div>
-                            </div>
-                            <button class="btn btn-sm btn-outline-danger">
-                                <i class="bi bi-download me-1"></i> Tải xuống
-                            </button>
-                        </a>
-                    </div>
-
-                    <!-- Word -->
-                    <div class="col-12">
-                        <a href="/uploads/TaiLieu_IoT.docx" download
-                           class="d-flex justify-content-between align-items-center border rounded-3 p-3 bg-white text-decoration-none shadow-sm"
-                           style="color: #2b579a;">
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-file-earmark-word fs-4 me-3"></i>
-                                <div><strong>Word:</strong> Bản hướng dẫn chi tiết</div>
-                            </div>
-                            <button class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-download me-1"></i> Tải xuống
-                            </button>
-                        </a>
-                    </div>
-
-                    <!-- Excel -->
-                    <div class="col-12">
-                        <a href="/uploads/DuLieu_CamBien.xlsx" download
-                           class="d-flex justify-content-between align-items-center border rounded-3 p-3 bg-white text-decoration-none shadow-sm"
-                           style="color: green;">
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-file-earmark-excel fs-4 me-3"></i>
-                                <div><strong>Excel:</strong> Dữ liệu cảm biến IoT</div>
-                            </div>
-                            <button class="btn btn-sm btn-outline-success">
-                                <i class="bi bi-download me-1"></i> Tải xuống
-                            </button>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Modal Sửa tài liệu -->
     <div class="modal fade" id="editTaiLieuModal" tabindex="-1" aria-labelledby="editTaiLieuModalLabel" aria-hidden="true">

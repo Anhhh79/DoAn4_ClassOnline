@@ -88,6 +88,12 @@ document.addEventListener("DOMContentLoaded", () => {
         btnTaiLieu.addEventListener("click", function (e) {
             e.preventDefault();
             loadNoiDung_Tc('/Teacher/Course/TaiLieu');
+            if (khoaHocId) {
+                loadTaiLieu_ChiTiet(khoaHocId);
+            } else {
+                console.error('khoaHocId is null');
+                showError_tc('Lỗi: Không xác định được ID khóa học!');
+            }
             setActiveButton(this);
         });
     }
