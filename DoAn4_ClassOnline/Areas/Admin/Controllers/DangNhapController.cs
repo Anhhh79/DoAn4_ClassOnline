@@ -126,7 +126,7 @@ namespace DoAn4_ClassOnline.Areas.Admin.Controllers
 
             return roleId switch
             {
-                1 => RedirectToAction("Index", "Home", new { area = "Admin" }),
+                1 => RedirectToAction("Index", "QuanLyTaiKhoan", new { area = "Admin" }),
                 2 => RedirectToAction("Index", "Home", new { area = "Teacher" }),
                 3 => RedirectToAction("Index", "Home", new { area = "Student" }),
                 _ => RedirectToAction("Index", "Home", new { area = "Student" })

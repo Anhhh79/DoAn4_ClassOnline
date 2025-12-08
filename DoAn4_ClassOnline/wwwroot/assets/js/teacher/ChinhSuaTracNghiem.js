@@ -58,17 +58,74 @@ document.addEventListener("DOMContentLoaded", () => {
             // ⭐ XÓA LOCALSTORAGE ĐỂ BẮT ĐẦU SẠCH ⭐
             localStorage.removeItem(STORAGE_KEY);
             
-            // ⭐ KIỂM TRA XEM ĐÃ CÓ CÂU HỎI CHƯA - NGĂN TẠO TRÙNG ⭐
-            const existingQuestions = document.querySelectorAll('.question-block');
-            if (existingQuestions.length > 0) {
-                console.log('⚠️ Questions already exist, skipping addQuestion()');
-                return;
+            // ⭐ KIỂM TRA XEM CÓ DỮ LIỆU TỪ WORD IMPORT KHÔNG ⭐
+            const importedQuestions = sessionStorage.getItem('importedQuestions');
+            const importedFileName = sessionStorage.getItem('importedFileName');
+            
+            if (importedQuestions) {
+                try {
+                    const questions = JSON.parse(importedQuestions);
+                    console.log(`✅ Đang import ${questions.length} câu hỏi từ file: ${importedFileName || 'Word'}`);
+                    
+                    // Xóa sessionStorage sau khi đọc
+                    sessionStorage.removeItem('importedQuestions');
+                    sessionStorage.removeItem('importedFileName');
+                    
+                    // Hiển thị thông báo toast
+                    if (typeof Swal !== 'undefined') {
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true
+                        });
+                        
+                        Toast.fire({
+                            icon: 'success',
+                            title: `Đã import ${questions.length} câu hỏi từ Word`
+                        });
+                    }
+                    
+                    // ⭐ XÓA TẤT CẢ CÂU HỎI HIỆN CÓ (NẾU CÓ) ⭐
+                    questionContainer.innerHTML = '';
+                    qIndex = 0;
+                    
+                    // ⭐ THÊM TỪNG CÂU HỎI TỪ WORD ⭐
+                    questions.forEach((q, index) => {
+                        const questionData = {
+                            text: q.text,
+                            options: q.options,
+                            answer: q.answer,
+                            point: q.point,
+                            image: null
+                        };
+                        addQuestion(questionData, false, false);
+                    });
+                    
+                    updateOrder();
+                    
+                    // Scroll to first question sau 500ms
+                    setTimeout(() => {
+                        const firstQuestion = document.querySelector('.question-block');
+                        if (firstQuestion) {
+                            firstQuestion.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    }, 500);
+                    
+                    console.log('✅ INIT: Đã import câu hỏi từ Word thành công');
+                    return; // ⭐ QUAN TRỌNG: Thoát hàm để không tạo câu mặc định ⭐
+                } catch (e) {
+                    console.error('❌ Lỗi khi load câu hỏi từ Word:', e);
+                }
             }
             
-            // ⭐ CHỈ TẠO 1 CÂU MẶC ĐỊNH ⭐
-            addQuestion();
-            
-            console.log('✅ INIT: Đã xóa localStorage, tạo 1 câu mới');
+            // ⭐ NẾU KHÔNG CÓ DỮ LIỆU IMPORT THÌ TẠO 1 CÂU MẶC ĐỊNH ⭐
+            const existingQuestions = document.querySelectorAll('.question-block');
+            if (existingQuestions.length === 0) {
+                addQuestion();
+                console.log('✅ INIT: Đã tạo 1 câu mặc định');
+            }
         }
 
         function addQuestion(data = null, scroll = true, isInit = false) {
