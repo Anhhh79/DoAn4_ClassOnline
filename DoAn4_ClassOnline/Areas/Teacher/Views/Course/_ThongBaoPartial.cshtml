@@ -9,46 +9,36 @@
     </div>
 
     <!--modal thêm thông báo-->
-    <div class="modal fade" id="addAnnouncementModal" tabindex="-1" aria-labelledby="addAnnouncementModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addAnnouncementModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
-                <form asp-controller="ThongBao" asp-action="Create" method="post" class="needs-validation" novalidate>
+                <form id="formAddThongBao">
                     <div class="modal-header">
-                        <h5 class="modal-title fw-bold" id="addAnnouncementModalLabel">
+                        <h5 class="modal-title fw-bold">
                             <i class="bi bi-chat-left-text me-2 text-danger"></i> Thêm thông báo
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="resetForm_TienIch('formAddThongBao')"></button>
                     </div>
 
-                    <div class="modal-body">
+                    <div class="modal-body mb-3">
                         <div class="row g-3 px-3">
                             <div class="col-12">
                                 <label class="form-label">Tiêu đề</label>
-                                <input class="form-control" maxlength="200" required />
-                                <div class="invalid-feedback">
-                                    Vui lòng nhập tiêu đề!
-                                </div>
+                                <input class="form-control" id="tieuDe" name="tieuDe" maxlength="200" required />
+                                <small id="err_tieuDe_Tb" class="text-danger d-none">Vui lòng nhập tiêu đề!</small>
                             </div>
 
                             <div class="col-12">
                                 <label class="form-label">Nội dung</label>
-                                <textarea class="form-control" rows="5" required></textarea>
-                                <div class="invalid-feedback">
-                                    Vui lòng nhập nội dung thông báo.
-                                </div>
-                            </div>
-
-                            <div class="col-12">
-                                <label class="form-label">Đính kèm (tùy chọn)</label>
-                                <input name="Files" type="file" class="form-control" multiple />
-                                <div class="form-text small">Cho phép nhiều file (PDF, ảnh, ..). Nếu dùng Upload, controller nhận IFormFileCollection.</div>
+                                <textarea class="form-control" id="noiDung" name="noiDung" rows="5" required></textarea>
+                                <small id="err_noiDung_Tb" class="text-danger d-none">Vui lòng nhập nội dung!</small>
                             </div>
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Huỷ</button>
-                        <button type="submit" class="btn btn-primary text-light">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="resetForm_TienIch('formAddThongBao')">Huỷ</button>
+                        <button type="button" class="btn btn-primary" onclick="addThongBao()">
                             <i class="bi bi-save me-1"></i> Lưu thông báo
                         </button>
                     </div>
@@ -57,130 +47,18 @@
         </div>
     </div>
 
-    <!-- ====== THÔNG BÁO 1 ====== -->
-    <div class="col-12">
-        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary d-flex justify-content-between align-items-center flex-wrap gap-2">
 
-            <!-- Tiêu đề -->
-            <a class="text-decoration-none text-dark d-flex align-items-center flex-grow-1"
-               data-bs-toggle="collapse"
-               href="#collapseThongBao1"
-               role="button"
-               aria-expanded="false"
-               aria-controls="collapseThongBao1">
-                <strong class="me-1">Thông báo 1:</strong>
-                Lịch học tuần này thay đổi sang thứ 4 và thứ 6.
-            </a>
-
-            <!-- Thời gian -->
-            <div class="text-muted small d-flex align-items-center me-4">
-                <i class="bi bi-clock me-1"></i> 23/10/2025 - 08:30
-            </div>
-
-            <!-- Nút -->
-            <div class="text-end">
-                <button class="btn btn-outline-secondary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#editAnnouncementModal">
-                    <i class="bi bi-pencil"></i> Sửa
-                </button>
-                <button class="btn btn-outline-danger btn-sm">
-                    <i class="bi bi-trash"></i> Xóa
-                </button>
-            </div>
-        </div>
-
-        <!-- Nội dung khi mở -->
-        <div class="collapse" id="collapseThongBao1">
-            <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
-                <p class="mb-0">
-                    <strong>Chi tiết:</strong> Lịch học môn IoT tuần này được dời lại do giảng viên bận công tác.
-                    Thời gian học mới là Thứ 4 (14h00 - 16h00) và Thứ 6 (9h00 - 11h00) tại phòng 101.
-                </p>
-            </div>
-        </div>
+    <!-- ====== danh sách thông báo ====== -->
+    <div id="dsThongBao">
+        <!--code vao day-->
     </div>
-
-    <!-- ====== THÔNG BÁO 2 ====== -->
-    <div class="col-12">
-        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary d-flex justify-content-between align-items-center flex-wrap gap-2">
-
-            <a class="text-decoration-none text-dark d-flex align-items-center flex-grow-1"
-               data-bs-toggle="collapse"
-               href="#collapseThongBao2"
-               role="button"
-               aria-expanded="false"
-               aria-controls="collapseThongBao2">
-                <strong class="me-1">Thông báo 2:</strong>
-                Bài kiểm tra giữa kỳ sẽ diễn ra vào thứ 2 tuần tới.
-            </a>
-
-            <div class="text-muted small d-flex align-items-center me-4">
-                <i class="bi bi-clock me-1"></i> 20/10/2025 - 09:00
-            </div>
-
-            <div class="text-end">
-                <button class="btn btn-outline-secondary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#editAnnouncementModal">
-                    <i class="bi bi-pencil"></i> Sửa
-                </button>
-                <button class="btn btn-outline-danger btn-sm">
-                    <i class="bi bi-trash"></i> Xóa
-                </button>
-            </div>
-        </div>
-
-        <div class="collapse" id="collapseThongBao2">
-            <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
-                <p class="mb-0">
-                    <strong>Chi tiết:</strong> Bài kiểm tra giữa kỳ sẽ diễn ra vào lúc 7h30 sáng tại phòng A105.
-                    Sinh viên cần mang theo thẻ sinh viên và dụng cụ làm bài.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- ====== THÔNG BÁO 3 ====== -->
-    <div class="col-12">
-        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary d-flex justify-content-between align-items-center flex-wrap gap-2">
-
-            <a class="text-decoration-none text-dark d-flex align-items-center flex-grow-1"
-               data-bs-toggle="collapse"
-               href="#collapseThongBao3"
-               role="button"
-               aria-expanded="false"
-               aria-controls="collapseThongBao3">
-                <strong class="me-1">Thông báo 3:</strong>
-                Mời sinh viên tham dự buổi hội thảo chuyên đề về Trí tuệ nhân tạo.
-            </a>
-
-            <div class="text-muted small d-flex align-items-center me-4">
-                <i class="bi bi-clock me-1"></i> 18/10/2025 - 14:00
-            </div>
-
-            <div class="text-end">
-                <button class="btn btn-outline-secondary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#editAnnouncementModal">
-                    <i class="bi bi-pencil"></i> Sửa
-                </button>
-                <button class="btn btn-outline-danger btn-sm">
-                    <i class="bi bi-trash"></i> Xóa
-                </button>
-            </div>
-        </div>
-
-        <div class="collapse" id="collapseThongBao3">
-            <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
-                <p class="mb-0">
-                    <strong>Chi tiết:</strong> Buổi hội thảo về "Ứng dụng AI trong giáo dục" sẽ diễn ra tại hội trường lớn A,
-                    với sự tham gia của các chuyên gia trong lĩnh vực.
-                    Sinh viên tham dự được cộng điểm rèn luyện.
-                </p>
-            </div>
-        </div>
-    </div>
+  
 
     <!-- Modal Sửa Thông Báo -->
     <div class="modal fade" id="editAnnouncementModal" tabindex="-1" aria-labelledby="editAnnouncementModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
-                <form asp-controller="ThongBao" asp-action="Edit" method="post" class="needs-validation" novalidate enctype="multipart/form-data">
+                <form>
                     <div class="modal-header">
                         <h5 class="modal-title fw-bold" id="editAnnouncementModalLabel">
                             <i class="bi bi-pencil-square me-2 text-primary"></i> Sửa thông báo
@@ -197,42 +75,22 @@
                             <div class="col-12">
                                 <label class="form-label">Tiêu đề</label>
                                 <input type="text" name="TieuDe" id="editTieuDe" class="form-control" maxlength="200" required />
-                                <div class="invalid-feedback">
-                                    Vui lòng nhập tiêu đề!
-                                </div>
+                                <small id="err_editTieuDe" class="text-danger d-none">Vui lòng nhập tiêu đề!</small>
                             </div>
 
                             <!-- Nội dung -->
-                            <div class="col-12">
+                            <div class="col-12 mb-3">
                                 <label class="form-label">Nội dung</label>
                                 <textarea name="NoiDung" id="editNoiDung" class="form-control" rows="5" required></textarea>
-                                <div class="invalid-feedback">
-                                    Vui lòng nhập nội dung thông báo.
-                                </div>
+                                <small id="err_editNoiDung" class="text-danger d-none">Vui lòng nhập nội dung thông báo.</small>
                             </div>
 
-                            <!-- File đính kèm -->
-                            <div class="col-12">
-                                <label class="form-label">Đính kèm mới (tùy chọn)</label>
-                                <input name="Files" type="file" class="form-control" multiple />
-                                <div class="form-text small">
-                                    Có thể chọn nhiều file (PDF, hình ảnh...). Nếu không chọn, file cũ sẽ được giữ nguyên.
-                                </div>
-                            </div>
-
-                            <!-- File hiện tại -->
-                            <div class="col-12">
-                                <label class="form-label text-muted">File hiện tại:</label>
-                                <div id="currentFiles" class="small fst-italic text-secondary">
-                                    (Không có tệp đính kèm)
-                                </div>
-                            </div>
                         </div>
                     </div>
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
-                        <button type="submit" class="btn btn-primary text-light">
+                        <button type="button" class="btn btn-primary text-light" onclick="updateThongBao()">
                             <i class="bi bi-save me-1"></i> Cập nhật
                         </button>
                     </div>
@@ -240,7 +98,5 @@
             </div>
         </div>
     </div>
-
-
 
 </div>
