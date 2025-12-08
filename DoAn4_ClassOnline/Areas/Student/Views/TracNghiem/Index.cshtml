@@ -1,128 +1,215 @@
-﻿<div class="row g-3 mt-4 p-3 shadow rounded-4 bg-white">
+﻿@{
+    var baiTap = ViewBag.BaiTap as List<dynamic> ?? new List<dynamic>();
+    var baiThi = ViewBag.BaiThi as List<dynamic> ?? new List<dynamic>();
+    var khoaHocId = ViewBag.KhoaHocId ?? 0;
+}
+
+<div class="row g-3 mt-4 p-3 shadow rounded-4 bg-white">
     <h5 class="fw-bold mb-3">
         <i class="bi bi-ui-checks-grid me-2 text-primary"></i> Trắc nghiệm
     </h5>
 
-    <!-- PHẦN BÀI TẬP -->
-   
-    <h6 class="fw-bold text-primary mt-2"> Bài tập trắc nghiệm</h6>
-
-    <!-- Bài tập 1 (đã làm) -->
-    <div class="col-12">
-        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
-            <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
-               data-bs-toggle="collapse" href="#bt1" role="button">
-                <div class="d-flex flex-column flex-md-row justify-content-between w-100">
-                    <div>
-                        <strong>Bài tập 1:</strong> Câu hỏi IoT cơ bản
-                    </div>
-                    <div class="text-muted small ms-md-3 mt-2 mt-md-0">
-                        <i class="bi bi-clock me-1"></i> Hạn: 10/11/2025 - 23:59
-                    </div>
-                </div>
-                <i class="bi bi-chevron-down ms-2"></i>
-            </a>
+    @if (baiTap.Count == 0 && baiThi.Count == 0)
+    {
+        <div class="alert alert-info text-center">
+            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+            <p class="mb-0">Chưa có bài trắc nghiệm nào trong khóa học này.</p>
         </div>
+    }
+    else
+    {
+        <!-- ⭐ PHẦN BÀI TẬP ⭐ -->
+        @if (baiTap.Count > 0)
+        {
+            <h6 class="fw-bold text-primary mt-2">
+                <i class="bi bi-pencil-square me-2"></i>Bài tập trắc nghiệm
+            </h6>
 
-        <div class="collapse" id="bt1">
-            <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
-                <p class="mb-1"><strong>Thời gian:</strong> 20 phút</p>
-                <p class="mb-1"><strong>Số lần đã làm:</strong> 2</p>
-                <p class="mb-2"><strong>Điểm cao nhất:</strong> 8.0 / 10</p>
+            @foreach (var item in baiTap)
+            {
+                var hanNop = item.ThoiGianKetThuc != null 
+                    ? ((DateTime)item.ThoiGianKetThuc).ToString("dd/MM/yyyy - HH:mm") 
+                    : "Không giới hạn";
+                var daLam = item.DaLam;
+                var soLanDaLam = item.SoLanDaLam;
+                var diemCaoNhat = item.DiemCaoNhat;
+                var soLanToiDa = item.SoLanLamToiDa ?? 999;
+                var collapseId = $"bt{item.BaiTracNghiemId}";
 
-                <div class="d-flex gap-2">
-                    <a asp-action="Index" asp-controller="LamBaiTracNghiem" asp-area="Student" class="btn btn-sm btn-success"><i class="bi bi-pencil-square me-1"></i>Làm lại</a>
-                    <button class="btn btn-sm btn-outline-info"><i class="bi bi-eye me-1"></i>Xem lại</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bài tập 2 (chưa làm) -->
-    <div class="col-12">
-        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
-            <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
-               data-bs-toggle="collapse" href="#bt2" role="button">
-                <div class="d-flex flex-column flex-md-row justify-content-between w-100">
-                    <div>
-                        <strong>Bài tập 2:</strong> Cảm biến nâng cao
+                <div class="col-12">
+                    <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
+                        <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
+                           data-bs-toggle="collapse" href="#@collapseId" role="button">
+                            <div class="d-flex flex-column flex-md-row justify-content-between w-100">
+                                <div>
+                                    <strong>@item.TenBaiThi</strong>
+                                    @if (!string.IsNullOrEmpty(item.MoTa))
+                                    {
+                                        <span class="text-muted small d-block">@item.MoTa</span>
+                                    }
+                                </div>
+                                <div class="text-muted small ms-md-3 mt-2 mt-md-0">
+                                    <i class="bi bi-clock me-1"></i> Hạn: @hanNop
+                                </div>
+                            </div>
+                            <i class="bi bi-chevron-down ms-2"></i>
+                        </a>
                     </div>
-                    <div class="text-muted small ms-md-3 mt-2 mt-md-0">
-                        <i class="bi bi-clock me-1"></i> Hạn: 20/11/2025 - 23:59
-                    </div>
-                </div>
-                <i class="bi bi-chevron-down ms-2"></i>
-            </a>
-        </div>
 
-        <div class="collapse" id="bt2">
-            <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
-                <p class="mb-1"><strong>Thời gian:</strong> 25 phút</p>
-                <p class="mb-2"><strong>Số lần đã làm:</strong> 0</p>
+                    <div class="collapse" id="@collapseId">
+                        <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
+                            <p class="mb-1"><strong>Thời gian:</strong> @item.ThoiLuongLamBai phút</p>
+                            <p class="mb-1"><strong>Số lần đã làm:</strong> @soLanDaLam / @soLanToiDa</p>
+                            
+                            @if (diemCaoNhat != null)
+                            {
+                                <p class="mb-2"><strong>Điểm cao nhất:</strong> @diemCaoNhat / @(item.DiemToiDa ?? 10)</p>
+                            }
 
-                <button class="btn btn-sm btn-success"><i class="bi bi-play-circle me-1"></i>Làm bài</button>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- PHẦN BÀI THI -->
-    <h6 class="fw-bold text-danger mt-4"> Bài thi</h6>
-
-    <!-- Bài thi 1 (đã thi) -->
-    <div class="col-12">
-        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
-            <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
-               data-bs-toggle="collapse" href="#thi1" role="button">
-                <div class="d-flex flex-column flex-md-row justify-content-between w-100">
-                    <div>
-                        <strong>Thi giữa kỳ:</strong> Lập trình IoT
-                    </div>
-                    <div class="text-muted small ms-md-3 mt-2 mt-md-0">
-                        <i class="bi bi-clock me-1"></i> Thời gian: 45 phút
-                    </div>
-                </div>
-                <i class="bi bi-chevron-down ms-2"></i>
-            </a>
-        </div>
-
-        <div class="collapse" id="thi1">
-            <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
-                <p class="mb-1">
-                    <strong>Trạng thái:</strong>
-                    <span class="badge bg-secondary"><i class="bi bi-check-circle me-1"></i> Đã thi</span>
-                </p>
-                <p class="mb-2"><strong>Điểm:</strong> 7.5 / 10</p>
-
-                <button class="btn btn-sm btn-outline-info"><i class="bi bi-eye me-1"></i>Xem lại bài thi</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bài thi 2 (chưa thi) -->
-    <div class="col-12">
-        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
-            <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
-               data-bs-toggle="collapse" href="#thi2" role="button">
-                <div class="d-flex flex-column flex-md-row justify-content-between w-100">
-                    <div>
-                        <strong>Thi cuối kỳ:</strong> Dự án IoT
-                    </div>
-                    <div class="text-muted small ms-md-3 mt-2 mt-md-0">
-                        <i class="bi bi-clock me-1"></i> Thời gian: 60 phút
+                            <div class="d-flex gap-2">
+                                @if (soLanDaLam < soLanToiDa)
+                                {
+                                    <a asp-action="Index" 
+                                       asp-controller="LamBaiTracNghiem" 
+                                       asp-area="Student" 
+                                       asp-route-baiTracNghiemId="@item.BaiTracNghiemId"
+                                       class="btn btn-sm btn-success">
+                                        <i class="bi bi-@(daLam ? "pencil-square" : "play-circle") me-1"></i>
+                                        @(daLam ? "Làm lại" : "Làm bài")
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Đã hết lượt làm</span>
+                                }
+                                
+                                @if (daLam && item.ChoXemKetQua == true)
+                                {
+                                    <a asp-action="XemKetQua" 
+                                       asp-controller="TracNghiem" 
+                                       asp-area="Student" 
+                                       asp-route-baiTracNghiemId="@item.BaiTracNghiemId"
+                                       class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye me-1"></i>Xem lại
+                                    </a>
+                                }
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <i class="bi bi-chevron-down ms-2"></i>
-            </a>
-        </div>
+            }
+        }
 
-        <div class="collapse" id="thi2">
-            <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
-                <p class="mb-2"><strong>Trạng thái:</strong> <span class="badge bg-warning text-dark">Chưa thi</span></p>
+        <!-- ⭐ PHẦN BÀI THI ⭐ -->
+        @if (baiThi.Count > 0)
+        {
+            <h6 class="fw-bold text-danger mt-4">
+                <i class="bi bi-trophy me-2"></i>Bài thi
+            </h6>
 
-                <button class="btn btn-sm btn-success"><i class="bi bi-play-circle me-1"></i>Bắt đầu thi</button>
-            </div>
-        </div>
-    </div>
+            @foreach (var item in baiThi)
+            {
+                var daLam = item.DaLam;
+                var soLanDaLam = item.SoLanDaLam;
+                var diemCaoNhat = item.DiemCaoNhat;
+                var soLanToiDa = item.SoLanLamToiDa ?? 1;
+                var collapseId = $"thi{item.BaiTracNghiemId}";
+                var thoiGianBatDau = item.ThoiGianBatDau != null ? (DateTime)item.ThoiGianBatDau : DateTime.MinValue;
+                var thoiGianKetThuc = item.ThoiGianKetThuc != null ? (DateTime)item.ThoiGianKetThuc : DateTime.MaxValue;
+                var now = DateTime.Now;
+                var coTheThiChua = now >= thoiGianBatDau && now <= thoiGianKetThuc;
 
+                <div class="col-12">
+                    <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
+                        <a class="text-decoration-none text-dark d-flex justify-content-between"
+                           data-bs-toggle="collapse" href="#@collapseId" role="button">
+                            <div class="d-flex flex-column flex-md-row justify-content-between w-100">
+                                <div>
+                                    <strong>@item.TenBaiThi</strong>
+                                    @if (!string.IsNullOrEmpty(item.MoTa))
+                                    {
+                                        <span class="text-muted small d-block">@item.MoTa</span>
+                                    }
+                                </div>
+                                <div class="text-muted small ms-md-3 mt-2 mt-md-0">
+                                    <i class="bi bi-clock me-1"></i> Thời gian: @item.ThoiLuongLamBai phút
+                                </div>
+                            </div>
+                            <i class="bi bi-chevron-down ms-2"></i>
+                        </a>
+                    </div>
+
+                    <div class="collapse" id="@collapseId">
+                        <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
+                            <p class="mb-1">
+                                <strong>Trạng thái:</strong>
+                                @if (daLam)
+                                {
+                                    <span class="badge bg-secondary">
+                                        <i class="bi bi-check-circle me-1"></i> Đã thi
+                                    </span>
+                                }
+                                else if (!coTheThiChua)
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="bi bi-clock me-1"></i> @(now < thoiGianBatDau ? "Chưa đến giờ thi" : "Đã hết hạn")
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-play-circle me-1"></i> Chưa thi
+                                    </span>
+                                }
+                            </p>
+                            
+                            @if (diemCaoNhat != null)
+                            {
+                                <p class="mb-2"><strong>Điểm:</strong> @diemCaoNhat / @(item.DiemToiDa ?? 10)</p>
+                            }
+
+                            <div class="d-flex gap-2">
+                                @if (coTheThiChua && soLanDaLam < soLanToiDa)
+                                {
+                                    <a asp-action="Index" 
+                                       asp-controller="LamBaiTracNghiem" 
+                                       asp-area="Student" 
+                                       asp-route-baiTracNghiemId="@item.BaiTracNghiemId"
+                                       class="btn btn-sm btn-success">
+                                        <i class="bi bi-play-circle me-1"></i>
+                                        @(daLam ? "Thi lại" : "Bắt đầu thi")
+                                    </a>
+                                }
+                                
+                                @if (daLam && item.ChoXemKetQua == true)
+                                {
+                                    <a asp-action="XemKetQua" 
+                                       asp-controller="TracNghiem" 
+                                       asp-area="Student" 
+                                       asp-route-baiTracNghiemId="@item.BaiTracNghiemId"
+                                       class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye me-1"></i>Xem lại bài thi
+                                    </a>
+                                }
+                            </div>
+
+                            @if (item.ThoiGianBatDau != null || item.ThoiGianKetThuc != null)
+                            {
+                                <div class="mt-3 pt-3 border-top">
+                                    <p class="small text-muted mb-1">
+                                        <i class="bi bi-calendar-event me-1"></i>
+                                        Thời gian mở: @thoiGianBatDau.ToString("dd/MM/yyyy HH:mm")
+                                    </p>
+                                    <p class="small text-muted mb-0">
+                                        <i class="bi bi-calendar-x me-1"></i>
+                                        Thời gian đóng: @thoiGianKetThuc.ToString("dd/MM/yyyy HH:mm")
+                                    </p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    }
 </div>

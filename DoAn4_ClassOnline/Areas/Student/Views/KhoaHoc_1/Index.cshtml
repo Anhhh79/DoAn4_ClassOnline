@@ -1,18 +1,23 @@
 ﻿@{
     ViewData["Title"] = "Chi tiết khóa học";
+    var khoaHocId = ViewBag.KhoaHocId ?? 0;
+    var tenKhoaHoc = ViewBag.TenKhoaHoc ?? "Chưa có thông tin";
+    var tenGiaoVien = ViewBag.TenGiaoVien ?? "Chưa có thông tin";
+    var linkHocOnline = ViewBag.LinkHocOnline ?? "";
 }
+
 <!-- Section chức năng -->
 <div class="container">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <!-- Nút quay lại -->
-        <a class="btn border-0" href="javascript:history.back()">
+        <a class="btn border-0" href="/Student/KhoaHoc/Index">
             <i class="bi bi-chevron-left me-1"></i> Quay lại
         </a>
 
-        <!-- Tiêu đề -->
+        <!-- ⭐ TIÊU ĐỀ ĐỘNG TỪ CSDL ⭐ -->
         <h3 class="fw-bold text-center flex-grow-1 mb-0">
-            Phát triển ứng dụng IoT - Nguyễn Đình Tứ
+            @tenKhoaHoc - @tenGiaoVien
         </h3>
 
         <!-- Chỗ trống bên phải để cân đối -->
@@ -74,9 +79,18 @@
             <div>
                 <div class="card custom-card text-center p-2 h-95 border-0 rounded-4 bg-body-tertiary">
                     <div class="icon mb-2"><img src="/assets/image/meet.png" style="width:50px" alt="" /></div>
-                    <a class="btn btn-success text-white px-4 rounded-pill" style="background-color:#0055ff">
-                        <i class="bi bi-camera-video me-1"></i> Tham gia
-                    </a>
+                    @if (!string.IsNullOrEmpty(linkHocOnline))
+                    {
+                        <a href="@linkHocOnline" target="_blank" class="btn btn-success text-white px-4 rounded-pill" style="background-color:#0055ff">
+                            <i class="bi bi-camera-video me-1"></i> Tham gia
+                        </a>
+                    }
+                    else
+                    {
+                        <button class="btn btn-secondary text-white px-4 rounded-pill" disabled>
+                            <i class="bi bi-camera-video me-1"></i> Chưa có link
+                        </button>
+                    }
                 </div>
             </div>
         </div>
@@ -85,7 +99,16 @@
 
     <!-- Khu vực load nội dung -->
     <div id="noiDungContainer" class="mt-4">
-        @await Html.PartialAsync("~/Areas/Student/Views/Notification/Index.cshtml");
+        
     </div>
     
 </div>
+
+<!-- ⭐ TRUYỀN KHOAHOCID VÀO JAVASCRIPT ⭐ -->
+<script>
+    window.khoaHocId = @khoaHocId;
+    console.log('🔥 KhoaHocId from ViewBag:', window.khoaHocId);
+</script>
+
+<!-- ⭐ LOAD FILE JAVASCRIPT RIÊNG ⭐ -->
+<script src="~/assets/js/student/ChiTietKhoaHoc.js"></script>

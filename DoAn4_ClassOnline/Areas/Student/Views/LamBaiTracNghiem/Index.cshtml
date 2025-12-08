@@ -1,31 +1,123 @@
-﻿<!-- ================== BẮT ĐẦU PHẦN TRẮC NGHIỆM ================== -->
+﻿@{
+    ViewData["Title"] = "Làm bài trắc nghiệm";
+    var baiTracNghiemId = ViewBag.BaiTracNghiemId ?? 0;
+    var tenBaiThi = ViewBag.TenBaiThi ?? "Bài trắc nghiệm";
+    var thoiLuongLamBai = ViewBag.ThoiLuongLamBai ?? 60;
+    var tenSinhVien = ViewBag.TenSinhVien ?? "Sinh viên";
+    var maSinhVien = ViewBag.MaSinhVien ?? "";
+    var soCauHoi = ViewBag.SoCauHoi ?? 0;
+    var tronCauHoi = ViewBag.TronCauHoi ?? false;
+    var choXemKetQua = ViewBag.ChoXemKetQua ?? false;
+}
+
+<!-- ⭐ HEADER ⭐ -->
 <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
-    <!-- Nút quay lại -->
     <a class="btn border-0" href="javascript:history.back()">
         <i class="bi bi-chevron-left me-1"></i> Quay lại
     </a>
 
-    <!-- Tên thí sinh (ở giữa) -->
-    <h5 class="fw-bold mb-0 flex-grow-1 text-center">Thí sinh: Quốc Bảo</h5>
+    <h5 class="fw-bold mb-0 flex-grow-1 text-center">Thí sinh: @tenSinhVien</h5>
 
-    <!-- Thời gian làm bài -->
     <div class="d-flex align-items-center gap-2">
         <span class="text-muted small">Thời gian còn lại:</span>
-        <span id="timer" class="fw-bold text-primary fs-5">00:40:00</span>
+        <span id="timer" class="fw-bold text-primary fs-5">@($"{thoiLuongLamBai:D2}:00:00")</span>
     </div>
 </div>
-
 
 <div class="row">
-  <!-- KHU VỰC CÂU HỎI -->
-  <div class="col-md-9" style="max-height: 75vh; overflow-y: auto;" id="questionList"></div>
-
-  <!-- DANH SÁCH CÂU HỎI -->
-  <div class="col-md-3">
-    <div class="bg-white border rounded-4 p-3 question-nav shadow-sm sticky-top" style="top: 20px;">
-      <h6 class="fw-bold mb-3">Danh sách câu hỏi</h6>
-      <div id="questionNav" class="d-flex flex-wrap gap-2"></div>
-      <button class="btn btn-primary w-100 mt-3" id="btnSubmit">Nộp bài</button>
+    <!-- KHU VỰC CÂU HỎI -->
+    <div class="col-md-9" style="max-height: 75vh; overflow-y: auto;" id="questionList">
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Đang tải...</span>
+            </div>
+            <p class="mt-3 text-muted">Đang tải câu hỏi...</p>
+        </div>
     </div>
-  </div>
+
+    <!-- DANH SÁCH CÂU HỎI -->
+    <div class="col-md-3">
+        <div class="bg-white border rounded-4 p-3 question-nav shadow-sm sticky-top" style="top: 20px;">
+            <h6 class="fw-bold mb-3">Danh sách câu hỏi</h6>
+            <div id="questionNav" class="d-flex flex-wrap gap-2"></div>
+            <button class="btn btn-primary w-100 mt-3" id="btnSubmit">Nộp bài</button>
+        </div>
+    </div>
 </div>
+
+<!-- ⭐ MODAL XÁC NHẬN NỘP BÀI ⭐ -->
+<div class="modal fade" id="modalXacNhan" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle text-warning me-2"></i>Xác nhận nộp bài
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có <strong id="soCauChuaLam">0</strong> câu chưa trả lời.</p>
+                <p class="mb-0">Bạn có chắc chắn muốn nộp bài không?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-success" id="btnXacNhanNop">
+                    <i class="bi bi-send me-1"></i>Nộp bài
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ⭐ MODAL KẾT QUẢ ⭐ -->
+<div class="modal fade" id="modalKetQua" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-check-circle me-2"></i>Kết quả làm bài
+                </h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <h3 class="mb-3">Điểm của bạn</h3>
+                <h1 class="display-3 fw-bold text-success mb-3">
+                    <span id="diemDat">0</span>/<span id="diemToiDa">10</span>
+                </h1>
+                <p class="text-muted" id="ketQuaMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                    <i class="bi bi-arrow-left me-1"></i>Quay lại
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- ⭐ LOAD FILE JS RIÊNG ⭐ -->
+    <script src="~/assets/js/student/Js_LamTracNghiem.js"></script>
+    
+    <!-- ⭐ KHỞI TẠO ⭐ -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const baiTracNghiemId = @baiTracNghiemId;
+            const thoiLuongPhut = @thoiLuongLamBai;
+            const tronCauHoi = @(tronCauHoi ? "true" : "false");
+            const choXemKetQua = @(choXemKetQua ? "true" : "false"); // ⭐ THÊM ⭐
+            
+            console.log('🎯 Khởi tạo trang làm bài:', { 
+                baiTracNghiemId, 
+                thoiLuongPhut, 
+                tronCauHoi,
+                choXemKetQua 
+            });
+            
+            if (typeof initLamBaiTracNghiem === 'function') {
+                initLamBaiTracNghiem(baiTracNghiemId, thoiLuongPhut, tronCauHoi, choXemKetQua);
+            } else {
+                console.error('❌ Function initLamBaiTracNghiem không tồn tại!');
+            }
+        });
+    </script>
+}

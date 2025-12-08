@@ -1,4 +1,6 @@
-﻿@{
+﻿@model List<DoAn4_ClassOnline.Models.KhoaHoc>
+
+@{
     ViewData["Title"] = "Khóa học";
 }
 
@@ -11,46 +13,78 @@
         <div class="d-flex justify-content-center">
             <select id="selectHocKy" class="form-select w-auto rounded-pill shadow-sm fw-semibold">
                 <option value="0">-- Tất cả khóa học --</option>
-                <option value="1">KH1 / 2024 - 2025</option>
-                <option value="2">KH2 / 2024 - 2025</option>
-                <option value="3">KH3 / 2024 - 2025</option>
             </select>
         </div>
-        <!-- Card Khóa học -->
-        <div class="row g-4 mt-2">
-            <div class="col-12 col-md-3">
-                <div class="card shadow border-0 rounded-4 overflow-hidden h-100">
-
-                    <!-- Ảnh banner -->
-                    <a asp-area="Student" asp-controller="KhoaHoc_1" asp-action="Index">
-                        <div class="card-header p-0 border-0 bg-white image-cuser">
-                            <img src="~/assets/image/tải xuống.jpg  "
-                                 class="w-100"
-                                 alt="Banner"
-                                 style="height: 130px; object-fit: cover;">
-                        </div>
-                    </a>
-                    <!-- Nội dung khóa học -->
-                    <div class="card-body text-start">
-                        <h6 class="fw-bold mb-2" style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;" title="">Phát triển ứng dụng IOT</h6>
-                        <span class="" style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">Giảng viên: Nguyễn Đình Tứ</span>
-                        <span class="" style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">Khoa Công nghệ thông tin</span>
-                        <span class="">HK1 / 2025 - 2026</span>
-
-                        <div class="d-flex justify-content-between text-secondary small mb-3 mt-2">
-                            <span>24 SV đã tham gia</span>
-                            <span>Tất cả mọi người</span>
-                        </div>
-                        <div class="text-start">
-                            <a class="btn btn-light w-100 border rounded-3" asp-area="Student" asp-controller="KhoaHoc_1" asp-action="Index">
-                                Xem chi tiết khóa học
-                            </a>
-                        </div>
-                    </div>
-
-                </div>
+        
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="text-center py-4 d-none">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
+            <p class="mt-2 text-muted">Đang tải...</p>
         </div>
 
+        <!-- Card Khóa học -->
+        <div class="row g-4 mt-2" id="khoaHocContainer">
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var khoaHoc in Model)
+                {
+                    <div class="col-12 col-md-3">
+                        <div class="card shadow border-0 rounded-4 overflow-hidden h-100">
+                            <!-- Ảnh banner -->
+                            <a href="#">
+                                <div class="card-header p-0 border-0 bg-white image-cuser">
+                                    <img src="@(string.IsNullOrEmpty(khoaHoc.HinhAnh) ? "/assets/image/tải xuống.jpg" : khoaHoc.HinhAnh)"
+                                         class="w-100"
+                                         alt="Banner"
+                                         style="height: 130px; object-fit: cover;"
+                                         onerror="this.src='/assets/image/tải xuống.jpg'">
+                                </div>
+                            </a>
+                            <!-- Nội dung khóa học -->
+                            <div class="card-body text-start">
+                                <h6 class="fw-bold mb-2" style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;" title="@khoaHoc.TenKhoaHoc">@khoaHoc.TenKhoaHoc</h6>
+                                <span class="" style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
+                                    Giảng viên: @(khoaHoc.GiaoVien?.FullName ?? "Chưa có thông tin")
+                                </span>
+                                <span class="" style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
+                                    @(khoaHoc.Khoa?.TenKhoa ?? "Chưa có thông tin")
+                                </span>
+                                <span class="">@(khoaHoc.HocKy?.TenHocKy ?? "") / @(khoaHoc.HocKy?.NamHoc ?? "")</span>
+
+                                <div class="d-flex justify-content-between text-secondary small mb-3 mt-2">
+                                    <span>@(khoaHoc.ThamGiaKhoaHocs?.Count ?? 0) SV đã tham gia</span>
+                                    <span>@(khoaHoc.IsPublic == true ? "Tất cả mọi người" : "Riêng tư")</span>
+                                </div>
+                                <div class="text-start">
+                                    <a class="btn btn-light w-100 border rounded-3" href="#">
+                                        Xem chi tiết khóa học
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                        <p class="mb-0">Bạn chưa tham gia khóa học nào.</p>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
 </div>
+
+<!-- ⭐ TRUYỀN HOCKYID VÀO JAVASCRIPT ⭐ -->
+<script>
+    window.hocKyHienTaiId = @(ViewBag.HocKyHienTaiId ?? 0);
+    console.log('🔥 HocKyHienTaiId from ViewBag:', window.hocKyHienTaiId);
+</script>
+
+<!-- ⭐ THÊM SCRIPT ⭐ -->
+<script src="~/assets/js/student/KhoaHoc.js"></script>
