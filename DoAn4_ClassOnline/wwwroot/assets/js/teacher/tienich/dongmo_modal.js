@@ -8,3 +8,4 @@ function closeModal(id) {
     let modal = bootstrap.Modal.getInstance(modalEl);
     if (modal) modal.hide();
 }
+

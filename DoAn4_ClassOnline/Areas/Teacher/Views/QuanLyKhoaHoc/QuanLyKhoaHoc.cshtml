@@ -42,12 +42,13 @@
 
                     <div class="col-12">
                         <label class="fw-semibold">Tên khóa học</label>
-                        <input type="text" class="form-control" value="@Model.TenKhoaHoc">
+                        <input type="text" id="tenKhoaHoc_ChiTietQuanLy" class="form-control" value="@Model.TenKhoaHoc">
+                        <small id="err_tenKhoaHoc_ChiTietQuanLy" class="text-danger d-none"></small>
                     </div>
 
                     <div class="col-12">
                         <label class="fw-semibold">Khoa</label>
-                        <select class="form-select">
+                        <select id="khoaId_ChiTietQuanLy" class="form-select">
                             <option selected disabled value="@Model.Khoa.KhoaId">@Model.Khoa.TenKhoa</option>
                             @foreach (var hk in ViewBag.KhoaList)
                             {
@@ -60,7 +61,7 @@
 
                     <div class="col-12">
                         <label class="fw-semibold">Học kỳ</label>
-                        <select class="form-select">
+                        <select id="hocKyId_ChiTietQuanLy" class="form-select">
                             <option selected disabled value="@Model.HocKyId">@Model.HocKy.TenHocKy / @Model.HocKy.NamHoc</option>
                             @foreach (var hk in ViewBag.HocKyList)
                             {
@@ -74,26 +75,28 @@
                     <div class="col-12">
                         <label class="fw-semibold">Link google meet</label>
                         <div class="input-group">
-                            <input type="text" id="googleMeetLink" class="form-control" value="@(Model.LinkHocOnline ?? "")" />
+                            <input type="text" id="googleMeetLink_ChiTietQuanLy" class="form-control" value="@(Model.LinkHocOnline ?? "")" />
                             <button class="btn btn-outline-primary" type="button" id="copyLinkBtn" title="Copy link">
                                 <i class="bi bi-clipboard" id="copyLinkIcon"></i>
-                            </button>
+                            </button>                          
                         </div>
+                        <small id="err_googleMeetLink_ChiTietQuanLy" class="text-danger d-none"></small>
                     </div>
 
                     <div class="col-12">
                         <label class="fw-semibold">Mật khẩu truy cập (không bắt buộc)</label>
                         <div class="input-group">
-                            <input type="password" id="passwordInput" class="form-control" value="@(Model.MatKhau ?? "")">
+                            <input type="password" id="passwordInput_ChiTietQuanLy" class="form-control" value="@(Model.MatKhau ?? "")">                        
                             <button class="btn btn-outline-secondary" type="button" id="togglePassword" title="Hiện/Ẩn mật khẩu">
                                 <i class="bi bi-eye" id="togglePasswordIcon"></i>
                             </button>
                         </div>
+                        <small id="err_passwordInput_ChiTietQuanLy" class="text-danger d-none"></small>
                     </div>
 
                     <div class="col-12">
                         <label class="fw-semibold">Hình ảnh khóa học</label>
-                        <input type="file" accept="image/*" class="form-control">
+                        <input type="file" id="anhKhoaHoc_ChiTietQuanLy" accept="image/*" class="form-control">
                     </div>
 
                     <div class="col-12">
@@ -121,8 +124,8 @@
                                 Khóa khóa học
                             </button>
                         }
-                        <button type="reset" class="btn btn-secondary rounded-3 text-light">Đặt lại</button>
-                        <button type="submit" class="btn btn-success rounded-3">Lưu thay đổi</button>
+                        <button type="reset" class="btn btn-secondary rounded-3 text-light" onclick="clearErrors_Update()">Đặt lại</button>
+                        <button type="button" onclick="capNhatKhoaHoc_QuanLy(@Model.KhoaHocId)" class="btn btn-success rounded-3">Lưu thay đổi</button>
                     </div>
 
                 </form>
@@ -148,7 +151,8 @@
                             <input class="form-control" placeholder="Tìm theo tên hoặc mã...">
                         </div>
 
-                        <button class="btn btn-outline-success btn-sm">
+                        <!-- ✅ ĐÚNG -->
+                        <button class="btn btn-outline-success btn-sm" onclick="xuatDanhSachSinhVien(@Model.KhoaHocId)">
                             <i class="bi bi-download"></i> Xuất file
                         </button>
 
@@ -206,9 +210,6 @@
                                         <button class="btn btn-outline-secondary btn-sm" title="Xem hồ sơ"
                                                onclick="xemHoSoSinhVien(@item.SinhVienId)">
                                             <i class="bi bi-eye"></i>
-                                        </button>
-                                        <button class="btn btn-outline-danger btn-sm" title="Xóa khỏi khóa học">
-                                            <i class="bi bi-person-x"></i>
                                         </button>
                                     </td>
                                 </tr>
@@ -272,38 +273,6 @@
         </div>
     </div>
 </div>
-
-<script>
-    // hiển thị thông tin sinh viên lên modal
-        // ✅ FUNCTION XEM HỒ SƠ SINH VIÊN (ĐÃ SỬA LỖI TYPO)
-    async function xemHoSoSinhVien(id) {
-        try {
-            const res = await fetch(`/Teacher/QuanLyKhoaHoc/ThongTinSinhVien?id=${id}`);
-
-            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-
-            const result = await res.json();
-
-            if (result.success) {
-                const d = result.sinhVien;
-                document.getElementById('modal_avatar').src = d.avatar || '/assets/image/tải xuống.jpg';
-                document.getElementById('modal_fullname').textContent = d.fullName || 'Chưa cập nhật';
-                document.getElementById('modal_maso').textContent = d.maSo || 'Chưa có mã số';
-                document.getElementById('modal_gioitinh').textContent = d.gioiTinh || 'Chưa cập nhật';
-                document.getElementById('modal_ngaysinh').textContent = d.ngaySinh || 'Chưa cập nhật';
-                document.getElementById('modal_email').textContent = d.email || 'Chưa cập nhật';
-                document.getElementById('modal_phone').textContent = d.phoneNumber || 'Chưa cập nhật';
-                document.getElementById('modal_khoa').textContent = d.tenKhoa || 'Chưa cập nhật';
-                openModal('studentInfoModal_QuanLy');
-            } else {
-                showWarning_tc(result.message || 'Không thể tải thông tin sinh viên!');
-            }
-        } catch (error) {
-            console.error('Lỗi:', error); 
-            showError_tc('Lỗi hệ thống!');
-        }
-    }
-</script>
 
 <script src="~/assets/js/teacher/chitietkhoahoc_quanly.js"></script>
 

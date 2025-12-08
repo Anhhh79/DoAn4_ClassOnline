@@ -5,6 +5,8 @@
 
 <!-- ⭐ THÊM DATA ATTRIBUTE ĐỂ JAVASCRIPT LẤY ĐƯỢC ⭐ -->
 <div class="container" data-khoa-hoc-id="@(khoaHoc?.KhoaHocId)">
+    <!--ẩn: Id khóa học-->
+    <input type="hidden" id="khoaHocId_ChiTiet" name="khoaHocId_ChiTiet" value="@(khoaHoc?.KhoaHocId)" />
     <div class="d-flex justify-content-between align-items-center mb-4">
         <!-- Nút quay lại -->
         <a class="btn border-0" asp-controller="Home" asp-action="Index">
@@ -94,8 +96,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body mb-2">
-                    <label class="form-label">Nhập link Google Meet:</label>
-                    <input type="text" id="meetLink" class="form-control" placeholder="https://meet.google.com/..." value="@(khoaHoc?.LinkHocOnline ?? "")">
+                    <label class="form-label">Nhập hoặc thay đổi link Google Meet:</label>
+                    <input type="text" id="meetLink" class="form-control" value="@(khoaHoc?.LinkHocOnline ?? "")">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
@@ -126,5 +128,7 @@
         }
     });
 </script>
+<script src="~/assets/js/teacher/quanly-thongbao.js"></script>
+
 
 

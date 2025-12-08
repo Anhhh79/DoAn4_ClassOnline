@@ -1,6 +1,5 @@
 ﻿
 document.addEventListener("DOMContentLoaded", () => {
-
     // ⭐ LẤY KHOAHOCID TỪ DATA ATTRIBUTE ⭐
     function getKhoaHocId() {
         const container = document.querySelector('.container[data-khoa-hoc-id]');
@@ -19,7 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return id;
         }
         
-        console.error('Cannot find KhoaHocId');
         return null;
     }
 
@@ -53,12 +51,33 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // ✅ TỰ ĐỘNG LOAD THÔNG BÁO KHI VÀO TRANG
+    const khoaHocId = getKhoaHocId();
+    if (khoaHocId) {
+        console.log('Auto-loading Thông báo for khoaHocId:', khoaHocId);
+        loadThongBaos(khoaHocId);
+
+        // Set active cho button Thông báo
+        const btnThongBao = document.getElementById("btnThongBao");
+        if (btnThongBao) {
+            setActiveButton(btnThongBao);
+        }
+    } 
+
     // Khi bấm Thông báo
     const btnThongBao = document.getElementById("btnThongBao");
     if (btnThongBao) {
         btnThongBao.addEventListener("click", function (e) {
             e.preventDefault();
             loadNoiDung_Tc('/Teacher/Course/ThongBao');
+
+            const khoaHocId = getKhoaHocId();
+            if (khoaHocId) {
+                loadThongBaos(khoaHocId);
+            } else {
+                console.error('khoaHocId is null');
+                showError_tc('Lỗi: Không xác định được ID khóa học!');
+            }
             setActiveButton(this);
         });
     }

@@ -65,7 +65,7 @@ function renderHocKies(hocKies) {
         // đảm bảo property đúng tên (theo API của bạn)
         const id = hk.hocKyId ?? hk.HocKyId ?? hk.id ?? 0;
         const name = hk.tenHocKy ?? hk.TenHocKy ?? hk.name ?? 'Học kỳ';
-        html += `<option value="${id}">${name}</option>`;
+        html += `<option value="${id}">${name} / ${hk.namHoc}</option>`;
     });
 
     select.innerHTML = html;
