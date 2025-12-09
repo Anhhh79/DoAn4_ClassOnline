@@ -35,6 +35,13 @@
 
     <!-- Css -->
     <link rel="stylesheet" href="~/assets/css/admin/css_admin.css">
+    <style>
+        .sidebar-link.bg-transparent {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+       
+    </style>
 </head>
 
 <body>
@@ -66,6 +73,15 @@
                         <i class="lni lni-calendar"></i>
                         <span>Quản lý học kỳ</span>
                     </a>
+                </li>
+                <li class="ms-4 sidebar-item">
+                    <form asp-area="Admin" asp-controller="DangNhap" asp-action="Logout" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="sidebar-link border-0 bg-transparent text-start w-100" style="color:red">
+                            <i class="lni lni-exit"></i>
+                            <span>Đăng Xuất</span>
+                        </button>
+                    </form>
                 </li>
 
             </ul>
