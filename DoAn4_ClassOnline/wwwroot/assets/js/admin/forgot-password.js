@@ -1,15 +1,133 @@
 ﻿// ==================== FORGOT PASSWORD FUNCTIONALITY ====================
 // File: forgot-password.js
-// Description: Xử lý chức năng quên mật khẩu với OTP
+// Description: Xử lý chức năng quên mật khẩu với OTP và countdown timer
 
 let userEmail = ''; // Lưu email để dùng cho các bước sau
+let countdownInterval = null; // Biến lưu interval của countdown
+let otpExpiryTime = null; // Thời gian hết hạn OTP
+
+// ==================== COUNTDOWN TIMER ====================
+
+/**
+ * Bắt đầu đếm ngược 5 phút
+ */
+function startCountdown() {
+    // Xóa countdown cũ nếu có
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+    }
+
+    // Đặt thời gian hết hạn (5 phút = 300 giây)
+    const duration = 5 * 60; // 300 seconds
+    otpExpiryTime = Date.now() + (duration * 1000);
+
+    const timerElement = document.getElementById('countdownTimer');
+    const countdownBadge = document.getElementById('otpCountdown');
+    const verifyButton = document.getElementById('btnVerifyOTP');
+    const resendLink = document.getElementById('resendOTPLink');
+
+    // Cập nhật mỗi giây
+    countdownInterval = setInterval(() => {
+        const remainingTime = Math.floor((otpExpiryTime - Date.now()) / 1000);
+
+        if (remainingTime <= 0) {
+            // Hết thời gian
+            clearInterval(countdownInterval);
+            timerElement.textContent = '00:00';
+            countdownBadge.classList.remove('bg-primary');
+            countdownBadge.classList.add('bg-danger');
+            
+            // Disable nút xác nhận
+            verifyButton.disabled = true;
+            verifyButton.classList.add('opacity-50');
+            
+            // Hiển thị thông báo
+            document.getElementById('otpError').textContent = 'Mã OTP đã hết hạn. Vui lòng gửi lại!';
+            
+            // Disable tất cả input OTP
+            document.querySelectorAll('.otp-input').forEach(input => {
+                input.disabled = true;
+                input.classList.add('bg-light');
+            });
+            
+            return;
+        }
+
+        // Tính phút và giây
+        const minutes = Math.floor(remainingTime / 60);
+        const seconds = remainingTime % 60;
+
+        // Format: MM:SS
+        const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        timerElement.textContent = formattedTime;
+
+        // Đổi màu khi còn dưới 1 phút
+        if (remainingTime <= 60) {
+            countdownBadge.classList.remove('bg-primary');
+            countdownBadge.classList.add('bg-warning', 'text-dark');
+        }
+
+        // Đổi màu khi còn dưới 30 giây
+        if (remainingTime <= 30) {
+            countdownBadge.classList.remove('bg-warning');
+            countdownBadge.classList.add('bg-danger', 'text-white');
+        }
+    }, 1000);
+}
+
+/**
+ * Dừng và reset countdown
+ */
+function stopCountdown() {
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+    }
+    
+    const timerElement = document.getElementById('countdownTimer');
+    const countdownBadge = document.getElementById('otpCountdown');
+    
+    if (timerElement) {
+        timerElement.textContent = '05:00';
+    }
+    
+    if (countdownBadge) {
+        countdownBadge.classList.remove('bg-warning', 'bg-danger', 'text-dark');
+        countdownBadge.classList.add('bg-primary');
+    }
+}
+
+/**
+ * Reset OTP inputs và button
+ */
+function resetOTPInputs() {
+    const verifyButton = document.getElementById('btnVerifyOTP');
+    const otpInputs = document.querySelectorAll('.otp-input');
+    
+    // Enable button
+    if (verifyButton) {
+        verifyButton.disabled = false;
+        verifyButton.classList.remove('opacity-50');
+    }
+    
+    // Enable và clear inputs
+    otpInputs.forEach(input => {
+        input.disabled = false;
+        input.value = '';
+        input.classList.remove('bg-light', 'border-danger');
+    });
+    
+    // Clear error
+    const errorDiv = document.getElementById('otpError');
+    if (errorDiv) {
+        errorDiv.textContent = '';
+    }
+}
 
 // ==================== HELPER FUNCTIONS ====================
 
 /**
  * Kiểm tra email hợp lệ
- * @param {string} email - Email cần kiểm tra
- * @returns {boolean} - True nếu email hợp lệ
  */
 function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -17,7 +135,6 @@ function isValidEmail(email) {
 
 /**
  * Hiển thị loading với SweetAlert2
- * @param {string} title - Tiêu đề loading
  */
 function showLoading(title = 'Đang xử lý...') {
     Swal.fire({
@@ -32,13 +149,10 @@ function showLoading(title = 'Đang xử lý...') {
 
 /**
  * Hiển thị thông báo thành công
- * @param {string} message - Nội dung thông báo
- * @param {number} timer - Thời gian tự động đóng (ms)
  */
 function showSuccess(message, timer = 2000) {
     Swal.fire({
         icon: 'success',
-        title: 'Thành công!',
         text: message,
         timer: timer,
         showConfirmButton: timer ? false : true
@@ -47,12 +161,10 @@ function showSuccess(message, timer = 2000) {
 
 /**
  * Hiển thị thông báo lỗi
- * @param {string} message - Nội dung thông báo lỗi
  */
 function showError(message) {
     Swal.fire({
         icon: 'error',
-        title: 'Lỗi!',
         text: message
     });
 }
@@ -70,7 +182,8 @@ function resetForms() {
     document.getElementById('xacNhanMatKhauMoi_QMKError').textContent = '';
     document.getElementById('otpError').textContent = '';
 
-    document.querySelectorAll('.otp-input').forEach(input => input.value = '');
+    resetOTPInputs();
+    stopCountdown();
 }
 
 // ==================== STEP 1: SEND OTP ====================
@@ -112,18 +225,22 @@ async function sendOTP() {
         Swal.close();
 
         if (data.success) {
-            userEmail = email; // Lưu email
+            userEmail = email;
 
-            // ✅ CHỈ ĐÓNG MODAL KHI GỬI OTP THÀNH CÔNG
+            // Đóng modal forgot password
             const forgotModal = bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal'));
             if (forgotModal) {
                 forgotModal.hide();
             }
 
-            // ✅ CHỈ MỞ MODAL OTP KHI ĐÃ GỬI THÀNH CÔNG
+            // Mở modal OTP
             setTimeout(() => {
                 const otpModal = new bootstrap.Modal(document.getElementById('modalCodeXacNhan'));
                 otpModal.show();
+                
+                // ⭐ BẮT ĐẦU ĐẾM NGƯỢC
+                resetOTPInputs();
+                startCountdown();
                 
                 // Focus vào ô OTP đầu tiên
                 setTimeout(() => {
@@ -135,7 +252,6 @@ async function sendOTP() {
             showSuccess(data.message);
             return true;
         } else {
-            // ❌ KHÔNG CHUYỂN MODAL KHI CÓ LỖI
             showError(data.message);
             return false;
         }
@@ -156,12 +272,18 @@ async function verifyOTP() {
     const otp = Array.from(otpInputs).map(input => input.value).join('');
     const errorDiv = document.getElementById('otpError');
 
+    // Kiểm tra thời gian còn lại
+    if (otpExpiryTime && Date.now() >= otpExpiryTime) {
+        errorDiv.textContent = 'Mã OTP đã hết hạn. Vui lòng gửi lại!';
+        errorDiv.classList.add('d-block');
+        return false;
+    }
+
     // Validation
     if (otp.length !== 6) {
         errorDiv.textContent = 'Vui lòng nhập đủ 6 số!';
         errorDiv.classList.add('d-block');
         
-        // Highlight các ô chưa nhập
         otpInputs.forEach(input => {
             if (!input.value) {
                 input.classList.add('border-danger');
@@ -171,7 +293,6 @@ async function verifyOTP() {
         return false;
     }
 
-    // Reset border color
     otpInputs.forEach(input => {
         input.classList.remove('border-danger');
     });
@@ -196,41 +317,35 @@ async function verifyOTP() {
         Swal.close();
 
         if (data.success) {
-            // ✅ CHỈ ĐÓNG MODAL KHI XÁC THỰC THÀNH CÔNG
+            // ⭐ DỪNG ĐẾM NGƯỢC KHI XÁC THỰC THÀNH CÔNG
+            stopCountdown();
+            
             const otpModal = bootstrap.Modal.getInstance(document.getElementById('modalCodeXacNhan'));
             if (otpModal) {
                 otpModal.hide();
             }
 
-            // ✅ CHỈ MỞ MODAL PASSWORD KHI ĐÃ XÁC THỰC THÀNH CÔNG
             setTimeout(() => {
                 const passwordModal = new bootstrap.Modal(document.getElementById('modalNhapmatkhaumoi'));
                 passwordModal.show();
                 
-                // Focus vào ô mật khẩu mới
                 setTimeout(() => {
                     const passwordInput = document.getElementById('matKhauMoi_QMK');
                     if (passwordInput) passwordInput.focus();
                 }, 300);
             }, 300);
 
-            // Xóa OTP đã nhập
-            otpInputs.forEach(input => input.value = '');
-            
+            resetOTPInputs();
             return true;
         } else {
-            // ❌ KHÔNG CHUYỂN MODAL KHI OTP SAI
             showError(data.message);
             
-            // Xóa OTP đã nhập để nhập lại
             otpInputs.forEach(input => {
                 input.value = '';
                 input.classList.add('border-danger');
             });
             
-            // Focus vào ô đầu tiên
             if (otpInputs[0]) otpInputs[0].focus();
-            
             return false;
         }
     } catch (error) {
@@ -307,16 +422,13 @@ async function resetPassword() {
         Swal.close();
 
         if (data.success) {
-            // Đóng modal
             const passwordModal = bootstrap.Modal.getInstance(document.getElementById('modalNhapmatkhaumoi'));
             if (passwordModal) {
                 passwordModal.hide();
             }
 
-            // Reset forms
             resetForms();
 
-            // Hiển thị thông báo thành công
             Swal.fire({
                 icon: 'success',
                 title: 'Thành công!',
@@ -324,7 +436,6 @@ async function resetPassword() {
                 confirmButtonText: 'Đăng nhập ngay',
                 confirmButtonColor: '#0d6efd'
             }).then(() => {
-                // Tự động điền email vào form đăng nhập
                 const emailInput = document.querySelector('input[name="email"]');
                 if (emailInput) {
                     emailInput.value = userEmail;
@@ -354,7 +465,6 @@ async function resendOTP() {
     if (!userEmail) {
         showError('Không tìm thấy email. Vui lòng thử lại từ đầu!');
         
-        // Đóng modal OTP và quay về modal nhập email
         const otpModal = bootstrap.Modal.getInstance(document.getElementById('modalCodeXacNhan'));
         if (otpModal) {
             otpModal.hide();
@@ -385,14 +495,12 @@ async function resendOTP() {
         if (data.success) {
             showSuccess('Mã OTP mới đã được gửi đến email của bạn!');
 
-            // Xóa OTP cũ
-            const otpInputs = document.querySelectorAll('.otp-input');
-            otpInputs.forEach(input => {
-                input.value = '';
-                input.classList.remove('border-danger');
-            });
+            // ⭐ RESET VÀ BẮT ĐẦU ĐẾM NGƯỢC LẠI
+            resetOTPInputs();
+            startCountdown();
             
             // Focus vào ô đầu tiên
+            const otpInputs = document.querySelectorAll('.otp-input');
             if (otpInputs[0]) otpInputs[0].focus();
             
             return true;
@@ -409,16 +517,12 @@ async function resendOTP() {
 
 // ==================== EVENT LISTENERS ====================
 
-/**
- * Khởi tạo các event listener khi DOM đã load
- */
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('✅ Forgot Password module loaded');
+    console.log('✅ Forgot Password module with countdown loaded');
 
-    // ⭐ Button: Gửi OTP - NGĂN CHẶN CHUYỂN MODAL TỰ ĐỘNG
+    // Button: Gửi OTP
     const btnSendOTP = document.querySelector('#forgotPasswordModal button[data-bs-toggle="modal"]');
     if (btnSendOTP) {
-        // Xóa attribute data-bs-toggle để không tự động chuyển modal
         btnSendOTP.removeAttribute('data-bs-toggle');
         btnSendOTP.removeAttribute('data-bs-target');
         
@@ -429,10 +533,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ⭐ Button: Xác thực OTP - NGĂN CHẶN CHUYỂN MODAL TỰ ĐỘNG
+    // Button: Xác thực OTP
     const btnVerifyOTP = document.querySelector('#modalCodeXacNhan button[data-bs-toggle="modal"]');
     if (btnVerifyOTP) {
-        // Xóa attribute data-bs-toggle để không tự động chuyển modal
         btnVerifyOTP.removeAttribute('data-bs-toggle');
         btnVerifyOTP.removeAttribute('data-bs-target');
         
@@ -453,11 +556,20 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Link: Gửi lại OTP
-    const linkResendOTP = document.querySelector('#modalCodeXacNhan a .text-primary');
-    if (linkResendOTP && linkResendOTP.parentElement) {
-        linkResendOTP.parentElement.addEventListener('click', async function (e) {
+    const linkResendOTP = document.getElementById('resendOTPLink');
+    if (linkResendOTP) {
+        linkResendOTP.addEventListener('click', async function (e) {
             e.preventDefault();
             await resendOTP();
+        });
+    }
+
+    // ⭐ DỪNG COUNTDOWN KHI ĐÓNG MODAL OTP
+    const otpModal = document.getElementById('modalCodeXacNhan');
+    if (otpModal) {
+        otpModal.addEventListener('hidden.bs.modal', function () {
+            stopCountdown();
+            resetOTPInputs();
         });
     }
 
@@ -483,7 +595,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
     
-    // ⭐ XÓA BORDER-DANGER KHI NHẬP LẠI
+    // Xóa border-danger khi nhập lại
     document.getElementById('emailFogetPassword')?.addEventListener('input', function() {
         this.classList.remove('border-danger');
         document.getElementById('emailFogetPasswordError').textContent = '';
@@ -499,7 +611,6 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('xacNhanMatKhauMoi_QMKError').textContent = '';
     });
     
-    // ⭐ XÓA BORDER-DANGER CHO OTP INPUTS
     document.querySelectorAll('.otp-input').forEach(input => {
         input.addEventListener('input', function() {
             this.classList.remove('border-danger');
@@ -508,13 +619,15 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// Export functions for testing (optional)
+// Export functions for testing
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         sendOTP,
         verifyOTP,
         resetPassword,
         resendOTP,
-        isValidEmail
+        isValidEmail,
+        startCountdown,
+        stopCountdown
     };
 }

@@ -2,85 +2,67 @@
     ViewData["Title"] = "Chi tiết khoa";
 
     var tenKhoa = ViewBag.TenKhoa as string;
-
-    var khoaHocList = new List<dynamic>
-    {
-        new { MaKhoaHoc = "CNTT101", TenKhoaHoc = "Lập trình C# Và kỹ thuật lập trình", HinhAnh = "/images/csharp.jpg", HocKy = "HK1", TenGiaoVien = "Nguyễn Văn A", NamHoc = "2024 - 2025" },
-        new { MaKhoaHoc = "CNTT102", TenKhoaHoc = "Cơ sở dữ liệu", HinhAnh = "/images/database.jpg", HocKy = "HK1", TenGiaoVien = "Trần Thị B", NamHoc = "2024 - 2025" },
-        new { MaKhoaHoc = "CNTT201", TenKhoaHoc = "Lập trình Web", HinhAnh = "/images/web.jpg", HocKy = "HK2", TenGiaoVien = "Phạm Văn C", NamHoc = "2024 - 2025" },
-        new { MaKhoaHoc = "CNTT202", TenKhoaHoc = "Mạng máy tính", HinhAnh = "/images/network.jpg", HocKy = "HK2", TenGiaoVien = "Lê Thị D", NamHoc = "2024 - 2025" },
-        new { MaKhoaHoc = "CNTT301", TenKhoaHoc = "Trí tuệ nhân tạo cơ bản", HinhAnh = "/images/ai.jpg", HocKy = "HK1", TenGiaoVien = "Nguyễn Văn E", NamHoc = "2024 - 2025" }
-    };
-
-    // Lấy danh sách học kỳ duy nhất từ dữ liệu khóa học
-    var hocKys = khoaHocList
-        .Select(kh => new { kh.HocKy, kh.NamHoc })
-        .Distinct()
-        .ToList();
+    var khoaId = ViewBag.KhoaId ?? 0;
+    var hocKyMoi = ViewBag.HocKyMoi as DoAn4_ClassOnline.Models.HocKy;
+    var danhSachHocKy = ViewBag.DanhSachHocKy as List<DoAn4_ClassOnline.Models.HocKy> ?? new List<DoAn4_ClassOnline.Models.HocKy>();
 }
-
 
 <div class="container">
     <!-- Tiêu đề -->
     <div class="text-center mb-4">
         <div class="d-flex page-header justify-content-between align-items-center mb-2">
-            <!-- Nút quay lại --> <a class="btn border-0" asp-controller="Home" asp-action="Index"> <i class="bi bi-chevron-left"></i> Quay lại </a>
+            <!-- Nút quay lại -->
+            <a class="btn border-0" asp-controller="Home" asp-action="Index">
+                <i class="bi bi-chevron-left"></i> Quay lại
+            </a>
             <h3 class="fw-bold text-center mb-0 flex-grow-1">@tenKhoa</h3>
             <!-- Placeholder to balance -->
             <div style="width:96px;"></div>
         </div>
 
-        <!-- Dropdown chọn học kỳ -->
+        <!-- ⭐ Dropdown chọn học kỳ -->
         <div class="d-flex justify-content-center mt-1">
-            <select id="selectHocKy" class="form-select w-auto rounded-pill shadow-sm fw-semibold">
-                <option value="all" selected>-- Tất cả khóa học --</option>
-                @foreach (var hk in hocKys)
+            <select id="selectHocKy" class="form-select w-auto rounded-pill shadow-sm fw-semibold" data-khoa-id="@khoaId">
+                <option value="0">-- Tất cả học kỳ --</option>
+                @if (danhSachHocKy.Any())
                 {
-                    <option value="@hk.HocKy">@hk.HocKy / @hk.NamHoc</option>
+                    @foreach (var hk in danhSachHocKy)
+                    {
+                        var isSelected = hocKyMoi != null && hk.HocKyId == hocKyMoi.HocKyId;
+                        <option value="@hk.HocKyId" selected="@isSelected">@hk.TenHocKy / @hk.NamHoc</option>
+                    }
+                }
+                else
+                {
+                    <option value="0" disabled>Không có học kỳ nào</option>
                 }
             </select>
         </div>
     </div>
 
-    <!-- Danh sách khóa học -->
+    <!-- ⭐ Loading Spinner -->
+    <div id="loadingSpinner" class="text-center my-5" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Đang tải...</span>
+        </div>
+        <p class="mt-2">Đang tải khóa học...</p>
+    </div>
+
+    <!-- ⭐ Danh sách khóa học -->
     <div id="danhSachKhoaHoc" class="row row-cols-1 row-cols-md-3 g-4">
-        @foreach (var kh in khoaHocList)
-        {
-            <div class="col-12 col-md-3 khoaHocItem" data-hocky="@kh.HocKy">
-                <div class="card shadow border-0 rounded-4 overflow-hidden h-100">
+        <!-- Sẽ được load bằng AJAX -->
+    </div>
 
-                    <!-- Ảnh banner -->
-                    <a href="#">
-                        <div class="card-header p-0 border-0 bg-white image-cuser">
-                            <img src="~/assets/image/tải xuống.jpg  "
-                                 class="w-100"
-                                 alt="Banner"
-                                 style="height: 130px; object-fit: cover;">
-                        </div>
-                    </a>
-                    <!-- Nội dung khóa học -->
-                    <div class="card-body text-start">
-                        <h6 class="fw-bold mb-2" style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;" title="">@kh.TenKhoaHoc</h6>
-                        <span class="" style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">Giảng viên: @kh.TenGiaoVien</span>
-                        <span class="" style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">@tenKhoa</span>
-                        <span class="">@kh.HocKy / @kh.NamHoc </span>
-
-                        <div class="d-flex justify-content-between text-secondary small mb-3 mt-2">
-                            <span>24 SV đã tham gia</span>
-                            <span>Tất cả mọi người</span>
-                        </div>
-                        <div class="text-start">
-                            <a class="btn btn-light w-100 border rounded-3" href="#">
-                                Ghi danh vào khóa học
-                            </a>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        }
+    <!-- ⭐ Thông báo không có khóa học -->
+    <div id="noDataMessage" class="alert alert-info text-center" style="display: none;">
+        <i class="bi bi-info-circle me-2"></i>
+        Chưa có khóa học nào trong học kỳ này.
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/assets/js/student/chitietkhoa.js"></script>
+}
 
 
 
