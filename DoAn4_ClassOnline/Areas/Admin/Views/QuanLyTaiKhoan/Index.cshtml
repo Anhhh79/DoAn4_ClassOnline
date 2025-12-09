@@ -31,8 +31,9 @@
 
                             <!-- Select chọn khoa -->
                             <div class="col-12 col-md-5">
-                                <select class="form-select" name="khoaId" id="LoaiSan" required style="border: solid 1px;">
-                                    <option value="">Chọn khoa</option>
+                                <select class="form-select" name="khoaId" id="LoaiSan" style="border: solid 1px;">
+                                    @* ⭐ THÊM LOGIC CHỌN "TẤT CẢ" ⭐ *@
+                                    <option value="" selected="@(string.IsNullOrEmpty(ViewContext.HttpContext.Request.Query["khoaId"]) ? "selected" : null)">Tất cả</option>
                                     @foreach (var khoa in ViewBag.Khoas)
                                     {
                                         <option value="@khoa.KhoaId" selected="@(ViewContext.HttpContext.Request.Query["khoaId"] == khoa.KhoaId.ToString() ? "selected" : null)">
@@ -66,12 +67,12 @@
                             <table class="table">
                                 <thead style="background: #0e2238;">
                                     <tr>
-                                        <th scope="col" class="col-1">#</th>
-                                        <th scope="col" class="col-2"><span>Họ và tên</span></th>
-                                        <th scope="col" class="col-2">Khoa</th>
-                                        <th scope="col" class="col-1">Chức vụ</th>
-                                        <th scope="col" class="col-3">Email</th>
-                                        <th scope="col" class="col-2"></th>
+                                        <th scope="col" style="width: 50px;">#</th>
+                                        <th scope="col" style="width: 15%;">Họ và tên</th>
+                                        <th scope="col" style="width: 22%;">Khoa</th>
+                                        <th scope="col" style="width: 10%;">Chức vụ</th>
+                                        <th scope="col" style="width: 23%;">Email</th>
+                                        <th scope="col" style="width: 20%;"></th>
                                     </tr>
                                 </thead>
                                 <tbody id="sanBongTable">
@@ -80,27 +81,36 @@
                                         int stt = 1;
                                         foreach (var user in Model)
                                         {
-                                            var role = user.UserRoles.FirstOrDefault()?.Role?.RoleName ?? "Chưa có vai trò";
+                                            var roleName = user.UserRoles.FirstOrDefault()?.Role?.RoleName ?? "Chưa có vai trò";
+                                            var roleDisplay = roleName switch
+                                            {
+                                                "Teacher" => "Giảng viên",
+                                                "Student" => "Sinh viên",
+                                                "Admin" => "Quản trị viên",
+                                                _ => roleName  // Giữ nguyên nếu không khớp
+                                            };
                                             var isActive = user.IsActive ?? false;
                                             
                                             <tr data-user-id="@user.UserId">
-                                                <th scope="row">@stt</th>
+                                                <th scope="row" style="text-align: center;">@stt</th>
                                                 <td>@user.FullName</td>
                                                 <td>@(user.Khoa?.TenKhoa ?? "Chưa có khoa")</td>
-                                                <td>@role</td>
+                                                <td>@roleDisplay</td>
                                                 <td>@user.Email</td>
                                                 <td>
-                                                    <button class="btn btn-sm btn-primary me-2 btn-detail" data-user-id="@user.UserId" data-bs-toggle="modal" data-bs-target="#detailModal">
+                                                    <button class="btn btn-sm btn-primary btn-detail" data-user-id="@user.UserId" data-bs-toggle="modal" data-bs-target="#detailModal">
                                                         <i class="bi bi-eye"></i> Chi tiết
                                                     </button>
+                                                    @* ⭐ ĐỔI VỊ TRÍ 2 NÚT ⭐ *@
                                                     @if (isActive)
                                                     {
-                                                        <button class="btn btn-sm btn-danger btn-toggle-status" data-user-id="@user.UserId">Khóa tài khoản</button>
+                                                        <button class="btn btn-sm btn-danger btn-toggle-status me-2" data-user-id="@user.UserId">Khóa tài khoản</button>
                                                     }
                                                     else
                                                     {
-                                                        <button class="btn btn-sm btn-success btn-toggle-status" data-user-id="@user.UserId" style="padding-left:15px; padding-right:14px">Mở tài khoản</button>
+                                                        <button class="btn btn-sm btn-success btn-toggle-status me-2" data-user-id="@user.UserId" style="padding-left:15px; padding-right:14px">Mở tài khoản</button>
                                                     }
+                                                    
                                                 </td>
                                             </tr>
                                             stt++;
@@ -121,7 +131,7 @@
         </div>
     </main>
 
-    <!-- Modal thêm (giữ nguyên) -->
+    <!-- Modal thêm -->
     <div class="modal fade" id="them" tabindex="-1" aria-labelledby="them" aria-hidden="true">
         <div class="modal-dialog modal-fullscreen-xl-down">
             <div class="modal-content" style="border-radius: 20px;">
@@ -200,95 +210,6 @@
 </div>
 
 @section Scripts {
-    <script>
-        $(document).ready(function() {
-            // Xử lý nút Chi tiết
-            $('.btn-detail').click(function() {
-                const userId = $(this).data('user-id');
-                
-                // Hiển thị loading
-                $('#modalBody').html(`
-                    <div class="text-center">
-                        <div class="spinner-border" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                `);
-
-                // Gọi API lấy chi tiết
-                $.get('@Url.Action("GetUserDetail", "QuanLyTaiKhoan")', { userId: userId }, function(response) {
-                    if (response.success) {
-                        const data = response.data;
-                        $('#modalBody').html(`
-                            <div class="row g-4 align-items-center">
-                                <div class="col-md-3 text-center">
-                                    <img src="${data.avatar}" alt="Ảnh người dùng"
-                                         class="img-fluid rounded-4 shadow-sm" style="max-height: 180px; object-fit: cover;">
-                                </div>
-                                <div class="col-md-9">
-                                    <div class="row mb-2">
-                                        <div class="col-md-6"><strong>Họ và tên:</strong> ${data.fullName}</div>
-                                        <div class="col-md-6"><strong>Ngày sinh:</strong> ${data.ngaySinh}</div>
-                                    </div>
-                                    <div class="row mb-2">
-                                        <div class="col-md-6"><strong>Email:</strong> ${data.email}</div>
-                                        <div class="col-md-6"><strong>Số điện thoại:</strong> ${data.phoneNumber}</div>
-                                    </div>
-                                    <div class="row mb-2">
-                                        <div class="col-md-6"><strong>Giới tính:</strong> ${data.gioiTinh}</div>
-                                        <div class="col-md-6"><strong>MSSV:</strong> ${data.maSo}</div>
-                                    </div>
-                                    <div class="row mb-2">
-                                        <div class="col-md-6"><strong>Khoa:</strong> ${data.khoa}</div>
-                                        <div class="col-md-6"><strong>Chức vụ:</strong> ${data.chucVu}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        `);
-                    } else {
-                        toastr.error(response.message, 'Lỗi');
-                    }
-                });
-            });
-
-            // Xử lý nút Khóa/Mở tài khoản
-            $('.btn-toggle-status').click(function() {
-                const userId = $(this).data('user-id');
-                const isLocking = $(this).hasClass('btn-danger');
-                const button = $(this);
-                
-                Swal.fire({
-                    title: isLocking ? "Bạn có chắc muốn khóa tài khoản này?" : "Mở khóa tài khoản?",
-                    text: isLocking ? "Người dùng sẽ không thể đăng nhập sau khi bị khóa." : "Người dùng sẽ có thể đăng nhập lại sau khi mở khóa.",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: isLocking ? "#d33" : "#28a745",
-                    cancelButtonColor: "#6c757d",
-                    confirmButtonText: isLocking ? "Có, khóa ngay" : "Có, mở ngay",
-                    cancelButtonText: "Hủy"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.post('@Url.Action("ToggleAccountStatus", "QuanLyTaiKhoan")', { userId: userId }, function(response) {
-                            if (response.success) {
-                                toastr.success(response.message, 'Thành công');
-                                
-                                // Cập nhật giao diện nút
-                                if (response.isActive) {
-                                    button.removeClass('btn-success').addClass('btn-danger');
-                                    button.text('Khóa tài khoản');
-                                    button.css({'padding-left': '', 'padding-right': ''});
-                                } else {
-                                    button.removeClass('btn-danger').addClass('btn-success');
-                                    button.text('Mở tài khoản');
-                                    button.css({'padding-left': '15px', 'padding-right': '14px'});
-                                }
-                            } else {
-                                toastr.error(response.message, 'Lỗi');
-                            }
-                        });
-                    }
-                });
-            });
-        });
-    </script>
+    <!-- ⭐ TÁCH RA FILE JS RIÊNG ⭐ -->
+    <script src="~/assets/js/Admin/QuanLyTaiKhoan.js"></script>
 }

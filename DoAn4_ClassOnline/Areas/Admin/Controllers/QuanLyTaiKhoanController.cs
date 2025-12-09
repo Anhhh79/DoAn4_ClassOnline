@@ -39,7 +39,9 @@ namespace DoAn4_ClassOnline.Areas.Admin.Controllers
             }
 
             var users = await query
-                .OrderByDescending(u => u.CreatedAt)
+                .OrderBy(u => u.UserId) // Sắp xếp theo UserId tăng dần
+                .Skip(1) // Bỏ user có UserId nhỏ nhất
+                .OrderByDescending(u => u.CreatedAt) // Sau đó sắp xếp lại theo CreatedAt
                 .ToListAsync();
 
             // Lấy danh sách khoa để hiển thị trong dropdown
