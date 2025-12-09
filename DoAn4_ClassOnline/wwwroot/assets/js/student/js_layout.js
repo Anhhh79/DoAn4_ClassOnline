@@ -186,22 +186,3 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Xử lý thanh tìm kiếm
-function setupSearch(inputId, resultsId) {
-	const input = document.getElementById(inputId);
-	const results = document.getElementById(resultsId);
-
-	if (input && results) {
-		input.addEventListener("focus", () => {
-			results.classList.remove("d-none");
-		});
-
-		input.addEventListener("blur", () => {
-			setTimeout(() => {
-				results.classList.add("d-none");
-			}, 200);
-		});
-	}
-}
-setupSearch("searchInputDesktop", "searchResultsDesktop");
-setupSearch("searchInputMobile", "searchResultsMobile");
