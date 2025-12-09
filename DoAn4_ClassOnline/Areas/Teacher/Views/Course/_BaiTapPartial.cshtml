@@ -35,7 +35,7 @@
         <h5 class="fw-bold mb-0">
             <i class="bi bi-journal-check me-2 text-primary"></i> Bài tập
         </h5>
-        <button type="button" class="btn btn-success btn-sm text-light" data-bs-toggle="modal" data-bs-target="#addBaiTapModal">
+        <button type="button" class="btn btn-success btn-sm text-light" data-bs-toggle="modal" data-bs-target="#addBaiTapModal" onclick="initTaoBaiTapModal(), resetFormTaoBaiTap()">
             <i class="bi bi-plus-lg me-1"></i> Tạo bài tập
         </button>
     </div>
@@ -44,7 +44,7 @@
     <div class="modal fade" id="addBaiTapModal" tabindex="-1" aria-labelledby="addBaiTapModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
-                <form  method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                <form id="formAddBaiTap" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
                     <div class="modal-header">
                         <h5 class="modal-title fw-bold" id="addBaiTapModalLabel">
                             <i class="bi bi-journal-plus me-2 text-primary"></i> Tạo bài tập
@@ -55,53 +55,55 @@
                     <div class="modal-body mb-2">
                         <div class="row g-3 px-3">
 
+                            <!-- Tiêu đề -->
                             <div class="col-12">
                                 <label class="form-label">Tiêu đề bài tập</label>
-                                <input type="text" class="form-control" name="TieuDe" maxlength="200" required>
+                                <input type="text" class="form-control" name="TieuDe" id="TieuDe_AddBaiTap"
+                                       maxlength="200" required>
                                 <div class="invalid-feedback">Vui lòng nhập tiêu đề!</div>
                             </div>
 
+                            <!-- Mô tả -->
                             <div class="col-12">
                                 <label class="form-label">Mô tả</label>
-                                <textarea class="form-control" name="MoTa" rows="4" required></textarea>
+                                <textarea class="form-control" name="MoTa" id="MoTa_AddBaiTap" rows="4" required></textarea>
                                 <div class="invalid-feedback">Vui lòng nhập mô tả!</div>
                             </div>
 
+                            <!-- Thời gian -->
                             <div class="col-md-6">
                                 <label class="form-label">Thời gian bắt đầu</label>
-                                <div class="input-group" id="startPicker">
-                                    <input type="text" name="ThoiGianBatDau" class="form-control" required>
-                                    <span class="input-group-text">
-                                        <i class="bi bi-calendar-event"></i>
-                                    </span>
+                                <div class="input-group">
+                                    <input type="datetime-local" name="ThoiGianBatDau" id="startPicker_AddBaiTap" class="form-control">
+                                    <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
                                 </div>
+                                <div class="invalid-feedback">Thời gian không hợp lệ!</div>
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">Thời gian kết thúc</label>
-                                <div class="input-group" id="endPicker">
-                                    <input type="text" name="ThoiGianKetThuc" class="form-control" required>
-                                    <span class="input-group-text">
-                                        <i class="bi bi-calendar-event"></i>
-                                    </span>
+                                <div class="input-group">
+                                    <input type="datetime-local" name="ThoiGianKetThuc" id="ThoiGianKetThuc_AddBaiTap" class="form-control">
+                                    <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
                                 </div>
+                                <div class="invalid-feedback">Thời gian không hợp lệ!</div>
                             </div>
 
+                            <!-- File -->
                             <div class="col-12">
                                 <label class="form-label">File đính kèm (tùy chọn)</label>
-                                <input type="file" class="form-control" name="Files" multiple>
+                                <input type="file" id="inputFile_Add" class="form-control" name="files" multiple>
                             </div>
 
-
+                            <!-- Giao cho -->
                             <div class="col-12 mt-3">
                                 <label class="form-label d-flex justify-content-between align-items-center mb-2">
                                     <span>Giao cho</span>
                                 </label>
 
-                                <!-- CONTENT -->
                                 <div class="student-list-container">
 
-                                    <!-- HEADER -->
+                                    <!-- Header -->
                                     <div class="student-header">
                                         <div class="d-flex justify-content-between align-items-center my-2">
 
@@ -109,6 +111,7 @@
                                             <div class="input-group w-50">
                                                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                                                 <input type="search" class="form-control form-control-sm"
+                                                       id="searchSinhVien_Giao"
                                                        placeholder="Tìm theo tên học sinh...">
                                             </div>
 
@@ -122,139 +125,37 @@
                                         </div>
                                     </div>
 
-
                                     <!-- Danh sách -->
-                                    <div class="p-2">
+                                    <div class="p-2" id="danhSachSinhVien_Giao"></div>
 
-                                        <!-- Item -->
-                                        <div class="student-item d-flex align-items-center gap-3 py-2 px-2 mb-1">
-                                            <div style="width:40px; height:40px; border-radius:8px; overflow:hidden;">
-                                                <img src="~/assets/image/tải xuống.jpg" alt="Avatar" style="width:100%; height:100%; object-fit:cover;">
-                                            </div>
-
-                                            <div class="flex-grow-1">
-                                                <div class="fw-semibold">Nguyễn Văn A</div>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="101" id="hs101">
-                                            </div>
-                                        </div>
-
-                                        <!-- Copy items → chỉ đổi chữ -->
-                                        <div class="student-item d-flex align-items-center gap-3 py-2 px-2 mb-1">
-                                            <div style="width:40px; height:40px; border-radius:8px; overflow:hidden;">
-                                                <img src="~/assets/image/tải xuống.jpg" alt="Avatar" style="width:100%; height:100%; object-fit:cover;">
-                                            </div>
-                                            <div class="flex-grow-1 fw-semibold">Trần Thị B</div>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox" value="102"></div>
-                                        </div>
-
-                                        <div class="student-item d-flex align-items-center gap-3 py-2 px-2 mb-1">
-                                            <div style="width:40px; height:40px; border-radius:8px; overflow:hidden;">
-                                                <img src="~/assets/image/tải xuống.jpg" alt="Avatar" style="width:100%; height:100%; object-fit:cover;">
-                                            </div>
-                                            <div class="flex-grow-1 fw-semibold">Lê Văn C</div>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox" value="103"></div>
-                                        </div>
-
-                                        <div class="student-item d-flex align-items-center gap-3 py-2 px-2 mb-1">
-                                            <div style="width:40px; height:40px; border-radius:8px; overflow:hidden;">
-                                                <img src="~/assets/image/tải xuống.jpg" alt="Avatar" style="width:100%; height:100%; object-fit:cover;">
-                                            </div>
-                                            <div class="flex-grow-1 fw-semibold">Phạm Thị D</div>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox" value="104"></div>
-                                        </div>
-
-                                        <div class="student-item d-flex align-items-center gap-3 py-2 px-2 mb-1">
-                                            <div style="width:40px; height:40px; border-radius:8px; overflow:hidden;">
-                                                <img src="~/assets/image/tải xuống.jpg" alt="Avatar" style="width:100%; height:100%; object-fit:cover;">
-                                            </div>
-                                            <div class="flex-grow-1 fw-semibold">Hoàng Văn E</div>
-                                            <div class="form-check"><input class="form-check-input" type="checkbox" value="105"></div>
-                                        </div>
-
-                                    </div>
                                 </div>
                             </div>
-
-
-
 
                         </div>
                     </div>
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
-                        <button class="btn btn-primary text-light">
+                        <button type="button" id="btnLuuBaiTap" class="btn btn-primary text-light" onclick="taoBaiTap()">
                             <i class="bi bi-save me-1"></i> Lưu bài tập
                         </button>
                     </div>
+
                 </form>
             </div>
         </div>
     </div>
-    <!-- ====== Bài tập 1 ====== -->
-    <div class="col-12">
-        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary d-flex justify-content-between align-items-center flex-wrap gap-2">
 
-            <a class="text-decoration-none text-dark d-flex align-items-center flex-grow-1"
-               data-bs-toggle="collapse"
-               href="#collapseBaiTap1">
-                <strong class="me-1">Bài tập 1:</strong>
-                Lập trình xử lý dữ liệu cảm biến
-            </a>
 
-            <div class="text-muted small me-4">
-                <i class="bi bi-calendar2-week me-1"></i> Thời gian: 25/10/2025 – 23:00 đến 26/10/2025 – 23:00
-            </div>
+    <div id="container_BaiTapList">
 
-            <div class="text-end">
-                <button class="btn btn-outline-secondary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#editBaiTapModal">
-                    <i class="bi bi-pencil"></i> Sửa
-                </button>
-                <button class="btn btn-outline-danger btn-sm">
-                    <i class="bi bi-trash"></i> Xóa
-                </button>
-            </div>
-        </div>
-
-        <!-- Khi mở ra -->
-        <div class="collapse" id="collapseBaiTap1">
-            <div class="p-3 border rounded-3 mb-3" style="background-color: rgba(243,246,248);">
-
-                <p><strong>Mô tả:</strong> Yêu cầu viết chương trình đọc dữ liệu cảm biến từ file Excel, tính toán giá trị trung bình và biểu diễn trên biểu đồ.</p>
-
-                <p class="text-muted small"><i class="bi bi-paperclip"></i> File đính kèm:</p>
-                <a href="/uploads/DeBai.xlsx" class="d-flex justify-content-between align-items-center border rounded-3 p-3 bg-white text-decoration-none mb-2 shadow-sm" download>
-                    <div class="d-flex align-items-center">
-                        <i class="bi bi-file-earmark-excel fs-4 text-success me-3"></i>
-                        <div><strong>Đề bài</strong> – dữ liệu cảm biến.xlsx</div>
-                    </div>
-                    <button class="btn btn-sm btn-outline-success">
-                        <i class="bi bi-download me-1"></i> Tải
-                    </button>
-                </a>
-
-                <hr>
-
-                <!-- Thống kê bài nộp -->
-                <div class="d-flex justify-content-between align-items-center">
-                    <div><strong>Đã nộp:</strong> 12 / 35 sinh viên</div>
-                    <a class="btn btn-outline-primary btn-sm" asp-controller="Course" asp-action="DanhSachNopBai">
-                        Xem danh sách nộp bài
-                    </a>
-                </div>
-
-            </div>
-        </div>
     </div>
-
 
     <!-- Modal sửa bài tập -->
     <div class="modal fade" id="editBaiTapModal" tabindex="-1" aria-labelledby="editBaiTapModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
-                <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                <form enctype="multipart/form-data" class="needs-validation" novalidate>
 
                     <div class="modal-header">
                         <h5 class="modal-title fw-bold" id="editBaiTapModalLabel">
@@ -281,7 +182,7 @@
                             <div class="col-md-6">
                                 <label class="form-label">Thời gian bắt đầu</label>
                                 <div class="input-group" id="startPickerEdit">
-                                    <input type="text" name="ThoiGianBatDau" class="form-control" required>
+                                    <input type="datetime-local" name="ThoiGianBatDau" class="form-control" required>
                                     <span class="input-group-text">
                                         <i class="bi bi-calendar-event"></i>
                                     </span>
@@ -291,7 +192,7 @@
                             <div class="col-md-6">
                                 <label class="form-label">Thời gian kết thúc</label>
                                 <div class="input-group" id="endPickerEdit">
-                                    <input type="text" name="ThoiGianKetThuc" class="form-control" required>
+                                    <input type="datetime-local" name="ThoiGianKetThuc" class="form-control" required>
                                     <span class="input-group-text">
                                         <i class="bi bi-calendar-event"></i>
                                     </span>
@@ -401,7 +302,6 @@
     </div>
 
 </div>
-
 
 
 

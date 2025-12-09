@@ -104,6 +104,13 @@ document.addEventListener("DOMContentLoaded", () => {
         btnBaiTap.addEventListener("click", function (e) {
             e.preventDefault();
             loadNoiDung_Tc('/Teacher/Course/BaiTap');
+            const khoaHocId = getKhoaHocId();
+            if (khoaHocId) {
+                loadDanhSachBaiTap(khoaHocId);
+            } else {
+                console.error('khoaHocId is null');
+                showError_tc('Lỗi: Không xác định được ID khóa học!');
+            }
             setActiveButton(this);
         });
     }
