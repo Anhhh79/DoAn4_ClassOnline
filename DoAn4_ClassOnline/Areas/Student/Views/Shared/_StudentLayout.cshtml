@@ -105,8 +105,14 @@
 							</div>
 						</button>
 						<ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
-							<li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#profileModal">Thông tin cá nhân</a></li>
+                            <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#profileModal">Thông tin cá nhân</a></li>
 							<li><hr class="dropdown-divider"></li>
+							<!-- ⭐ SỬA: THÊM data-bs-toggle và data-bs-target ⭐ -->
+							<li>
+                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                                    Đổi mật khẩu
+                                </a>
+                            </li>
 							<li>
 								<form method="post" asp-area="Admin" asp-controller="DangNhap" asp-action="Logout">
 									@Html.AntiForgeryToken()
@@ -116,138 +122,216 @@
 						</ul>
 					</div>
 
-					<!-- ⭐ MODAL THÔNG TIN CÁ NHÂN ⭐ -->
-					<div class="modal fade" id="profileModal" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="true" aria-labelledby="profileModalLabel" aria-hidden="true">
-						<div class="modal-dialog modal-lg modal-dialog-centered">
-							<div class="modal-content border-0 shadow-lg">
-								<div class="modal-header p-0">
-									<div class="w-100 d-flex align-items-center justify-content-between px-4 py-3 rounded-top">
-										<h5 class="modal-title m-0" id="profileModalLabel">Thông tin cá nhân</h5>
-										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-									</div>
-								</div>
-
-								<div class="modal-body p-4">
-									<form id="profileForm" novalidate>
-										<div class="row g-3">
-											<!-- Avatar -->
-											<div class="col-md-4 text-center">
-												<div class="position-relative d-inline-block">
-													<img id="avatarPreview" src="@avatar" alt="Avatar" 
-													     class="rounded-circle img-thumbnail" 
-													     style="width:150px;height:150px;object-fit:cover;box-shadow:0 6px 18px rgba(0,0,0,0.15);"
-													     onerror="this.src='~/assets/image/logo.png'">
-													<label for="avatarInput" class="position-absolute bottom-0 end-0 translate-middle bg-white rounded-circle p-1 border" style="cursor:pointer;">
-														<!-- icon upload -->
-														<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#0d6efd" viewBox="0 0 16 16">
-															<path d="M10.5 2a.5.5 0 0 1 .5.5V4h1.5A1.5 1.5 0 0 1 14 5.5v7A1.5 1.5 0 0 1 12.5 14h-9A1.5 1.5 0 0 1 2 12.5v-7A1.5 1.5 0 0 1 3.5 4H5V2.5a.5.5 0 0 1 .5-.5h5zM5 4h6v1H5V4z" />
-														</svg>
-													</label>
-													<input id="avatarInput" type="file" accept="image/*" class="d-none" aria-label="Upload ảnh đại diện">
-												</div>
-												<h5 class="mt-3 mb-1 fw-bold" id="displayName">@fullName</h5>
-												<div class="small text-muted" id="displayRole">@roleName</div>
-											</div>
-
-											<!-- Fields -->
-											<div class="col-md-8">
-												<div class="row g-2">
-													<div class="col-md-6">
-														<div class="form-floating">
-															<input type="text" class="form-control" id="firstName_InforSinhVien" 
-															       name="firstName" placeholder="Họ và tên" value="@fullName" required>
-															<label for="firstName_InforSinhVien">Họ và tên</label>
-															<div class="invalid-feedback">Vui lòng nhập họ và tên.</div>
-														</div>
-													</div>
-
-													<div class="col-md-6">
-														<div class="form-floating">
-															<input type="text" class="form-control" id="dob" 
-															       name="dob" value="@ngaySinh" placeholder="Ngày sinh">
-															<label for="dob">Ngày sinh</label>
-															<div class="invalid-feedback">Ngày sinh không hợp lệ.</div>
-														</div>
-													</div>
-
-													<div class="col-md-6">
-														<div class="form-floating">
-															<input type="email" class="form-control" id="email_InforSinhVien" 
-															       name="email" value="@email" placeholder="Email" required>
-															<label for="email_InforSinhVien">Email</label>
-															<div class="invalid-feedback">Email không hợp lệ.</div>
-														</div>
-													</div>
-
-													<div class="col-md-6">
-														<div class="form-floating">
-															<input type="tel" class="form-control" id="phone_InforSinhVien" 
-															       name="phone" value="@phone" placeholder="Số điện thoại" pattern="[\d\s\+\-()]{6,}">
-															<label for="phone_InforSinhVien">Số điện thoại</label>
-															<div class="invalid-feedback">Số điện thoại không hợp lệ.</div>
-														</div>
-													</div>
-
-													<div class="col-md-6">
-														<label class="form-label small mb-1">Giới tính</label>
-														<div class="d-flex gap-2">
-															<div class="form-check">
-																<input class="form-check-input" type="radio" name="gender" 
-																       id="genderMale_InforSinhVien" value="Nam" 
-																       @(gioiTinh == "Nam" ? "checked" : "")>
-																<label class="form-check-label" for="genderMale_InforSinhVien">Nam</label>
-															</div>
-															<div class="form-check">
-																<input class="form-check-input" type="radio" name="gender" 
-																       id="genderFemale_InforSinhVien" value="Nữ" 
-																       @(gioiTinh == "Nữ" ? "checked" : "")>
-																<label class="form-check-label" for="genderFemale_InforSinhVien">Nữ</label>
-															</div>
-															<div class="form-check">
-																<input class="form-check-input" type="radio" name="gender" 
-																       id="genderOther_InforSinhVien" value="Khác" 
-																       @(gioiTinh == "Khác" ? "checked" : "")>
-																<label class="form-check-label" for="genderOther_InforSinhVien">Khác</label>
-															</div>
-														</div>
-													</div>
-
-													<div class="col-md-6">
-														<div class="form-floating">
-															<input type="text" class="form-control bg-body-tertiary" 
-															       id="MSSV_InforSinhVien" placeholder="MSSV" 
-															       value="@maSo" readonly>
-															<label for="MSSV_InforSinhVien">MSSV</label>
-														</div>
-													</div>
-
-													<!-- ⭐ THAY ĐỊA CHỈ BẰNG TÊN KHOA (READONLY) ⭐ -->
-													<div class="col-md-12">
-														<div class="form-floating">
-															<input type="text" class="form-control bg-body-tertiary" 
-															       id="khoaName_InforSinhVien" placeholder="Khoa" 
-															       value="@tenKhoa" readonly>
-															<label for="khoaName_InforSinhVien">Khoa</label>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-									</form>
-								</div>
-
-								<div class="modal-footer">
-									<div class="me-auto text-muted small" id="saveStatus" style="display:none;"></div>
-									<button type="button" class="btn btn-secondary text-light" data-bs-dismiss="modal">Đóng</button>
-									<button type="button" class="btn btn-primary text-light" id="saveBtn">Cập nhật</button>
-								</div>
-							</div>
-						</div>
-					</div>
 				</div>
 			</div>
 		</nav>
 	</header>
+
+<!-- ⭐ DI CHUYỂN CÁC MODAL RA NGOÀI HEADER - ĐẶT SAU </header> ⭐ -->
+
+<!-- ⭐ MODAL THÔNG TIN CÁ NHÂN ⭐ -->
+<div class="modal fade" id="profileModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="true" aria-labelledby="profileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header p-0">
+                <div class="w-100 d-flex align-items-center justify-content-between px-4 py-3 rounded-top">
+                    <h5 class="modal-title m-0" id="profileModalLabel">Thông tin cá nhân</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+            </div>
+
+            <div class="modal-body p-4">
+                <form id="profileForm" novalidate>
+                    <div class="row g-3">
+                        <!-- Avatar -->
+                        <div class="col-md-4 text-center">
+                            <div class="position-relative d-inline-block">
+                                <img id="avatarPreview" src="@avatar" alt="Avatar" 
+                                     class="rounded-circle img-thumbnail" 
+                                     style="width:150px;height:150px;object-fit:cover;box-shadow:0 6px 18px rgba(0,0,0,0.15);"
+                                     onerror="this.src='~/assets/image/logo.png'">
+                                <label for="avatarInput" class="position-absolute bottom-0 end-0 translate-middle bg-white rounded-circle p-1 border" style="cursor:pointer;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#0d6efd" viewBox="0 0 16 16">
+                                        <path d="M10.5 2a.5.5 0 0 1 .5.5V4h1.5A1.5 1.5 0 0 1 14 5.5v7A1.5 1.5 0 0 1 12.5 14h-9A1.5 1.5 0 0 1 2 12.5v-7A1.5 1.5 0 0 1 3.5 4H5V2.5a.5.5 0 0 1 .5-.5h5zM5 4h6v1H5V4z" />
+                                    </svg>
+                                </label>
+                                <input id="avatarInput" type="file" accept="image/*" class="d-none" aria-label="Upload ảnh đại diện">
+                            </div>
+                            <h5 class="mt-3 mb-1 fw-bold" id="displayName">@fullName</h5>
+                            <div class="small text-muted" id="displayRole">@roleName</div>
+                        </div>
+
+                        <!-- Fields -->
+                        <div class="col-md-8">
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="firstName_InforSinhVien" 
+                                               name="firstName" placeholder="Họ và tên" value="@fullName" required>
+                                        <label for="firstName_InforSinhVien">Họ và tên</label>
+                                        <div class="invalid-feedback">Vui lòng nhập họ và tên.</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="dob" 
+                                               name="dob" value="@ngaySinh" placeholder="Ngày sinh">
+                                        <label for="dob">Ngày sinh</label>
+                                        <div class="invalid-feedback">Ngày sinh không hợp lệ.</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="email" class="form-control" id="email_InforSinhVien" 
+                                               name="email" value="@email" placeholder="Email" required>
+                                        <label for="email_InforSinhVien">Email</label>
+                                        <div class="invalid-feedback">Email không hợp lệ.</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="tel" class="form-control" id="phone_InforSinhVien" 
+                                               name="phone" value="@phone" placeholder="Số điện thoại" pattern="[\d\s\+\-()]{6,}">
+                                        <label for="phone_InforSinhVien">Số điện thoại</label>
+                                        <div class="invalid-feedback">Số điện thoại không hợp lệ.</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label small mb-1">Giới tính</label>
+                                    <div class="d-flex gap-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="gender" 
+                                                   id="genderMale_InforSinhVien" value="Nam" 
+                                                   @(gioiTinh == "Nam" ? "checked" : "")>
+                                            <label class="form-check-label" for="genderMale_InforSinhVien">Nam</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="gender" 
+                                                   id="genderFemale_InforSinhVien" value="Nữ" 
+                                                   @(gioiTinh == "Nữ" ? "checked" : "")>
+                                            <label class="form-check-label" for="genderFemale_InforSinhVien">Nữ</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="gender" 
+                                                   id="genderOther_InforSinhVien" value="Khác" 
+                                                   @(gioiTinh == "Khác" ? "checked" : "")>
+                                            <label class="form-check-label" for="genderOther_InforSinhVien">Khác</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control bg-body-tertiary" 
+                                               id="MSSV_InforSinhVien" placeholder="MSSV" 
+                                               value="@maSo" readonly>
+                                        <label for="MSSV_InforSinhVien">MSSV</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control bg-body-tertiary" 
+                                               id="khoaName_InforSinhVien" placeholder="Khoa" 
+                                               value="@tenKhoa" readonly>
+                                        <label for="khoaName_InforSinhVien">Khoa</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <div class="me-auto text-muted small" id="saveStatus" style="display:none;"></div>
+                <button type="button" class="btn btn-secondary text-light" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary text-light" id="saveBtn">Cập nhật</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ⭐ MODAL ĐỔI MẬT KHẨU ⭐ -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" 
+     data-bs-backdrop="static" data-bs-keyboard="true" 
+     aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-3 shadow-lg">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold" id="changePasswordModalLabel">
+                    Đổi mật khẩu
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-4">
+                <form id="changePasswordForm">
+                    <!-- Mật khẩu cũ -->
+                    <div class="mb-3">
+                        <label for="oldPassword" class="form-label fw-semibold">
+                            Mật khẩu cũ <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="oldPassword" 
+                                   placeholder="Nhập mật khẩu cũ" required autocomplete="current-password">
+                            <button class="btn btn-outline-secondary" type="button" 
+                                    onclick="togglePasswordVisibility('oldPassword')" tabindex="-1">
+                                <i class="bi bi-eye" id="oldPassword-icon"></i>
+                            </button>
+                        </div>
+                        <div class="text-danger small mt-1" id="oldPasswordError" style="display:none;"></div>
+                    </div>
+
+                    <!-- Mật khẩu mới -->
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label fw-semibold">
+                            Mật khẩu mới <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="newPassword" 
+                                   placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)" 
+                                   required autocomplete="new-password">
+                            <button class="btn btn-outline-secondary" type="button" 
+                                    onclick="togglePasswordVisibility('newPassword')" tabindex="-1">
+                                <i class="bi bi-eye" id="newPassword-icon"></i>
+                            </button>
+                        </div>
+                        <div class="text-danger small mt-1" id="newPasswordError" style="display:none;"></div>
+                    </div>
+
+                    <!-- Xác nhận mật khẩu mới -->
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label fw-semibold">
+                            Xác nhận mật khẩu mới <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="confirmPassword" 
+                                   placeholder="Nhập lại mật khẩu mới" 
+                                   required autocomplete="new-password">
+                            <button class="btn btn-outline-secondary" type="button" 
+                                    onclick="togglePasswordVisibility('confirmPassword')" tabindex="-1">
+                                <i class="bi bi-eye" id="confirmPassword-icon"></i>
+                            </button>
+                        </div>
+                        <div class="text-danger small mt-1" id="confirmPasswordError" style="display:none;"></div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="submitChangePassword()">
+                    <i class="bi bi-check-circle me-1"></i>Đổi mật khẩu
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 	<!-- Main content -->
@@ -326,6 +410,7 @@
 <script src="~/assets/js/student/KhoaHoc.js"></script>
 <script src="~/assets/js/student/Js_LamTracNghiem.js"></script>
 <script src="~/assets/js/student/nopbai.js"></script>
+<script src="~/assets/js/student/change-password.js"></script>
 
 <!-- ⭐ 6. INLINE SCRIPTS (SAU TẤT CẢ) ⭐ -->
 <script>
