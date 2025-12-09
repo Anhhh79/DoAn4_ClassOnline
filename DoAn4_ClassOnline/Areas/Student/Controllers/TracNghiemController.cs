@@ -59,7 +59,7 @@ namespace DoAn4_ClassOnline.Areas.Student.Controllers
                     gb.SinhVienId == userId))
                 .Include(bt => bt.BaiLamTracNghiems
                     .Where(bl => bl.SinhVienId == userId))
-                .OrderBy(bt => bt.ThoiGianBatDau)
+                .OrderByDescending(bt => bt.NgayTao) // ⭐ SẮP XẾP THEO NGÀY TẠO MỚI NHẤT ⭐
                 .ToListAsync();
 
             _logger.LogInformation($"✅ Loaded {baiTracNghiems.Count} bài trắc nghiệm");
@@ -77,6 +77,7 @@ namespace DoAn4_ClassOnline.Areas.Student.Controllers
                 bt.ChoXemKetQua,
                 bt.SoLanLamToiDa,
                 bt.DiemToiDa,
+                bt.NgayTao, // ⭐ THÊM NGÀY TẠO VÀO OBJECT ⭐
                 // Thông tin bài làm của sinh viên
                 SoLanDaLam = bt.BaiLamTracNghiems.Count,
                 DiemCaoNhat = bt.BaiLamTracNghiems.Any() 
@@ -85,7 +86,7 @@ namespace DoAn4_ClassOnline.Areas.Student.Controllers
                 DaLam = bt.BaiLamTracNghiems.Any()
             }).ToList();
 
-            // ⭐ CHIA BÀI TRẮC NGHIỆM THEO LOẠI ⭐
+            // ⭐ CHIA BÀI TRẮC NGHIỆM THEO LOẠI (ĐÃ ĐƯỢC SẮP XẾP THEO NGÀY TẠO) ⭐
             var baiTap = baiTracNghiemList.Where(b => b.LoaiBaiThi == "Bài tập").Cast<dynamic>().ToList();
             var baiThi = baiTracNghiemList.Where(b => b.LoaiBaiThi == "Bài thi").Cast<dynamic>().ToList();
 

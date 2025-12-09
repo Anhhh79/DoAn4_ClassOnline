@@ -418,7 +418,7 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
             }
         }
 
-        // ⭐ API XUẤT EXCEL KẾT QUẢ TRẮC NGHIỆM ⭐
+        // ⭐ API XUẤT EXCEL KẾT QUẢ TRẮC NGHIỆM - CẢI TIẾN ĐẸP HƠN ⭐
         [HttpGet]
         public async Task<IActionResult> XuatExcelKetQua(int baiTracNghiemId)
         {
@@ -431,7 +431,7 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
                     return Unauthorized();
                 }
 
-                // Lấy dữ liệu bài trắc nghiệm với kết quả
+                // ⭐ LẤY DỮ LIỆU - BỔ SUNG LOGIC HIỂN THỊ ĐIỂM CAO NHẤT ⭐
                 var baiTracNghiem = await _context.BaiTracNghiems
                     .Include(b => b.KhoaHoc)
                         .ThenInclude(k => k.GiaoVien)
@@ -444,47 +444,174 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
                     return NotFound();
                 }
 
+                // ⭐ NHÓM THEO SINH VIÊN VÀ LẤY ĐIỂM CAO NHẤT ⭐
+                var baiLamTheoSinhVien = baiTracNghiem.BaiLamTracNghiems
+                    .GroupBy(b => b.SinhVienId)
+                    .Select(g => new
+                    {
+                        BaiLam = g.OrderByDescending(b => b.Diem ?? 0)
+                          .ThenByDescending(b => b.NgayNop)
+                          .First(),
+                        TongSoLanLam = g.Count()
+                    })
+                    .OrderByDescending(x => x.BaiLam.NgayNop)
+                    .ToList();
+
                 // ⭐ TẠO FILE EXCEL VỚI EPPLUS ⭐
-                ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // Quan trọng!
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
                 using var package = new ExcelPackage();
-                var worksheet = package.Workbook.Worksheets.Add("Kết quả thi");
+                var ws = package.Workbook.Worksheets.Add("Kết quả thi");
 
-                // ⭐ HEADER THÔNG TIN ⭐
-                worksheet.Cells["A1"].Value = "KẾT QUẢ BÀI TRẮC NGHIỆM";
-                worksheet.Cells["A1"].Style.Font.Bold = true;
-                worksheet.Cells["A1"].Style.Font.Size = 16;
+                // =====================================================
+                // ⭐ PHẦN 1: TIÊU ĐỀ VÀ THÔNG TIN BÀI THI ⭐
+                // =====================================================
                 
-                worksheet.Cells["A2"].Value = $"Tên bài thi: {baiTracNghiem.TenBaiThi}";
-                worksheet.Cells["A3"].Value = $"Khóa học: {baiTracNghiem.KhoaHoc.TenKhoaHoc}";
-                worksheet.Cells["A4"].Value = $"Giảng viên: {baiTracNghiem.KhoaHoc.GiaoVien.FullName}";
-                worksheet.Cells["A5"].Value = $"Ngày xuất: {DateTime.Now:dd/MM/yyyy HH:mm}";
+                // Tiêu đề chính
+                ws.Cells["A1"].Value = "BẢNG ĐIỂM TRẮC NGHIỆM";
+                ws.Cells["A1"].Style.Font.Size = 18;
+                ws.Cells["A1"].Style.Font.Bold = true;
+                ws.Cells["A1"].Style.Font.Color.SetColor(System.Drawing.Color.White);
+                ws.Cells["A1"].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells["A1"].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(0, 51, 153));
+                ws.Cells["A1"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                ws.Cells["A1"].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                ws.Cells["A1:G1"].Merge = true;
+                ws.Row(1).Height = 35;
 
-                // ⭐ HEADER BẢNG ⭐
+                int row = 3; // Bắt đầu từ dòng 3
+
+                // ⭐ THÔNG TIN BÀI THI - LAYOUT ĐẸP HƠN ⭐
+                
+                // Tên bài thi
+                ws.Cells[row, 1].Value = "Tên bài thi:";
+                ws.Cells[row, 1].Style.Font.Bold = true;
+                ws.Cells[row, 1].Style.Font.Size = 11;
+                ws.Cells[row, 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(217, 225, 242));
+                
+                ws.Cells[row, 2, row, 7].Merge = true;
+                ws.Cells[row, 2].Value = baiTracNghiem.TenBaiThi;
+                ws.Cells[row, 2].Style.Font.Size = 12;
+                ws.Cells[row, 2].Style.Font.Bold = true;
+                ws.Cells[row, 2].Style.Font.Color.SetColor(System.Drawing.Color.FromArgb(0, 51, 153));
+                row++;
+
+                // Khóa học
+                ws.Cells[row, 1].Value = "Khóa học:";
+                ws.Cells[row, 1].Style.Font.Bold = true;
+                ws.Cells[row, 1].Style.Font.Size = 11;
+                ws.Cells[row, 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(217, 225, 242));
+                
+                ws.Cells[row, 2, row, 7].Merge = true;
+                ws.Cells[row, 2].Value = baiTracNghiem.KhoaHoc.TenKhoaHoc;
+                ws.Cells[row, 2].Style.Font.Size = 11;
+                row++;
+
+                // Giảng viên
+                ws.Cells[row, 1].Value = "Giảng viên:";
+                ws.Cells[row, 1].Style.Font.Bold = true;
+                ws.Cells[row, 1].Style.Font.Size = 11;
+                ws.Cells[row, 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(217, 225, 242));
+                
+                ws.Cells[row, 2, row, 7].Merge = true;
+                ws.Cells[row, 2].Value = baiTracNghiem.KhoaHoc.GiaoVien.FullName;
+                ws.Cells[row, 2].Style.Font.Size = 11;
+                row++;
+
+                // Ngày xuất
+                ws.Cells[row, 1].Value = "Ngày xuất:";
+                ws.Cells[row, 1].Style.Font.Bold = true;
+                ws.Cells[row, 1].Style.Font.Size = 11;
+                ws.Cells[row, 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(217, 225, 242));
+                
+                ws.Cells[row, 2, row, 7].Merge = true;
+                ws.Cells[row, 2].Value = DateTime.Now;
+                ws.Cells[row, 2].Style.Numberformat.Format = "dd/MM/yyyy HH:mm";
+                ws.Cells[row, 2].Style.Font.Size = 11;
+
+                // Viền cho phần thông tin
+                var infoRange = ws.Cells[3, 1, row, 7];
+                infoRange.Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                infoRange.Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                infoRange.Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                infoRange.Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                infoRange.Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+
+                // =====================================================
+                // ⭐ PHẦN 2: BẢNG ĐIỂM CHI TIẾT ⭐
+                // =====================================================
+                row += 2; // Khoảng cách giữa thông tin và bảng điểm
+                int headerRow = row;
+
                 var headers = new[] { "STT", "Mã SV", "Họ tên", "Điểm", "Số lần làm", "Ngày nộp", "Trạng thái" };
                 for (int i = 0; i < headers.Length; i++)
                 {
-                    worksheet.Cells[7, i + 1].Value = headers[i];
-                    worksheet.Cells[7, i + 1].Style.Font.Bold = true;
-                    worksheet.Cells[7, i + 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                    worksheet.Cells[7, i + 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+                    ws.Cells[headerRow, i + 1].Value = headers[i];
+                    ws.Cells[headerRow, i + 1].Style.Font.Bold = true;
+                    ws.Cells[headerRow, i + 1].Style.Font.Size = 11;
+                    ws.Cells[headerRow, i + 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                    ws.Cells[headerRow, i + 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(79, 129, 189));
+                    ws.Cells[headerRow, i + 1].Style.Font.Color.SetColor(System.Drawing.Color.White);
+                    ws.Cells[headerRow, i + 1].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                    ws.Cells[headerRow, i + 1].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
                 }
+                ws.Row(headerRow).Height = 25;
 
-                // ⭐ DỮ LIỆU ⭐
-                var baiLamList = baiTracNghiem.BaiLamTracNghiems.OrderByDescending(b => b.NgayNop).ToList();
-                int row = 8;
+                // ⭐ DỮ LIỆU - SỬ DỤNG LOGIC ĐIỂM CAO NHẤT ⭐
+                row = headerRow + 1;
                 int stt = 1;
 
-                foreach (var baiLam in baiLamList)
+                foreach (var item in baiLamTheoSinhVien)
                 {
-                    worksheet.Cells[row, 1].Value = stt++;
-                    worksheet.Cells[row, 2].Value = baiLam.SinhVien?.MaSo ?? "N/A";
-                    worksheet.Cells[row, 3].Value = baiLam.SinhVien?.FullName ?? "N/A";
-                    worksheet.Cells[row, 4].Value = baiLam.Diem?.ToString("F1") ?? "--";
-                    worksheet.Cells[row, 5].Value = baiLam.SoLanLam ?? 0;
-                    worksheet.Cells[row, 6].Value = baiLam.NgayNop?.ToString("dd/MM/yyyy HH:mm") ?? "Chưa nộp";
+                    var baiLam = item.BaiLam;
                     
-                    // Xác định trạng thái
+                    ws.Cells[row, 1].Value = stt++;
+                    ws.Cells[row, 1].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+
+                    ws.Cells[row, 2].Value = baiLam.SinhVien?.MaSo ?? "N/A";
+                    ws.Cells[row, 3].Value = baiLam.SinhVien?.FullName ?? "N/A";
+                    
+                    // ⭐ ĐIỂM - VỚI MÀU SẮC ⭐
+                    if (baiLam.NgayNop.HasValue && baiLam.Diem.HasValue)
+                    {
+                        ws.Cells[row, 4].Value = baiLam.Diem.Value;
+                        ws.Cells[row, 4].Style.Numberformat.Format = "0.0";
+                        ws.Cells[row, 4].Style.Font.Bold = true;
+                        ws.Cells[row, 4].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+
+                        // ⭐ MÀU SẮC THEO ĐIỂM ⭐
+                        if (baiLam.Diem >= 8)
+                            ws.Cells[row, 4].Style.Font.Color.SetColor(System.Drawing.Color.Green);
+                        else if (baiLam.Diem >= 5)
+                            ws.Cells[row, 4].Style.Font.Color.SetColor(System.Drawing.Color.Orange);
+                        else
+                            ws.Cells[row, 4].Style.Font.Color.SetColor(System.Drawing.Color.Red);
+                    }
+                    else
+                    {
+                        ws.Cells[row, 4].Value = "--";
+                        ws.Cells[row, 4].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                    }
+                    
+                    ws.Cells[row, 5].Value = item.TongSoLanLam;
+                    ws.Cells[row, 5].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                    
+                    // NGÀY NỘP
+                    if (baiLam.NgayNop.HasValue)
+                    {
+                        ws.Cells[row, 6].Value = baiLam.NgayNop.Value;
+                        ws.Cells[row, 6].Style.Numberformat.Format = "dd/MM/yyyy HH:mm";
+                    }
+                    else
+                    {
+                        ws.Cells[row, 6].Value = "Chưa nộp";
+                    }
+                    
+                    // TRẠNG THÁI
                     string trangThai;
                     if (baiLam.NgayNop.HasValue)
                         trangThai = "Đã nộp";
@@ -493,14 +620,57 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
                     else
                         trangThai = "Chưa làm";
                     
-                    worksheet.Cells[row, 7].Value = trangThai;
+                    ws.Cells[row, 7].Value = trangThai;
+                    ws.Cells[row, 7].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                    
+                    // ⭐ MÀU NỀN XEN KẼ ⭐
+                    if (stt % 2 == 0)
+                    {
+                        for (int col = 1; col <= 7; col++)
+                        {
+                            ws.Cells[row, col].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                            ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(242, 242, 242));
+                        }
+                    }
+                    
+                    // Căn giữa theo chiều dọc
+                    for (int col = 1; col <= 7; col++)
+                    {
+                        ws.Cells[row, col].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                    }
+                    
                     row++;
                 }
 
-                // ⭐ AUTO-FIT COLUMNS ⭐
-                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+                // =====================================================
+                // ⭐ PHẦN 3: ĐỊNH DẠNG VÀ VIỀN BẢNG ⭐
+                // =====================================================
+                
+                // Viền cho bảng điểm
+                var tableRange = ws.Cells[headerRow, 1, row - 1, 7];
+                tableRange.Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                tableRange.Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                tableRange.Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                tableRange.Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
 
-                // ⭐ TRẢ VỀ FILE ⭐
+                // ⭐ AUTO-FIT COLUMNS ⭐
+                ws.Cells[ws.Dimension.Address].AutoFitColumns();
+                
+                // Đặt chiều rộng tối ưu cho các cột
+                ws.Column(1).Width = 8;  // STT
+                ws.Column(2).Width = 15; // Mã SV
+                ws.Column(3).Width = 30; // Họ tên
+                ws.Column(4).Width = 10; // Điểm
+                ws.Column(5).Width = 13; // Số lần làm
+                ws.Column(6).Width = 18; // Ngày nộp
+                ws.Column(7).Width = 15; // Trạng thái
+
+                // ⭐ ĐÓNG BĂNG DÒNG TIÊU ĐỀ ⭐
+                ws.View.FreezePanes(headerRow + 1, 1);
+
+                // =====================================================
+                // ⭐ PHẦN 4: TRẢ VỀ FILE ⭐
+                // =====================================================
                 var stream = new MemoryStream(package.GetAsByteArray());
                 var fileName = $"KetQua_{baiTracNghiem.TenBaiThi.Replace(" ", "_")}_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
 

@@ -1,96 +1,93 @@
-﻿<div class="row g-3 mt-4 p-3 shadow rounded-4 bg-white">
+﻿@{
+    var thongBaos = ViewBag.ThongBaos as List<DoAn4_ClassOnline.Models.ThongBao> ?? new List<DoAn4_ClassOnline.Models.ThongBao>();
+    var khoaHocId = ViewBag.KhoaHocId ?? 0;
+}
+
+<div class="row g-3 mt-4 p-3 shadow rounded-4 bg-white">
     <h5 class="fw-bold mb-3">
         <i class="bi bi-bell me-2 text-danger"></i> Các thông báo chính
     </h5>
 
-    <!-- Thông báo 1 -->
-    <div class="col-12">
-        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
-            <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
-               data-bs-toggle="collapse" href="#collapseThongBao1" role="button" aria-expanded="false" aria-controls="collapseThongBao1">
-
-                <div class="d-flex flex-column flex-md-row justify-content-between w-100">
-                    <div>
-                        <strong>Thông báo 1:</strong> Lịch học tuần này thay đổi sang thứ 4 và thứ 6.
-                    </div>
-                    <div class="text-muted small ms-md-3 mt-2 mt-md-0 me-2">
-                        <span class="text-muted">
-                            <i class="bi bi-clock me-1"></i> 23/10/2025 - 08:30
-                        </span>
-                    </div>
-                </div>
-                <i class="bi bi-chevron-down ms-2"></i>
-            </a>
-        </div>
-        <div class="collapse" id="collapseThongBao1">
-            <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
-                <p>
-                    <strong>Chi tiết:</strong> Lịch học môn IoT tuần này được dời lại do giảng viên bận công tác.
-                    Thời gian học mới là Thứ 4 (14h00 - 16h00) và Thứ 6 (9h00 - 11h00) tại phòng 101.
-                </p>
+    @if (thongBaos == null || thongBaos.Count == 0)
+    {
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                <p class="mb-0">Chưa có thông báo nào trong khóa học này.</p>
+                <small class="text-muted">Total count: @(thongBaos?.Count ?? -1)</small>
             </div>
         </div>
-    </div>
+    }
+    else
+    { 
+        @foreach (var tb in thongBaos)
+        {
+            var collapseId = $"collapseThongBao{tb.ThongBaoId}";
+            var ngayTao = tb.NgayTao != null 
+                ? ((DateTime)tb.NgayTao).ToString("dd/MM/yyyy - HH:mm")
+                : "N/A";
 
-    <!-- Thông báo 2 -->
-    <div class="col-12">
-        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
-            <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
-               data-bs-toggle="collapse" href="#collapseThongBao2" role="button" aria-expanded="false" aria-controls="collapseThongBao2">
+            <div class="col-12">
+                <!-- Header thông báo -->
+                <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
+                    <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
+                       data-bs-toggle="collapse" href="#@collapseId" role="button" 
+                       aria-expanded="false" aria-controls="@collapseId">
 
-                <div class="d-flex flex-column flex-md-row justify-content-between w-100">
-                    <div>
-                        <strong>Thông báo 2:</strong> Hạn nộp bài tập lớn là ngày 10/11/2025.
-                    </div>
-                    <div class="text-muted small ms-md-3 mt-2 mt-md-0">
-                        <span class="text-muted">
-                            <i class="bi bi-clock me-1"></i> 23/10/2025 - 08:30
-                        </span>
-                    </div>
+                        <div class="d-flex flex-column flex-md-row justify-content-between w-100">
+                            <div>
+                                <strong>Thông báo: </strong>
+                                @tb.TieuDe
+                            </div>
+                            <div class="text-muted small ms-md-3 mt-2 mt-md-0 me-2">
+                                <span class="text-muted">
+                                    <i class="bi bi-clock me-1"></i> @ngayTao
+                                </span>
+                            </div>
+                        </div>
+                        <i class="bi bi-chevron-down ms-2"></i>
+                    </a>
                 </div>
 
-                <i class="bi bi-chevron-down ms-2"></i>
-            </a>
-        </div>
-
-        <div class="collapse" id="collapseThongBao2">
-            <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
-                <p>
-                    <strong>Chi tiết:</strong> Sinh viên nộp bài qua hệ thống LMS trước 23:59 ngày 10/11/2025.
-                    Nộp trễ sẽ không được chấm điểm.
-                </p>
-            </div>
-        </div>
-    </div>
-    <!-- Thông báo 3 -->
-    <div class="col-12">
-        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
-            <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
-               data-bs-toggle="collapse" href="#collapseThongBao3" role="button" aria-expanded="false" aria-controls="collapseThongBao3">
-
-                <div class="d-flex flex-column flex-md-row justify-content-between w-100">
-                    <div>
-                        <strong>Thông báo 3:</strong> Buổi ôn tập giữa kỳ tổ chức vào thứ 7 tuần này.
-                    </div>
-                    <div class="text-muted small ms-md-3 mt-2 mt-md-0">
-                        <span class="text-muted">
-                            <i class="bi bi-clock me-1"></i> 23/10/2025 - 08:30
-                        </span>
+                <!-- Nội dung chi tiết -->
+                <div class="collapse" id="@collapseId">
+                    <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
+                        <div>
+                            <strong>Chi tiết:</strong>
+                            <div class="mt-2">
+                                @Html.Raw(tb.NoiDung?.Replace("\n", "<br/>") ?? "Không có nội dung")
+                            </div>
+                        </div>
+                        
+                        @if (tb.NgayCapNhat != null && tb.NgayCapNhat != tb.NgayTao)
+                        {
+                            <div class="mt-3 pt-2 border-top">
+                                <small class="text-muted">
+                                    <i class="bi bi-pencil me-1"></i>
+                                    Cập nhật lần cuối: @(((DateTime)tb.NgayCapNhat).ToString("dd/MM/yyyy - HH:mm"))
+                                </small>
+                            </div>
+                        }
                     </div>
                 </div>
-
-                <i class="bi bi-chevron-down ms-2"></i>
-            </a>
-        </div>
-
-        <div class="collapse" id="collapseThongBao3">
-            <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
-                <p>
-                    <strong>Chi tiết:</strong> Buổi ôn tập diễn ra lúc 8h00 tại phòng A201.
-                    Sinh viên nên mang laptop và tài liệu ôn tập.
-                </p>
             </div>
-        </div>
-    </div>
-
+        }
+    }
 </div>
+
+<style>
+    /* ⭐ ANIMATION CHO CHEVRON ICON ⭐ */
+    .collapsed .bi-chevron-down {
+        transition: transform 0.3s ease;
+    }
+    
+    [aria-expanded="true"] .bi-chevron-down {
+        transform: rotate(180deg);
+    }
+    
+    /* ⭐ HOVER EFFECT ⭐ */
+    .bg-body-tertiary:hover {
+        background-color: #e9ecef !important;
+        transition: background-color 0.2s ease;
+    }
+</style>

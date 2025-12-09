@@ -1,32 +1,43 @@
 ﻿@{
     ViewData["Title"] = "Trang chủ";
-
-    // Dữ liệu mẫu
-    var khoaList = new List<dynamic>
-    {
-        new { MaKhoa = "CNTT", TenKhoa = "Khoa Công nghệ thông tin", Icon = "bi-laptop" },
-        new { MaKhoa = "DDT", TenKhoa = "Khoa Điện - Điện tử", Icon = "bi-lightning-charge" },
-        new { MaKhoa = "CK", TenKhoa = "Khoa Kỹ thuật cơ khí", Icon = "bi-gear-wide-connected" },
-        new { MaKhoa = "XD", TenKhoa = "Khoa Kỹ thuật xây dựng", Icon = "bi-building" },
-        new { MaKhoa = "KHXH", TenKhoa = "Khoa Khoa học xã hội", Icon = "bi-book" }
-    };
+    
+    // Lấy danh sách khoa từ ViewBag (đã được load từ database)
+    var khoaList = ViewBag.KhoaList as IEnumerable<dynamic> ?? new List<dynamic>();
 }
 
-    <!-- Slides -->
+<!-- Slides -->
 <div class="container p-4">
-    <div class="row row-cols-2 row-cols-md-4 g-4">
-        @foreach (var khoa in khoaList)
-        {
-            <div class="col">
-                <a asp-controller="Home" asp-action="chiTietKhoa" asp-route-maKhoa="@khoa.MaKhoa" class="text-decoration-none">
-                    <div class="card custom-card text-center p-4 h-100 border-0 rounded-4 bg-body-tertiary hover-card">
-                        <div class="icon mb-3 text-primary"><i class="bi @khoa.Icon fs-1"></i></div>
-                        <h6 class="fw-bold mb-0 text-dark">@khoa.TenKhoa</h6>
-                    </div>
-                </a>
-            </div>
-        }
-    </div>
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Lỗi: @ViewBag.ErrorMessage
+        </div>
+    }
+    
+    @if (khoaList.Any())
+    {
+        <div class="row row-cols-2 row-cols-md-4 g-4">
+            @foreach (var khoa in khoaList)
+            {
+                <div class="col">
+                    <a asp-controller="Home" asp-action="ChiTietKhoa" asp-route-khoaId="@khoa.KhoaId" class="text-decoration-none">
+                        <div class="card custom-card text-center p-4 h-100 border-0 rounded-4 bg-body-tertiary hover-card">
+                            <div class="icon mb-3 text-primary"><i class="bi @khoa.Icon fs-1"></i></div>
+                            <h6 class="fw-bold mb-0 text-dark">@khoa.TenKhoa</h6>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">
+            <i class="bi bi-info-circle me-2"></i>
+            Hiện tại chưa có thông tin khoa nào.
+        </div>
+    }
 </div>
 
 

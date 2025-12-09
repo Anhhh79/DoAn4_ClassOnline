@@ -143,10 +143,22 @@
                             @if (Model?.BaiLamTracNghiems != null && Model.BaiLamTracNghiems.Any())
                             {
                                 int stt = 1;
-                                foreach (var baiLam in Model.BaiLamTracNghiems.OrderByDescending(b => b.NgayNop))
+                                // ⭐ NHÓM THEO SINH VIÊN VÀ LẤY BÀI LÀM CÓ ĐIỂM CAO NHẤT ⭐
+                                var baiLamTheoSinhVien = Model.BaiLamTracNghiems
+                                    .GroupBy(b => b.SinhVienId)
+                                    .Select(g => g.OrderByDescending(b => b.Diem ?? 0)
+                                                  .ThenByDescending(b => b.NgayNop)
+                                                  .First())
+                                    .OrderByDescending(b => b.NgayNop);
+
+                                foreach (var baiLam in baiLamTheoSinhVien)
                                 {
                                     var diem = baiLam.Diem ?? 0;
                                     var colorClass = diem >= 8 ? "text-success" : diem >= 5 ? "text-warning" : "text-danger";
+                                    
+                                    // ⭐ TÍNH TỔNG SỐ LẦN LÀM CỦA SINH VIÊN ⭐
+                                    var tongSoLanLam = Model.BaiLamTracNghiems
+                                        .Count(b => b.SinhVienId == baiLam.SinhVienId);
                                     
                                     // ⭐ LOGIC: XÁC ĐỊNH TRẠNG THÁI
                                     string trangThai;
@@ -195,7 +207,7 @@
                                             }
                                         </td>
                                         <td class="text-center">
-                                            @(baiLam.SoLanLam ?? 0) lần
+                                            @tongSoLanLam lần
                                         </td>
                                         <td>
                                             @if (baiLam.NgayNop.HasValue)
