@@ -51,9 +51,25 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // ✅ TỰ ĐỘNG LOAD THÔNG BÁO KHI VÀO TRANG
+    // ⭐ KIỂM TRA SESSIONSTORAGE ĐỂ TỰ ĐỘNG LOAD TAB ⭐
+    const activeTab = sessionStorage.getItem('activeTab');
     const khoaHocId = getKhoaHocId();
-    if (khoaHocId) {
+
+    if (activeTab === 'baitap' && khoaHocId) {
+        // Xóa sessionStorage để không tự động load lần sau
+        sessionStorage.removeItem('activeTab');
+
+        console.log('Auto-loading Bài tập for khoaHocId:', khoaHocId);
+        loadNoiDung_Tc('/Teacher/Course/BaiTap');
+        loadDanhSachBaiTap(khoaHocId);
+
+        // Set active cho button Bài tập
+        const btnBaiTap = document.getElementById("btnBaiTap");
+        if (btnBaiTap) {
+            setActiveButton(btnBaiTap);
+        }
+    } else if (khoaHocId) {
+        // ✅ TỰ ĐỘNG LOAD THÔNG BÁO KHI VÀO TRANG (mặc định)
         console.log('Auto-loading Thông báo for khoaHocId:', khoaHocId);
         loadThongBaos(khoaHocId);
 
@@ -62,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (btnThongBao) {
             setActiveButton(btnThongBao);
         }
-    } 
+    }
 
     // Khi bấm Thông báo
     const btnThongBao = document.getElementById("btnThongBao");
@@ -104,6 +120,13 @@ document.addEventListener("DOMContentLoaded", () => {
         btnBaiTap.addEventListener("click", function (e) {
             e.preventDefault();
             loadNoiDung_Tc('/Teacher/Course/BaiTap');
+            const khoaHocId = getKhoaHocId();
+            if (khoaHocId) {
+                loadDanhSachBaiTap(khoaHocId);
+            } else {
+                console.error('khoaHocId is null');
+                showError_tc('Lỗi: Không xác định được ID khóa học!');
+            }
             setActiveButton(this);
         });
     }
