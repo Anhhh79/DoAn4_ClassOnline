@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using DoAn4_ClassOnline.Models;
+using DoAn4_ClassOnline.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,7 @@ builder.Services.AddSession(options =>
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 var app = builder.Build();
 
