@@ -718,6 +718,327 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
                 return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
             }
         }
+
+        // Action xem danh sách nộp bài
+        [HttpGet]
+        public async Task<IActionResult> GetDanhSachNopBai(int baiTapId)
+        {
+            try
+            {
+                // Kiểm tra đăng nhập
+                var userId = HttpContext.Session.GetInt32("UserId");
+                if (userId == null)
+                {
+                    return Json(new { success = false, message = "Vui lòng đăng nhập!" });
+                }
+
+                // Kiểm tra tham số
+                if (baiTapId <= 0)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy bài tập!" });
+                }
+
+                // Lấy thông tin bài tập và kiểm tra quyền
+                var baiTap = await _context.BaiTaps
+                    .AsNoTracking()
+                    .Include(bt => bt.KhoaHoc)
+                    .FirstOrDefaultAsync(bt => bt.BaiTapId == baiTapId);
+
+                if (baiTap == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy bài tập!" });
+                }
+
+                // Kiểm tra quyền truy cập
+                if (baiTap.KhoaHoc.GiaoVienId != userId)
+                {
+                    return Json(new { success = false, message = "Bạn không có quyền xem danh sách nộp bài này!" });
+                }
+
+                // Lấy danh sách nộp bài
+                var danhSachNopBai = await _context.BaiTapNops
+                    .AsNoTracking()
+                    .Where(bn => bn.BaiTapId == baiTapId)
+                    .Include(bn => bn.SinhVien)
+                    .Include(bn => bn.BaiTapNopFiles)
+                    .OrderByDescending(bn => bn.NgayNop)
+                    .ThenBy(bn => bn.SinhVien.FullName)
+                    .Select(bn => new
+                    {
+                        baiNopId = bn.BaiNopId,
+                        sinhVienId = bn.SinhVienId,
+                        tenSinhVien = bn.SinhVien.FullName ?? "",
+                        maSinhVien = bn.SinhVien.MaSo ?? "",
+                        email = bn.SinhVien.Email ?? "",
+                        avatar = bn.SinhVien.Avatar ?? "~/assets/image/default.jpg",
+                        trangThai = bn.TrangThai ?? "ChuaNop",
+                        ngayNop = bn.NgayNop,
+                        diem = bn.Diem,
+                        nhanXet = bn.NhanXet,
+                        ngayCham = bn.NgayCham,
+                        danhSachFile = bn.BaiTapNopFiles.Select(f => new
+                        {
+                            fileId = f.FileId,
+                            tenFile = f.TenFile,
+                            duongDan = f.DuongDan,
+                            kichThuoc = f.KichThuoc,
+                            loaiFile = f.LoaiFile
+                        }).ToList()
+                    })
+                    .ToListAsync();
+
+                // Đếm số lượng đã nộp và chưa nộp
+                var daNop = danhSachNopBai.Count(bn => bn.trangThai == "DaNop");
+                var chuaNop = danhSachNopBai.Count(bn => bn.trangThai == "ChuaNop");
+
+                return Json(new
+                {
+                    success = true,
+                    data = new
+                    {
+                        baiTap = new
+                        {
+                            baiTapId = baiTap.BaiTapId,
+                            tieuDe = baiTap.TieuDe,
+                            thoiGianKetThuc = baiTap.ThoiGianKetThuc,
+                            diemToiDa = baiTap.DiemToiDa ?? 10
+                        },
+                        thongKe = new
+                        {
+                            daNop,
+                            chuaNop,
+                            tongSo = danhSachNopBai.Count
+                        },
+                        danhSachNopBai
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
+
+        // Action chấm điểm bài nộp
+        [HttpPost]
+        public async Task<IActionResult> ChamDiem([FromBody] ChamDiemViewModel model)
+        {
+            try
+            {
+                // Kiểm tra đăng nhập
+                var userId = HttpContext.Session.GetInt32("UserId");
+                if (userId == null)
+                {
+                    return Json(new { success = false, message = "Vui lòng đăng nhập!" });
+                }
+
+                // Kiểm tra tham số
+                if (model.BaiNopId <= 0)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy bài nộp!" });
+                }
+
+                // Validate điểm
+                if (model.Diem < 0)
+                {
+                    return Json(new { success = false, message = "Điểm không được âm!" });
+                }
+
+                // Lấy thông tin bài nộp và kiểm tra quyền
+                var baiNop = await _context.BaiTapNops
+                    .Include(bn => bn.BaiTap)
+                        .ThenInclude(bt => bt.KhoaHoc)
+                    .FirstOrDefaultAsync(bn => bn.BaiNopId == model.BaiNopId);
+
+                if (baiNop == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy bài nộp!" });
+                }
+
+                // Kiểm tra quyền truy cập
+                if (baiNop.BaiTap.KhoaHoc.GiaoVienId != userId)
+                {
+                    return Json(new { success = false, message = "Bạn không có quyền chấm điểm bài nộp này!" });
+                }
+
+                // Kiểm tra điểm tối đa
+                var diemToiDa = baiNop.BaiTap.DiemToiDa ?? 10;
+                if (model.Diem > diemToiDa)
+                {
+                    return Json(new { success = false, message = $"Điểm không được vượt quá {diemToiDa}!" });
+                }
+
+                // Cập nhật điểm
+                baiNop.Diem = model.Diem;
+                baiNop.NgayCham = DateTime.Now;
+
+                await _context.SaveChangesAsync();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Chấm điểm thành công!",
+                    data = new
+                    {
+                        baiNopId = baiNop.BaiNopId,
+                        diem = baiNop.Diem,
+                        ngayCham = baiNop.NgayCham
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                // Có thể thêm log: _logger.LogError(ex, "Lỗi chấm điểm");
+                return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
+
+        // Action xuất CSV danh sách nộp bài
+        [HttpGet]
+        public async Task<IActionResult> XuatCSVDanhSachNopBai(int baiTapId)
+        {
+            try
+            {
+                // Kiểm tra đăng nhập
+                var userId = HttpContext.Session.GetInt32("UserId");
+                if (userId == null)
+                {
+                    return Json(new { success = false, message = "Vui lòng đăng nhập!" });
+                }
+
+                // Kiểm tra tham số
+                if (baiTapId <= 0)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy bài tập!" });
+                }
+
+                // Lấy thông tin bài tập và kiểm tra quyền
+                var baiTap = await _context.BaiTaps
+                    .AsNoTracking()
+                    .Include(bt => bt.KhoaHoc)
+                    .FirstOrDefaultAsync(bt => bt.BaiTapId == baiTapId);
+
+                if (baiTap == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy bài tập!" });
+                }
+
+                // Kiểm tra quyền truy cập
+                if (baiTap.KhoaHoc.GiaoVienId != userId)
+                {
+                    return Json(new { success = false, message = "Bạn không có quyền xuất dữ liệu này!" });
+                }
+
+                // Lấy danh sách nộp bài
+                var danhSachNopBai = await _context.BaiTapNops
+                    .AsNoTracking()
+                    .Where(bn => bn.BaiTapId == baiTapId)
+                    .Include(bn => bn.SinhVien)
+                    .OrderBy(bn => bn.SinhVien.FullName)
+                    .Select(bn => new
+                    {
+                        MaSinhVien = bn.SinhVien.MaSo ?? "",
+                        TenSinhVien = bn.SinhVien.FullName ?? "",
+                        Email = bn.SinhVien.Email ?? "",
+                        TrangThai = bn.TrangThai ?? "ChuaNop",
+                        NgayNop = bn.NgayNop,
+                        Diem = bn.Diem,
+                        ThoiGianKetThuc = baiTap.ThoiGianKetThuc
+                    })
+                    .ToListAsync();
+
+                // Tạo CSV content
+                var csv = new System.Text.StringBuilder();
+
+                // BOM để hỗ trợ tiếng Việt trong Excel
+                csv.Append("\uFEFF");
+
+                // Header
+                csv.AppendLine("STT,MSSV,Họ và tên,Email,Trạng thái,Thời gian nộp,Trạng thái nộp,Điểm");
+
+                // Data rows
+                int stt = 1;
+                foreach (var item in danhSachNopBai)
+                {
+                    var trangThai = item.TrangThai == "DaNop" ? "Đã nộp" : "Chưa nộp";
+                    var ngayNop = item.NgayNop.HasValue ? item.NgayNop.Value.ToString("dd/MM/yyyy HH:mm") : "--";
+
+                    // Tính trạng thái nộp (sớm/đúng hạn/trễ)
+                    string trangThaiNop = "--";
+                    if (item.NgayNop.HasValue && item.ThoiGianKetThuc.HasValue)
+                    {
+                        var timeSpan = item.NgayNop.Value - item.ThoiGianKetThuc.Value;
+                        if (timeSpan.TotalMinutes < -1)
+                        {
+                            var absDays = Math.Abs(timeSpan.Days);
+                            var absHours = Math.Abs(timeSpan.Hours);
+                            var absMinutes = Math.Abs(timeSpan.Minutes);
+
+                            if (absDays > 0)
+                                trangThaiNop = $"Nộp sớm {absDays} ngày";
+                            else if (absHours > 0)
+                                trangThaiNop = $"Nộp sớm {absHours} giờ";
+                            else
+                                trangThaiNop = $"Nộp sớm {absMinutes} phút";
+                        }
+                        else if (Math.Abs(timeSpan.TotalMinutes) < 1)
+                        {
+                            trangThaiNop = "Đúng hạn";
+                        }
+                        else
+                        {
+                            var days = timeSpan.Days;
+                            var hours = timeSpan.Hours;
+                            var minutes = timeSpan.Minutes;
+
+                            if (days > 0)
+                                trangThaiNop = $"Nộp trễ {days} ngày";
+                            else if (hours > 0)
+                                trangThaiNop = $"Nộp trễ {hours} giờ";
+                            else
+                                trangThaiNop = $"Nộp trễ {minutes} phút";
+                        }
+                    }
+
+                    var diem = item.Diem.HasValue ? item.Diem.Value.ToString() : "--";
+
+                    // Escape CSV values (xử lý dấu phẩy và dấu ngoặc kép)
+                    csv.AppendLine($"{stt}," +
+                                  $"\"{EscapeCsv(item.MaSinhVien)}\"," +
+                                  $"\"{EscapeCsv(item.TenSinhVien)}\"," +
+                                  $"\"{EscapeCsv(item.Email)}\"," +
+                                  $"\"{trangThai}\"," +
+                                  $"\"{ngayNop}\"," +
+                                  $"\"{trangThaiNop}\"," +
+                                  $"\"{diem}\"");
+                    stt++;
+                }
+
+                // Tạo file name
+                var safeFileName = $"DanhSachNopBai_{baiTap.TieuDe}_{DateTime.Now:yyyyMMdd_HHmmss}.csv"
+                    .Replace(" ", "_")
+                    .Replace("/", "_")
+                    .Replace("\\", "_");
+
+                // Return file
+                var bytes = System.Text.Encoding.UTF8.GetBytes(csv.ToString());
+                return File(bytes, "text/csv", safeFileName);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
+
+        // Helper method để escape giá trị CSV
+        private string EscapeCsv(string? value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return "";
+
+            // Escape dấu ngoặc kép bằng cách thêm một dấu ngoặc kép nữa
+            return value.Replace("\"", "\"\"");
+        }
     }
 
 
@@ -752,6 +1073,13 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
         public DateTime? ThoiGianKetThuc { get; set; }
         public bool ChoPhepNopTre { get; set; }
         public decimal? DiemToiDa { get; set; } = 10;
+    }
+
+    // ViewModel cho chấm điểm
+    public class ChamDiemViewModel
+    {
+        public int BaiNopId { get; set; }
+        public decimal Diem { get; set; }
     }
 }
 

@@ -671,7 +671,6 @@ async function xoaFileBaiTap(fileId) {
     }
 }
 
-
 // Hàm submit form cập nhật bài tập
 async function capNhatBaiTap() {
     if (!validateEditBaiTap()) {

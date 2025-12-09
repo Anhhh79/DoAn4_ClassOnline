@@ -31,16 +31,42 @@
         text-align: center;
         color: #6c757d;
     }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .status-badge.ontime {
+            background-color: #d1f4e0;
+            color: #0d894f;
+        }
+
+        .status-badge.early {
+            background-color: #cfe2ff;
+            color: #084298;
+        }
+
+        .status-badge.late {
+            background-color: #f8d7da;
+            color: #842029;
+        }
 </style>
 
 <div class="container">
     <!-- Header -->
     <div class="d-flex page-header justify-content-between align-items-center mb-4">
-        <!-- Nút quay lại --> <a class="btn border-0"> <i class="bi bi-chevron-left" onclick="history.back()"></i> Quay lại </a>
+        <a class="btn border-0" onclick="history.back()">
+            <i class="bi bi-chevron-left"></i> Quay lại
+        </a>
 
         <h3 class="fw-bold text-center mb-0 flex-grow-1">Danh sách nộp bài tập</h3>
 
-        <!-- Placeholder to balance -->
         <div style="width:96px;"></div>
     </div>
 
@@ -51,64 +77,64 @@
                 <i class="bi bi-journal-text fs-3"></i>
             </div>
             <div>
-                <div class="fw-semibold">Bài tập: Lập trình sử lý dữ liệu cảm biến </div>
-                <div class="text-muted small">Hạn nộp: <strong>25/10/2025 – 23:59</strong></div>
+                <div class="fw-semibold" id="tenBaiTap_NopBai">Đang tải...</div>
+                <div class="text-muted small">
+                    Hạn nộp: <strong id="hanNop_NopBai">--</strong>
+                </div>
             </div>
 
             <div class="ms-auto d-flex gap-2 align-items-center filter-stats">
-
                 <!-- Đã nộp -->
-                <span class="status-chip btn btn-outline-success ubmitted boder" disabled>
+                <span class="status-chip btn btn-outline-success" disabled>
                     <i class="bi bi-check-circle-fill me-1"></i>
                     Đã nộp:
-                    <strong class="ms-1">12</strong>
+                    <strong class="ms-1" id="soDaNop_NopBai">0</strong>
                 </span>
 
                 <!-- Chưa nộp -->
-                <span class="status-chip not-submitted btn btn-outline-danger">
+                <span class="status-chip btn btn-outline-danger" disabled>
                     <i class="bi bi-x-circle-fill me-1"></i>
                     Chưa nộp:
-                    <strong class="ms-1">23</strong>
+                    <strong class="ms-1" id="soChuaNop_NopBai">0</strong>
                 </span>
-
             </div>
-
         </div>
     </div>
 
     <!-- Filter / Search -->
     <div class="my-4">
-            <div class="row g-2 align-items-center">
-                <div class="col-md-5">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-search"></i></span>
-                        <input type="text" class="form-control" placeholder="Tìm kiếm sinh viên theo tên hoặc MSSV...">
-                    </div>
+        <div class="row g-2 align-items-center">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" id="searchSinhVien_NopBai" class="form-control" placeholder="Tìm kiếm sinh viên theo tên hoặc MSSV...">
                 </div>
+            </div>
 
-                <div class="col-md-3">
-                    <select class="form-select">
-                        <option value="all">Tất cả trạng thái</option>
-                        <option value="submitted">Đã nộp</option>
-                        <option value="not-submitted">Chưa nộp</option>
-                    </select>
-                </div>
+            <div class="col-md-3">
+                <select class="form-select" id="filterTrangThai_NopBai">
+                    <option value="all">Tất cả trạng thái</option>
+                    <option value="DaNop">Đã nộp</option>
+                    <option value="ChuaNop">Chưa nộp</option>
+                </select>
+            </div>
 
-                <div class="col-md-4 text-md-end">
-                    <div class="d-inline-flex gap-2">
-                        <button class="btn btn-outline-primary btn-sm">Xuất CSV</button>
-                        <button class="btn btn-outline-secondary btn-sm">Tải tất cả</button>
-                    </div>
+            <div class="col-md-4 text-md-end">
+                <div class="d-inline-flex gap-2">
+                    <button class="btn btn-outline-primary btn-sm" id="btnXuatCSV" onclick="xuatCSVDanhSachNopBai()">
+                        <i class="bi bi-file-earmark-spreadsheet me-1"></i>Xuất CSV
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
 
     <!-- Table -->
     <div class="card border-0 shadow-sm rounded-4">
         <div class="card-body p-0">
-            <div class="table-responsive" style="max-height: 360px; overflow-y: auto; display: block;">
+            <div class="table-responsive" style="max-height: 480px; overflow-y: auto; display: block;">
                 <table class="table table-hover align-middle mb-0 text-light">
-                    <thead style="position: sticky; top: 0; z-index: 10;">
+                    <thead style="position: sticky; top: 0; z-index: 10; background-color: white;">
                         <tr>
                             <th style="width:60px;">STT</th>
                             <th>Sinh viên</th>
@@ -120,234 +146,114 @@
                             <th class="text-center" style="width:150px;">Hành động</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <!-- Sample: submitted -->
+                    <tbody id="tbody_DanhSachNopBai">
+                        <!-- Data will be loaded here -->
                         <tr>
-                            <td class="align-middle">1</td>
-                            <td class="align-middle">
-                                <div class="d-flex align-items-center">
-                                    <img src="~/assets/image/tải xuống.jpg"
-                                         class="rounded-circle me-3"
-                                         alt="avatar"
-                                         style="width: 40px; height: 40px; object-fit: cover;">
-
-                                    <div>
-                                        <div class="fw-semibold">Nguyễn Văn A</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="align-middle">CNTT2211026</td>
-                            <td class="align-middle">
-                                <span ><i class="bi bi-check-circle me-1"></i>Đã nộp</span>
-                            </td>
-
-                            <td class="align-middle">10/11/2025 – 14:35</td>
-
-                        
-
-                            <td class="align-middle">
-                                <a href="#" class="text-decoration-none"><i class="bi bi-paperclip me-1"></i>bai_lam.pdf</a>
-                            </td>
-
-                            <td class="align-middle"><span class="text-secondary fw-bold">8.5 / 10</span></td>
-                            <td class="align-middle text-center action-btns">
-                                <button class="btn btn-outline-primary btn-sm me-1" title="Xem">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                                <button class="btn btn-outline-success btn-sm" title="Chấm / Sửa điểm">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
+                            <td colspan="8" class="text-center py-4">
+                                <i class="bi bi-hourglass-split fs-3"></i>
+                                <p class="mt-2 text-muted">Đang tải dữ liệu...</p>
                             </td>
                         </tr>
-
-                        <!-- Sample: not submitted -->
-                        <tr>
-                            <td>2</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <img src="~/assets/image/tải xuống.jpg"
-                                         class="rounded-circle me-3"
-                                         alt="avatar"
-                                         style="width: 40px; height: 40px; object-fit: cover;">
-                                    <div>
-                                        <div class="fw-semibold">Trần Thị B</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="align-middle">CNTT2211026</td>
-                            <td><span><i class="bi bi-x-circle me-1"></i>Chưa nộp</span></td>
-
-                            <td class="text-muted">—</td>
-                            <td class="text-muted">—</td>
-                            <td class="text-muted">—</td>
-
-                            <td class="text-center">
-                                <button class="btn btn-outline-secondary btn-sm" disabled title="Chưa có file">
-                                    <i class="bi bi-slash-circle"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="align-middle">1</td>
-                            <td class="align-middle">
-                                <div class="d-flex align-items-center">
-                                    <img src="~/assets/image/tải xuống.jpg"
-                                         class="rounded-circle me-3"
-                                         alt="avatar"
-                                         style="width: 40px; height: 40px; object-fit: cover;">
-
-                                    <div>
-                                        <div class="fw-semibold">Nguyễn Văn A</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="align-middle">CNTT2211026</td>
-                            <td class="align-middle">
-                                <span><i class="bi bi-check-circle me-1"></i>Đã nộp</span>
-                            </td>
-
-                            <td class="align-middle">10/11/2025 – 14:35</td>
-
-
-
-                            <td class="align-middle">
-                                <a href="#" class="text-decoration-none"><i class="bi bi-paperclip me-1"></i>bai_lam.pdf</a>
-                            </td>
-
-                            <td class="text-muted">—</td>
-                            <td class="align-middle text-center action-btns">
-                                <button class="btn btn-outline-primary btn-sm me-1" title="Xem">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                                <button class="btn btn-outline-success btn-sm" title="Chấm / Sửa điểm">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="align-middle">3</td>
-                            <td class="align-middle">
-                                <div class="d-flex align-items-center">
-                                    <img src="~/assets/image/tải xuống.jpg"
-                                         class="rounded-circle me-3"
-                                         alt="avatar"
-                                         style="width: 40px; height: 40px; object-fit: cover;">
-
-                                    <div>
-                                        <div class="fw-semibold">Nguyễn Văn A</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="align-middle">CNTT2211026</td>
-                            <td class="align-middle">
-                                <span ><i class="bi bi-check-circle me-1"></i>Đã nộp</span>
-                            </td>
-
-                            <td class="align-middle">10/11/2025 – 14:35</td>
-
-                        
-
-                            <td class="align-middle">
-                                <a href="#" class="text-decoration-none"><i class="bi bi-paperclip me-1"></i>bai_lam.pdf</a>
-                            </td>
-
-                            <td class="align-middle"><span class="text-secondary fw-bold">8.5 / 10</span></td>
-                            <td class="align-middle text-center action-btns">
-                                <button class="btn btn-outline-primary btn-sm me-1" title="Xem">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                                <button class="btn btn-outline-success btn-sm" title="Chấm / Sửa điểm">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="align-middle">4</td>
-                            <td class="align-middle">
-                                <div class="d-flex align-items-center">
-                                    <img src="~/assets/image/tải xuống.jpg"
-                                         class="rounded-circle me-3"
-                                         alt="avatar"
-                                         style="width: 40px; height: 40px; object-fit: cover;">
-
-                                    <div>
-                                        <div class="fw-semibold">Nguyễn Văn A</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="align-middle">CNTT2211026</td>
-                            <td class="align-middle">
-                                <span><i class="bi bi-check-circle me-1"></i>Đã nộp</span>
-                            </td>
-
-                            <td class="align-middle">10/11/2025 – 14:35</td>
-
-
-
-                            <td class="align-middle">
-                                <a href="#" class="text-decoration-none"><i class="bi bi-paperclip me-1"></i>bai_lam.pdf</a>
-                            </td>
-
-                            <td class="align-middle"><span class="text-secondary fw-bold">8.5 / 10</span></td>
-                            <td class="align-middle text-center action-btns">
-                                <button class="btn btn-outline-primary btn-sm me-1" title="Xem">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                                <button class="btn btn-outline-success btn-sm" title="Chấm / Sửa điểm">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="align-middle">5</td>
-                            <td class="align-middle">
-                                <div class="d-flex align-items-center">
-                                    <img src="~/assets/image/tải xuống.jpg"
-                                         class="rounded-circle me-3"
-                                         alt="avatar"
-                                         style="width: 40px; height: 40px; object-fit: cover;">
-
-                                    <div>
-                                        <div class="fw-semibold">Nguyễn Văn A</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="align-middle">CNTT2211026</td>
-                            <td class="align-middle">
-                                <span><i class="bi bi-check-circle me-1"></i>Đã nộp</span>
-                            </td>
-
-                            <td class="align-middle">10/11/2025 – 14:35</td>
-
-
-
-                            <td class="align-middle">
-                                <a href="#" class="text-decoration-none"><i class="bi bi-paperclip me-1"></i>bai_lam.pdf</a>
-                            </td>
-
-                            <td class="align-middle"><span class="text-secondary fw-bold">8.5 / 10</span></td>
-                            <td class="align-middle text-center action-btns">
-                                <button class="btn btn-outline-primary btn-sm me-1" title="Xem">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                                <button class="btn btn-outline-success btn-sm" title="Chấm / Sửa điểm">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
-                            </td>
-                        </tr>
-
-                        <!-- Nếu không có dữ liệu -->
-                        <!--
-                        <tr>
-                          <td colspan="7">
-                            <div class="no-data">Chưa có học sinh nộp bài nào.</div>
-                          </td>
-                        </tr>
-                        -->
-
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Modal Chấm Điểm -->
+<div class="modal fade" id="modalChamDiem" tabindex="-1" aria-labelledby="modalChamDiemLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content rounded-4">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="modalChamDiemLabel">
+                    <i class="bi bi-pencil-square me-2 text-primary"></i>Chấm điểm bài nộp
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" id="chamDiem_BaiNopId">
+
+                <!-- Thông tin sinh viên -->
+                <div class="card border-0 bg-light mb-3">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-3">
+                            <img id="chamDiem_Avatar" src="/assets/image/tải xuống.jpg"
+                                 class="rounded-circle" style="width: 60px; height: 60px; object-fit: cover;" alt="Avatar">
+                            <div>
+                                <h6 class="mb-1 fw-bold" id="chamDiem_TenSinhVien">--</h6>
+                                <div class="text-muted small">
+                                    <span>MSSV: <strong id="chamDiem_MaSinhVien">--</strong></span>
+                                    <span class="ms-3">Email: <strong id="chamDiem_Email">--</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thông tin bài nộp -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label text-muted small mb-1">
+                            <i class="bi bi-clock-history me-1"></i>Thời gian nộp
+                        </label>
+                        <div class="fw-semibold" id="chamDiem_NgayNop">--</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-muted small mb-1">
+                            <i class="bi bi-hourglass me-1"></i>Trạng thái nộp
+                        </label>
+                        <div id="chamDiem_TrangThaiNop">--</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-muted small mb-1">
+                            <i class="bi bi-file-earmark me-1"></i>Số file đính kèm
+                        </label>
+                        <div class="fw-semibold" id="chamDiem_SoFile">0 file</div>
+                    </div>
+                </div>
+
+                <!-- Danh sách file đính kèm -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold mb-2">
+                        <i class="bi bi-paperclip me-1"></i>File đính kèm
+                    </label>
+                    <div id="chamDiem_DanhSachFile" class="border rounded-3 p-3 bg-white" style="max-height: 200px; overflow-y: auto;">
+                        <!-- Files will be loaded here -->
+                        <div class="text-center text-muted py-2">
+                            <i class="bi bi-inbox"></i>
+                            <p class="mb-0 small">Không có file đính kèm</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form chấm điểm -->
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label for="chamDiem_Diem" class="form-label fw-semibold">
+                            Điểm <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="chamDiem_Diem"
+                                   min="0" step="0.5" placeholder="0" required>
+                            <span class="input-group-text">/ <span id="chamDiem_DiemToiDa" class="ms-1">10</span></span>
+                        </div>
+                        <div class="invalid-feedback" id="errorDiem">Vui lòng nhập điểm hợp lệ!</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg me-1"></i>Hủy
+                </button>
+                <button type="button" class="btn btn-success" onclick="luuChamDiem()">
+                    <i class="bi bi-check-lg me-1"></i>Lưu điểm
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/assets/js/teacher/\quanly-bainop.js"></script>
