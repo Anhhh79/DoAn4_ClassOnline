@@ -30,13 +30,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const btnAdd = document.getElementById('btnAdd');
         const btnPreview = document.getElementById('btnPreview');
         const btnSave = document.getElementById('btnSave');
-        const btnExport = document.getElementById('btnExport');
-        const fileImport = document.getElementById('fileImport');
-        const btnImport = document.getElementById('btnImport');
         const STORAGE_KEY = 'local_test_data_v3';
 
         // ⭐ KIỂM TRA CÁC PHẦN TỬ KHÁC MỘT CÁCH IM LẶNG ⭐
-        const required = { btnAdd, btnPreview, btnSave, btnExport, fileImport, btnImport };
+        const required = { btnAdd, btnPreview, btnSave };
         for (const [k, v] of Object.entries(required)) {
             if (!v) {
                 // ⭐ KHÔNG LOG ERROR, CHỈ THOÁT IM LẶNG ⭐
@@ -48,9 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
         btnAdd.onclick = () => addQuestion();
         btnPreview.onclick = preview;
         btnSave.onclick = (e) => { e.preventDefault(); saveLocal(); };
-        btnExport.onclick = exportJSON;
-        btnImport.onclick = () => fileImport.click();
-        fileImport.onchange = handleImport;
 
         init();
 
@@ -163,6 +157,14 @@ document.addEventListener("DOMContentLoaded", () => {
             </span>
           </div>
         `).join('')}
+
+        <div class="row mb-2">
+          <div class="col">
+            <label class="small">Điểm:</label>
+            <input type="number" min="0" class="form-control question-point" placeholder="Nhập điểm câu hỏi"
+                   value="${data?.point || ''}" required>
+          </div>
+        </div>
       `;
 
             const imgInput = block.querySelector('.img-input');
@@ -223,12 +225,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     const opts = [...b.querySelectorAll('.option-text')].map(o => o.value.trim());
                     const ans = b.querySelector('input[type="radio"]:checked');
                     const img = b.querySelector('.question-img')?.src || null;
+                    const point = b.querySelector('.question-point').value.trim();
 
                     if (!text) throw new Error(`Câu ${i + 1} chưa có nội dung!`);
                     if (opts.some(o => !o)) throw new Error(`Câu ${i + 1} có đáp án bị trống!`);
                     if (!ans) throw new Error(`Câu ${i + 1} chưa chọn đáp án đúng!`);
+                    if (!point) throw new Error(`Câu ${i + 1} chưa có điểm!`);
 
-                    return { text, image: img, options: opts, answer: ans.value, point: pointEach };
+                    return { text, image: img, options: opts, answer: ans.value, point: +point };
                 })
             };
         }
@@ -426,45 +430,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         window.confirmSaveBaiTracNghiem = confirmSaveBaiTracNghiem;
-
-        function exportJSON() {
-            let data;
-            try { 
-                data = collect(); 
-            } catch (e) { 
-                return alert(e.message); 
-            }
-
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "bai_thi.json";
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        function handleImport(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = () => {
-                try {
-                    const data = JSON.parse(reader.result);
-                    questionContainer.innerHTML = "";
-                    qIndex = 0;
-                    data.questions.forEach(q => addQuestion(q, false, true));
-                    updateOrder();
-                    alert("✅ Import thành công!");
-                } catch {
-                    alert("❌ File JSON không hợp lệ!");
-                } finally {
-                    fileImport.value = '';
-                }
-            };
-            reader.readAsText(file);
-        }
 
         function escapeHtml(str) {
             if (!str) return '';
