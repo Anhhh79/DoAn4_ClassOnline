@@ -26,7 +26,10 @@
             var baiTap = baiTaps[i];
             var collapseId = "collapseBaiTap" + baiTap.BaiTapId;
             var baiNop = baiTap.BaiTapNops.FirstOrDefault();
-            var daNop = baiNop != null;
+            
+            // ⭐ CẬP NHẬT LOGIC KIỂM TRA TRẠNG THÁI
+            var daNop = baiNop != null && baiNop.TrangThai == "DaNop";
+            var chuaNop = baiNop == null || baiNop.TrangThai == "ChuaNop";
             var daCham = daNop && baiNop.Diem.HasValue;
             var isQuaHan = baiTap.ThoiGianKetThuc.HasValue && DateTime.Now > baiTap.ThoiGianKetThuc.Value;
 
@@ -132,7 +135,7 @@
                         }
                         else
                         {
-                            <!-- TRƯỜNG HỢP 3: CHƯA NỘP -->
+                            <!-- TRƯỜNG HỢP 3: CHƯA NỘP (bao gồm TrangThai = "ChuaNop" hoặc null) -->
                             <p>
                                 <strong>Trạng thái:</strong> 
                                 <span class="badge @(isQuaHan ? "bg-danger" : "bg-warning text-dark")">

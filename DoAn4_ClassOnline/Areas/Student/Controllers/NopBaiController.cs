@@ -8,10 +8,16 @@ namespace DoAn4_ClassOnline.Areas.Student.Controllers
 	public class NopBaiController : Controller
 	{
 		private readonly ApplicationDbContext _context;
+		private readonly ILogger<NopBaiController> _logger;
 
-		public NopBaiController(ApplicationDbContext context)
+		// ⭐ Định nghĩa constants cho TrangThai
+		private const string TRANG_THAI_CHUA_NOP = "ChuaNop";
+		private const string TRANG_THAI_DA_NOP = "DaNop";
+
+		public NopBaiController(ApplicationDbContext context, ILogger<NopBaiController> logger)
 		{
 			_context = context;
+			_logger = logger;
 		}
 
 		public async Task<IActionResult> Index(int khoaHocId)
@@ -79,30 +85,27 @@ namespace DoAn4_ClassOnline.Areas.Student.Controllers
 					return Json(new { success = false, message = "Đã hết hạn nộp bài!" });
 				}
 
-				// Kiểm tra xem đã nộp chưa
-				var baiNopCu = await _context.BaiTapNops
+				// ⭐ TÌM HOẶC TẠO MỚI BaiTapNop với TrangThai
+				var baiNop = await _context.BaiTapNops
 					.FirstOrDefaultAsync(bn => bn.BaiTapId == baiTapId && bn.SinhVienId == sinhVienId);
 
-				BaiTapNop baiNop;
-				if (baiNopCu != null)
+				bool isNewRecord = false;
+				if (baiNop == null)
 				{
-					// Cập nhật bài nộp cũ
-					baiNopCu.NgayNop = DateTime.Now;
-					baiNopCu.TrangThai = "DaNop";
-					baiNop = baiNopCu;
-				}
-				else
-				{
-					// Tạo bài nộp mới
+					// Tạo record mới với TrangThai = "ChuaNop" ban đầu
 					baiNop = new BaiTapNop
 					{
 						BaiTapId = baiTapId,
 						SinhVienId = sinhVienId.Value,
-						NgayNop = DateTime.Now,
-						TrangThai = "DaNop"
+						TrangThai = TRANG_THAI_CHUA_NOP
 					};
 					_context.BaiTapNops.Add(baiNop);
+					isNewRecord = true;
 				}
+
+				// ⭐ CẬP NHẬT TrangThai và NgayNop
+				baiNop.NgayNop = DateTime.Now;
+				baiNop.TrangThai = TRANG_THAI_DA_NOP;
 
 				await _context.SaveChangesAsync();
 
@@ -136,6 +139,8 @@ namespace DoAn4_ClassOnline.Areas.Student.Controllers
 				_context.BaiTapNopFiles.Add(baiTapNopFile);
 				await _context.SaveChangesAsync();
 
+				_logger.LogInformation($"Sinh viên {sinhVienId} nộp bài {baiTapId} - {(isNewRecord ? "Tạo mới" : "Cập nhật")}");
+
 				// ⭐ TRẢ VỀ DỮ LIỆU ĐẦY ĐỦ ĐỂ CẬP NHẬT UI ⭐
 				return Json(new 
 				{ 
@@ -147,12 +152,14 @@ namespace DoAn4_ClassOnline.Areas.Student.Controllers
 						fileName = file.FileName,
 						filePath = "/assets/baitapnop/" + newFileName,
 						fileExtension = ext,
-						ngayNop = DateTime.Now.ToString("dd/MM/yyyy - HH:mm")
+						ngayNop = DateTime.Now.ToString("dd/MM/yyyy - HH:mm"),
+						trangThai = baiNop.TrangThai
 					}
 				});
 			}
 			catch (Exception ex)
 			{
+				_logger.LogError(ex, "Lỗi khi nộp bài");
 				return Json(new { success = false, message = "Lỗi: " + ex.Message });
 			}
 		}
@@ -177,6 +184,7 @@ namespace DoAn4_ClassOnline.Areas.Student.Controllers
 					return Json(new { success = false, message = "Bài nộp không tồn tại!" });
 				}
 
+				// ⭐ CHỈ XÓA FILES VÀ CẬP NHẬT TrangThai - KHÔNG XÓA RECORD
 				// Xóa file vật lý
 				foreach (var file in baiNop.BaiTapNopFiles)
 				{
@@ -187,15 +195,27 @@ namespace DoAn4_ClassOnline.Areas.Student.Controllers
 					}
 				}
 
-				// Xóa trong database
+				// Xóa records file trong database
 				_context.BaiTapNopFiles.RemoveRange(baiNop.BaiTapNopFiles);
-				_context.BaiTapNops.Remove(baiNop);
+
+				// ⭐ CẬP NHẬT TrangThai thay vì xóa BaiTapNop
+				baiNop.TrangThai = TRANG_THAI_CHUA_NOP;
+				baiNop.NgayNop = null; // Reset ngày nộp
+
 				await _context.SaveChangesAsync();
 
-				return Json(new { success = true, message = "Hủy bài nộp thành công!" });
+				_logger.LogInformation($"Sinh viên {sinhVienId} hủy bài nộp {baiNopId}");
+
+				return Json(new 
+				{ 
+					success = true, 
+					message = "Hủy bài nộp thành công!",
+					trangThai = baiNop.TrangThai
+				});
 			}
 			catch (Exception ex)
 			{
+				_logger.LogError(ex, "Lỗi khi hủy bài nộp");
 				return Json(new { success = false, message = "Lỗi: " + ex.Message });
 			}
 		}
