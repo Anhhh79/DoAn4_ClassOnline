@@ -24,7 +24,7 @@
         {
             var collapseId = $"collapseThongBao{tb.ThongBaoId}";
             var ngayTao = tb.NgayTao != null 
-                ? ((DateTime)tb.NgayTao).ToString("dd/MM/yyyy - HH:mm") 
+                ? ((DateTime)tb.NgayTao).ToString("dd/MM/yyyy - HH:mm")
                 : "N/A";
 
             <div class="col-12">
@@ -36,7 +36,8 @@
 
                         <div class="d-flex flex-column flex-md-row justify-content-between w-100">
                             <div>
-                                <strong>@tb.TieuDe</strong>
+                                <strong>Thông báo: </strong>
+                                @tb.TieuDe
                             </div>
                             <div class="text-muted small ms-md-3 mt-2 mt-md-0 me-2">
                                 <span class="text-muted">

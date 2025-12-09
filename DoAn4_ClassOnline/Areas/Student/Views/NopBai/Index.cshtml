@@ -1,144 +1,226 @@
-﻿<div class="row g-3 mt-4 p-3 shadow rounded-4 bg-white">
+﻿@{
+    var baiTaps = ViewBag.BaiTaps as List<DoAn4_ClassOnline.Models.BaiTap> ?? new List<DoAn4_ClassOnline.Models.BaiTap>();
+    var sinhVienId = ViewBag.SinhVienId ?? 0;
+    var khoaHocId = ViewBag.KhoaHocId ?? 0;
+    var errorMessage = ViewBag.ErrorMessage as string;
+}
+
+<div class="row g-3 mt-4 p-3 shadow rounded-4 bg-white">
     <h5 class="fw-bold mb-3">
         <i class="bi bi-upload me-2 text-primary"></i> Nộp bài tập
     </h5>
 
-    <!-- Bài tập 1 -->
-    <div class="col-12">
-        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
-            <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
-               data-bs-toggle="collapse" href="#collapseBaiTap1" role="button" aria-expanded="false" aria-controls="collapseBaiTap1">
-
-                <div class="d-flex flex-column flex-md-row justify-content-between w-100">
-                    <div>
-                        <strong>Bài tập 1:</strong> Thiết kế hệ thống giám sát nhiệt độ IoT
-                    </div>
-                    <div class="text-muted small ms-md-3 mt-2 mt-md-0">
-                        <i class="bi bi-clock me-1"></i> Hạn nộp: 10/11/2025 - 23:59
-                    </div>
-                </div>
-
-                <i class="bi bi-chevron-down ms-2"></i>
-            </a>
-        </div>  
-
-        <!-- Nội dung sổ xuống -->
-        <div class="collapse" id="collapseBaiTap1">
-            <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
-                <p>
-                    <strong>Trạng thái:</strong>
-                    <span class="badge bg-success">
-                        <i class="bi bi-check-circle me-1"></i> Đã nộp
-                    </span>
-                </p>
-
-                <div>
-                    <p class="mb-1">
-                        <strong>Tệp đã nộp:</strong>
-                        <a href="/uploads/PTTK_FOOTBALL_3TL.docx" download="PTTK_FOOTBALL_3TL.docx"
-                           class="text-decoration-underline text-dark ms-1">
-                            <i class="bi bi-file-earmark-word me-1 text-primary"></i>
-                            PTTK FOOTBALL 3TL.docx
-                        </a>
-                    </p>
-
-                    <p class="mb-0">
-                        <strong>Điểm:</strong> 8.5 / 10
-                    </p>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- Bài tập 2 -->
-    <div class="col-12">
-        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
-            <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
-               data-bs-toggle="collapse" href="#collapseBaiTap2" role="button" aria-expanded="false" aria-controls="collapseBaiTap2">
-
-                <div class="d-flex flex-column flex-md-row justify-content-between w-100">
-                    <div>
-                        <strong>Bài tập 2:</strong> Xây dựng dashboard hiển thị dữ liệu cảm biến
-                    </div>
-                    <div class="text-muted small ms-md-3 mt-2 mt-md-0">
-                        <i class="bi bi-clock me-1"></i> Hạn nộp: 20/11/2025 - 23:59
-                    </div>
-                </div>
-
-                <i class="bi bi-chevron-down ms-2"></i>
-            </a>
-        </div>
-
-        <div class="collapse" id="collapseBaiTap2">
-            <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
-                <p><strong>Trạng thái:</strong> <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split me-1"></i> Chưa nộp</span></p>
-                <form class="mt-2">
-                    <div class="input-group input-group-sm" style="width:300px;" >
-                        <input type="file" class="form-control"  accept=".zip,.rar,.pdf,.docx">
-                        <button class="btn btn-success  " style="color:white;" type="submit">
-                            <i class="bi bi-upload me-1"></i> Nộp bài
-                        </button>
-                    </div>
-                </form>
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="col-12">
+            <div class="alert alert-warning text-center">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                @errorMessage
             </div>
         </div>
-    </div>
-    <!-- Bài tập 3 -->
-    <div class="col-12">
-        <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
-            <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
-               data-bs-toggle="collapse" href="#collapseBaiTap3" role="button" aria-expanded="false" aria-controls="collapseBaiTap3">
+    }
+    else if (baiTaps.Any())
+    {
+        @for (int i = 0; i < baiTaps.Count; i++)
+        {
+            var baiTap = baiTaps[i];
+            var collapseId = "collapseBaiTap" + baiTap.BaiTapId;
+            var baiNop = baiTap.BaiTapNops.FirstOrDefault();
+            var daNop = baiNop != null;
+            var daCham = daNop && baiNop.Diem.HasValue;
+            var isQuaHan = baiTap.ThoiGianKetThuc.HasValue && DateTime.Now > baiTap.ThoiGianKetThuc.Value;
 
-                <div class="d-flex flex-column flex-md-row justify-content-between w-100">
-                    <div>
-                        <strong>Bài tập 3:</strong> Viết báo cáo tổng kết dự án IoT nhóm
-                    </div>
-                    <div class="text-muted small ms-md-3 mt-2 mt-md-0">
-                        <i class="bi bi-clock me-1"></i> Hạn nộp: 01/12/2025 - 23:59
-                    </div>
-                </div>
+            <div class="col-12">
+                <div class="border rounded-3 p-3 mb-2 bg-body-tertiary">
+                    <a class="text-decoration-none text-dark d-flex justify-content-between align-items-center"
+                       data-bs-toggle="collapse" href="#@collapseId" role="button" aria-expanded="false" aria-controls="@collapseId">
 
-                <i class="bi bi-chevron-down ms-2"></i>
-            </a>
-        </div>
-
-        <div class="collapse" id="collapseBaiTap3">
-            <div class="p-3 border rounded-3 mb-3" style="background-color: rgba(243, 246, 248);">
-
-                <!-- ĐÃ NỘP -->
-                <div id="daNopSection">
-                    <p>
-                        <strong>Trạng thái:</strong>
-                        <span class="badge bg-secondary">
-                            <i class="bi bi-check-circle me-1"></i> Đã nộp - Chờ chấm
-                        </span>
-                    </p>
-
-                    <p class="mb-2"><strong>Điểm:</strong> -- / 10</p>
-
-                    <p class="mb-1">
-                        <strong>Tệp đã nộp:</strong>
-                        <a id="fileDaNop" href="/uploads/PTTK_FOOTBALL_3TL.docx" download="PTTK_FOOTBALL_3TL.docx"
-                           class="text-decoration-underline text-dark ms-1">
-                            <i class="bi bi-file-earmark-word me-1 text-primary"></i>
-                            PTTK FOOTBALL 3TL.docx
-                        </a>
-                    </p>
-
-                    <div class="d-flex flex-wrap gap-2">
-                        <div class="input-group input-group-sm" style="width:300px;">
-                            <input type="file" class="form-control" accept=".zip,.rar,.pdf,.docx">
-                            <button class="btn btn-success " style="color:white;" type="submit">
-                                <i class="bi bi-upload me-1"></i> Nộp bài
-                            </button>
+                        <div class="d-flex flex-column flex-md-row justify-content-between w-100">
+                            <div>
+                                <strong>Bài tập @(i + 1):</strong> @baiTap.TieuDe
+                            </div>
+                            <div class="text-muted small ms-md-3 mt-2 mt-md-0">
+                                <i class="bi bi-clock me-1"></i> Hạn nộp: @(baiTap.ThoiGianKetThuc?.ToString("dd/MM/yyyy - HH:mm") ?? "Không giới hạn")
+                            </div>
                         </div>
-                        <button class="btn btn-sm btn-outline-danger" id="btnHuyBai">
-                            <i class="bi bi-x-circle me-1"></i> Hủy bài nộp
-                        </button>
+
+                        <i class="bi bi-chevron-down ms-2"></i>
+                    </a>
+                </div>
+
+                <div class="collapse" id="@collapseId">
+                    <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
+                        
+                        @if (daNop && daCham)
+                        {
+                            <!-- TRƯỜNG HỢP 1: ĐÃ NỘP VÀ ĐÃ CHẤM ĐIỂM -->
+                            <p>
+                                <strong>Trạng thái:</strong>
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle me-1"></i> Đã nộp
+                                </span>
+                            </p>
+
+                            <div>
+                                @if (baiNop.BaiTapNopFiles.Any())
+                                {
+                                    var file = baiNop.BaiTapNopFiles.First();
+                                    var iconClass = GetFileIcon(file.LoaiFile);
+                                    
+                                    <p class="mb-1">
+                                        <strong>Tệp đã nộp:</strong>
+                                        <a href="@file.DuongDan" download="@file.TenFile"
+                                           class="text-decoration-underline text-dark ms-1">
+                                            <i class="bi @iconClass me-1 text-primary"></i>
+                                            @file.TenFile
+                                        </a>
+                                    </p>
+                                }
+
+                                <p class="mb-0">
+                                    <strong>Điểm:</strong> @(baiNop.Diem?.ToString("0.#") ?? "--") / @(baiTap.DiemToiDa?.ToString("0.#") ?? "10")
+                                </p>
+
+                                @if (!string.IsNullOrEmpty(baiNop.NhanXet))
+                                {
+                                    <p class="mb-0 mt-2">
+                                        <strong>Nhận xét:</strong> @baiNop.NhanXet
+                                    </p>
+                                }
+                            </div>
+                        }
+                        else if (daNop && !daCham)
+                        {
+                            <!-- TRƯỜNG HỢP 2: ĐÃ NỘP NHƯNG CHƯA CHẤM -->
+                            <p>
+                                <strong>Trạng thái:</strong>
+                                <span class="badge bg-secondary">
+                                    <i class="bi bi-check-circle me-1"></i> Đã nộp - Chờ chấm
+                                </span>
+                            </p>
+
+                            <p class="mb-2"><strong>Điểm:</strong> -- / @(baiTap.DiemToiDa?.ToString("0.#") ?? "10")</p>
+
+                            @if (baiNop.BaiTapNopFiles.Any())
+                            {
+                                var file = baiNop.BaiTapNopFiles.First();
+                                var iconClass = GetFileIcon(file.LoaiFile);
+                                
+                                <p class="mb-1">
+                                    <strong>Tệp đã nộp:</strong>
+                                    <a href="@file.DuongDan" download="@file.TenFile"
+                                       class="text-decoration-underline text-dark ms-1">
+                                        <i class="bi @iconClass me-1 text-primary"></i>
+                                        @file.TenFile
+                                    </a>
+                                </p>
+                            }
+
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                <form class="upload-form" data-baitap-id="@baiTap.BaiTapId">
+                                    <div class="input-group input-group-sm" style="width:300px;">
+                                        <input type="file" name="file" class="form-control" accept=".zip,.rar,.pdf,.docx" required>
+                                        <button class="btn btn-success" style="color:white;" type="submit">
+                                            <i class="bi bi-upload me-1"></i> Nộp lại
+                                        </button>
+                                    </div>
+                                </form>
+                                <button class="btn btn-sm btn-outline-danger btn-huy-bai" data-bainop-id="@baiNop.BaiNopId">
+                                    <i class="bi bi-x-circle me-1"></i> Hủy bài nộp
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <!-- TRƯỜNG HỢP 3: CHƯA NỘP -->
+                            <p>
+                                <strong>Trạng thái:</strong> 
+                                <span class="badge @(isQuaHan ? "bg-danger" : "bg-warning text-dark")">
+                                    <i class="bi @(isQuaHan ? "bi-x-circle" : "bi-hourglass-split") me-1"></i> 
+                                    @(isQuaHan ? "Quá hạn" : "Chưa nộp")
+                                </span>
+                            </p>
+
+                            @if (!string.IsNullOrEmpty(baiTap.MoTa))
+                            {
+                                <div class="mb-2">
+                                    <strong>Mô tả:</strong>
+                                    <p class="mb-0">@Html.Raw(baiTap.MoTa)</p>
+                                </div>
+                            }
+
+                            @if (baiTap.BaiTapFiles.Any())
+                            {
+                                <div class="mb-2">
+                                    <strong>Tài liệu đính kèm:</strong>
+                                    @foreach (var file in baiTap.BaiTapFiles)
+                                    {
+                                        var iconClass = GetFileIcon(file.LoaiFile);
+                                        <div>
+                                            <a href="@file.DuongDan" download="@file.TenFile" class="text-decoration-underline">
+                                                <i class="bi @iconClass me-1"></i>
+                                                @file.TenFile
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                            }
+
+                            @if (!isQuaHan || baiTap.ChoPhepNopTre == true)
+                            {
+                                <form class="mt-2 upload-form" data-baitap-id="@baiTap.BaiTapId">
+                                    <div class="input-group input-group-sm" style="width:300px;">
+                                        <input type="file" name="file" class="form-control" accept=".zip,.rar,.pdf,.docx" required>
+                                        <button class="btn btn-success" style="color:white;" type="submit">
+                                            <i class="bi bi-upload me-1"></i> Nộp bài
+                                        </button>
+                                    </div>
+                                    @if (isQuaHan && baiTap.ChoPhepNopTre == true)
+                                    {
+                                        <small class="text-warning d-block mt-1">
+                                            <i class="bi bi-exclamation-triangle me-1"></i> Nộp trễ có thể bị trừ điểm
+                                        </small>
+                                    }
+                                </form>
+                            }
+                            else
+                            {
+                                <div class="alert alert-danger mt-2 mb-0">
+                                    <i class="bi bi-x-circle me-2"></i>
+                                    Đã hết hạn nộp bài và không cho phép nộp trễ
+                                </div>
+                            }
+                        }
                     </div>
                 </div>
             </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="bi bi-info-circle me-2"></i>
+                Chưa có bài tập nào trong khóa học này.
+            </div>
         </div>
-    </div>
+    }
 </div>
+
+
+@functions {
+    string GetFileIcon(string loaiFile)
+    {
+        if (string.IsNullOrEmpty(loaiFile)) return "bi-file-earmark";
+        
+        loaiFile = loaiFile.ToLower();
+        
+        if (loaiFile.Contains("doc")) return "bi-file-earmark-word";
+        if (loaiFile.Contains("xls")) return "bi-file-earmark-excel";
+        if (loaiFile.Contains("pdf")) return "bi-file-earmark-pdf";
+        if (loaiFile.Contains("ppt")) return "bi-file-earmark-ppt";
+        if (loaiFile.Contains("zip") || loaiFile.Contains("rar")) return "bi-file-earmark-zip";
+        
+        return "bi-file-earmark";
+    }
+}
