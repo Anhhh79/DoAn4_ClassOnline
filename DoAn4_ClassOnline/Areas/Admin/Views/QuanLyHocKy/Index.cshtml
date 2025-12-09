@@ -57,32 +57,6 @@
                                 </tr>
                             </thead>
                             <tbody id="tableHocKy">
-
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>HK1</td>
-                                    <td>2024 - 2025</td>
-                                    <td>01/09/2024</td>
-                                    <td>15/12/2024</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                                                data-bs-target="#modalSuaHocKy">
-                                            Sửa
-                                        </button>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <th scope="row">2</th>
-                                    <td>HK2</td>
-                                    <td>2024 - 2025</td>
-                                    <td>10/01/2025</td>
-                                    <td>20/05/2025</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-warning">Sửa</button>
-                                    </td>
-                                </tr>
-
                             </tbody>
                         </table>
                     </div>
@@ -105,22 +79,24 @@
 
             <div class="modal-body px-4">
 
-                <div class="mb-2">
-                    <label class="form-label fw-semibold">Học kỳ</label>
-                    <input type="text" class="form-control" id="hocKy_Them" placeholder="VD: HK1">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Học kỳ <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="hocKy_Them" placeholder="VD: HK1, HK2, HK3">
+                    <small class="text-danger" id="errorHocKy_Them"></small>
                 </div>
 
-                <div class="mb-2">
-                    <label class="form-label fw-semibold">Năm học</label>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Năm học <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="namHoc_Them" placeholder="VD: 2024 - 2025">
+                    <small class="text-danger" id="errorNamHoc_Them"></small>
                 </div>
 
-                <div class="mb-2">
+                <div class="mb-3">
                     <label class="form-label fw-semibold">Thời gian bắt đầu</label>
                     <input type="text" class="form-control" id="batDau_Them">
                 </div>
 
-                <div class="mb-2">
+                <div class="mb-3">
                     <label class="form-label fw-semibold">Thời gian kết thúc</label>
                     <input type="text" class="form-control" id="ketThuc_Them">
                 </div>
@@ -151,22 +127,24 @@
 
                 <input type="hidden" id="idHocKy_Sua">
 
-                <div class="mb-2">
-                    <label class="form-label fw-semibold">Học kỳ</label>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Học kỳ <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="hocKy_Sua">
+                    <small class="text-danger" id="errorHocKy_Sua"></small>
                 </div>
 
-                <div class="mb-2">
-                    <label class="form-label fw-semibold">Năm học</label>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Năm học <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="namHoc_Sua">
+                    <small class="text-danger" id="errorNamHoc_Sua"></small>
                 </div>
 
-                <div class="mb-2">
+                <div class="mb-3">
                     <label class="form-label fw-semibold">Thời gian bắt đầu</label>
                     <input type="text" class="form-control" id="batDau_Sua">
                 </div>
 
-                <div class="mb-2">
+                <div class="mb-3">
                     <label class="form-label fw-semibold">Thời gian kết thúc</label>
                     <input type="text" class="form-control" id="ketThuc_Sua">
                 </div>
@@ -182,3 +160,5 @@
         </div>
     </div>
 </div>
+
+<script src="~/assets/js/Admin/quanly-hocky.js"></script>
