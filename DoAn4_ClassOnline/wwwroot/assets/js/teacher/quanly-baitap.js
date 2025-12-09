@@ -104,8 +104,8 @@ function renderDanhSachBaiTap(danhSach) {
                         <!-- Thống kê bài nộp -->
                         <div class="d-flex justify-content-between align-items-center">
                             <div><strong>Đã nộp:</strong> ${baiTap.soBaiNop} / ${baiTap.soHocVien} sinh viên</div>
-                            <a class="btn btn-outline-primary btn-sm" 
-                               href="/Teacher/Course/DanhSachNopBai?baiTapId=${baiTap.baiTapId}">
+                            <a class="btn btn-outline-primary btn-sm"
+                               href="/Teacher/Course/DanhSachNopBai?baiTapId=${baiTap.baiTapId}&khoaHocId=${baiTap.khoaHocId}">
                                 Xem danh sách nộp bài
                             </a>
                         </div>
