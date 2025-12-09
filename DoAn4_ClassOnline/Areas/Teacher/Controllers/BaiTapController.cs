@@ -378,7 +378,349 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
             }
         }
 
+
+        // Action xóa bài tập
+        [HttpPost]
+        public async Task<IActionResult> XoaBaiTap([FromBody] int baiTapId)
+        {
+            try
+            {
+                // Kiểm tra đăng nhập
+                var userId = HttpContext.Session.GetInt32("UserId");
+                if (userId == null)
+                {
+                    return Json(new { success = false, message = "Vui lòng đăng nhập!" });
+                }
+
+                // Kiểm tra tham số
+                if (baiTapId <= 0)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy bài tập!" });
+                }
+
+                // Lấy thông tin bài tập và kiểm tra quyền
+                var baiTap = await _context.BaiTaps
+                    .Include(bt => bt.KhoaHoc)
+                    .Include(bt => bt.BaiTapFiles)
+                    .Include(bt => bt.BaiTapNops)
+                        .ThenInclude(bn => bn.BaiTapNopFiles)
+                    .FirstOrDefaultAsync(bt => bt.BaiTapId == baiTapId);
+
+                if (baiTap == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy bài tập!" });
+                }
+
+                // Kiểm tra quyền truy cập
+                if (baiTap.KhoaHoc.GiaoVienId != userId)
+                {
+                    return Json(new { success = false, message = "Bạn không có quyền xóa bài tập này!" });
+                }
+
+                // Xóa files bài tập trên server
+                var uploadPath = Path.Combine(_env.WebRootPath, "uploads", "baitap", baiTap.BaiTapId.ToString());
+                if (Directory.Exists(uploadPath))
+                {
+                    try
+                    {
+                        Directory.Delete(uploadPath, true);
+                    }
+                    catch (Exception)
+                    {
+                        // Log lỗi xóa file nhưng vẫn tiếp tục xóa database
+                        // _logger.LogWarning(ex, "Không thể xóa thư mục files của bài tập {BaiTapId}", baiTapId);
+                    }
+                }
+
+                // Xóa files bài nộp của sinh viên trên server
+                foreach (var baiNop in baiTap.BaiTapNops)
+                {
+                    var baiNopPath = Path.Combine(_env.WebRootPath, "assets", "baitapnop", baiNop.BaiNopId.ToString());
+                    if (Directory.Exists(baiNopPath))
+                    {
+                        try
+                        {
+                            Directory.Delete(baiNopPath, true);
+                        }
+                        catch (Exception)
+                        {
+                            // Bỏ qua lỗi xóa file
+                        }
+                    }
+                }
+
+                // Xóa dữ liệu trong database (cascade delete sẽ xóa BaiTapFiles, BaiTapNops và BaiTapNopFiles)
+                _context.BaiTaps.Remove(baiTap);
+                await _context.SaveChangesAsync();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Xóa bài tập thành công!"
+                });
+            }
+            catch (Exception ex)
+            {
+                // Có thể thêm log: _logger.LogError(ex, "Lỗi xóa bài tập");
+                return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
+
+        // Action load dữ liệu bài tập để sửa
+        [HttpGet]
+        public async Task<IActionResult> GetBaiTapById(int baiTapId)
+        {
+            try
+            {
+                // Kiểm tra đăng nhập
+                var userId = HttpContext.Session.GetInt32("UserId");
+                if (userId == null)
+                {
+                    return Json(new { success = false, message = "Vui lòng đăng nhập!" });
+                }
+
+                // Kiểm tra tham số
+                if (baiTapId <= 0)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy bài tập!" });
+                }
+
+                // Lấy thông tin bài tập và kiểm tra quyền
+                var baiTap = await _context.BaiTaps
+                    .AsNoTracking()
+                    .Include(bt => bt.KhoaHoc)
+                    .Include(bt => bt.BaiTapFiles)
+                    .FirstOrDefaultAsync(bt => bt.BaiTapId == baiTapId);
+
+                if (baiTap == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy bài tập!" });
+                }
+
+                // Kiểm tra quyền truy cập
+                if (baiTap.KhoaHoc.GiaoVienId != userId)
+                {
+                    return Json(new { success = false, message = "Bạn không có quyền truy cập bài tập này!" });
+                }
+
+                // Trả về dữ liệu bài tập
+                var result = new
+                {
+                    baiTapId = baiTap.BaiTapId,
+                    khoaHocId = baiTap.KhoaHocId,
+                    tieuDe = baiTap.TieuDe,
+                    moTa = baiTap.MoTa,
+                    thoiGianBatDau = baiTap.ThoiGianBatDau?.ToString("yyyy-MM-ddTHH:mm"),
+                    thoiGianKetThuc = baiTap.ThoiGianKetThuc?.ToString("yyyy-MM-ddTHH:mm"),
+                    choPhepNopTre = baiTap.ChoPhepNopTre ?? false,
+                    diemToiDa = baiTap.DiemToiDa ?? 10,
+                    ngayTao = baiTap.NgayTao,
+                    danhSachFile = baiTap.BaiTapFiles.Select(f => new
+                    {
+                        fileId = f.FileId,
+                        tenFile = f.TenFile,
+                        duongDan = f.DuongDan,
+                        kichThuoc = f.KichThuoc,
+                        loaiFile = f.LoaiFile,
+                        loaiFileBaiTap = f.LoaiFileBaiTap
+                    }).ToList()
+                };
+
+                return Json(new
+                {
+                    success = true,
+                    data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                // Có thể thêm log: _logger.LogError(ex, "Lỗi lấy thông tin bài tập");
+                return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
+
+        // Action xóa file bài tập
+        [HttpPost]
+        public async Task<IActionResult> XoaFileBaiTap([FromBody] int fileId)
+        {
+            try
+            {
+                // Kiểm tra đăng nhập
+                var userId = HttpContext.Session.GetInt32("UserId");
+                if (userId == null)
+                {
+                    return Json(new { success = false, message = "Vui lòng đăng nhập!" });
+                }
+
+                // Kiểm tra tham số
+                if (fileId <= 0)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy file!" });
+                }
+
+                // Lấy thông tin file và kiểm tra quyền
+                var baiTapFile = await _context.BaiTapFiles
+                    .Include(f => f.BaiTap)
+                        .ThenInclude(bt => bt.KhoaHoc)
+                    .FirstOrDefaultAsync(f => f.FileId == fileId);
+
+                if (baiTapFile == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy file!" });
+                }
+
+                // Kiểm tra quyền truy cập
+                if (baiTapFile.BaiTap.KhoaHoc.GiaoVienId != userId)
+                {
+                    return Json(new { success = false, message = "Bạn không có quyền xóa file này!" });
+                }
+
+                // Xóa file vật lý trên server
+                var filePath = Path.Combine(_env.WebRootPath, baiTapFile.DuongDan.TrimStart('/'));
+                if (System.IO.File.Exists(filePath))
+                {
+                    try
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+                    catch (Exception)
+                    {
+                        // Log lỗi nhưng vẫn tiếp tục xóa database
+                        // _logger.LogWarning(ex, "Không thể xóa file vật lý {FilePath}", filePath);
+                    }
+                }
+
+                // Xóa bản ghi trong database
+                _context.BaiTapFiles.Remove(baiTapFile);
+                await _context.SaveChangesAsync();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Xóa file thành công!"
+                });
+            }
+            catch (Exception ex)
+            {
+                // Có thể thêm log: _logger.LogError(ex, "Lỗi xóa file bài tập");
+                return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
+
+        // Action cập nhật bài tập
+        [HttpPost]
+        public async Task<IActionResult> CapNhatBaiTap([FromForm] CapNhatBaiTapViewModel model, List<IFormFile>? files)
+        {
+            try
+            {
+                // Kiểm tra đăng nhập
+                var userId = HttpContext.Session.GetInt32("UserId");
+                if (userId == null)
+                {
+                    return Json(new { success = false, message = "Vui lòng đăng nhập!" });
+                }
+
+                // Kiểm tra tham số
+                if (model.BaiTapId <= 0)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy bài tập!" });
+                }
+
+                // Lấy thông tin bài tập và kiểm tra quyền
+                var baiTap = await _context.BaiTaps
+                    .Include(bt => bt.KhoaHoc)
+                    .FirstOrDefaultAsync(bt => bt.BaiTapId == model.BaiTapId);
+
+                if (baiTap == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy bài tập!" });
+                }
+
+                // Kiểm tra quyền truy cập
+                if (baiTap.KhoaHoc.GiaoVienId != userId)
+                {
+                    return Json(new { success = false, message = "Bạn không có quyền cập nhật bài tập này!" });
+                }
+
+                // Validate dữ liệu
+                if (string.IsNullOrWhiteSpace(model.TieuDe))
+                {
+                    return Json(new { success = false, message = "Vui lòng nhập tiêu đề bài tập!" });
+                }
+
+                if (model.ThoiGianBatDau.HasValue && model.ThoiGianKetThuc.HasValue
+                    && model.ThoiGianKetThuc <= model.ThoiGianBatDau)
+                {
+                    return Json(new { success = false, message = "Thời gian kết thúc phải sau thời gian bắt đầu!" });
+                }
+
+                // Cập nhật thông tin bài tập
+                baiTap.TieuDe = model.TieuDe.Trim();
+                baiTap.MoTa = model.MoTa?.Trim();
+                baiTap.ThoiGianBatDau = model.ThoiGianBatDau;
+                baiTap.ThoiGianKetThuc = model.ThoiGianKetThuc;
+
+                // Xử lý upload files mới nếu có
+                if (files != null && files.Any())
+                {
+                    var uploadPath = Path.Combine(_env.WebRootPath, "uploads", "baitap", baiTap.BaiTapId.ToString());
+                    if (!Directory.Exists(uploadPath))
+                    {
+                        Directory.CreateDirectory(uploadPath);
+                    }
+
+                    foreach (var file in files)
+                    {
+                        if (file.Length > 0)
+                        {
+                            // Lấy tên file an toàn
+                            string safeFileName = Path.GetFileName(file.FileName);
+                            safeFileName = string.Concat(safeFileName.Split(Path.GetInvalidFileNameChars()));
+                            var fileName = $"{Guid.NewGuid()}_{safeFileName}";
+                            var filePath = Path.Combine(uploadPath, fileName);
+
+                            using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await file.CopyToAsync(stream);
+                            }
+
+                            var baiTapFile = new BaiTapFile
+                            {
+                                BaiTapId = baiTap.BaiTapId,
+                                TenFile = safeFileName,
+                                DuongDan = $"/uploads/baitap/{baiTap.BaiTapId}/{fileName}",
+                                KichThuoc = file.Length,
+                                LoaiFile = Path.GetExtension(file.FileName)?.ToLower(),
+                                LoaiFileBaiTap = "DeBai"
+                            };
+
+                            _context.BaiTapFiles.Add(baiTapFile);
+                        }
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Cập nhật bài tập thành công!",
+                    data = new
+                    {
+                        baiTapId = baiTap.BaiTapId,
+                        tieuDe = baiTap.TieuDe
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                // Có thể thêm log: _logger.LogError(ex, "Lỗi cập nhật bài tập");
+                return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
     }
+
+
 
     // ViewModel cho form tạo bài tập
     public class BaiTapViewModel
@@ -400,5 +742,16 @@ namespace DoAn4_ClassOnline.Areas.Teacher.Controllers
         public List<int>? DanhSachSinhVienId { get; set; } // Danh sách sinh viên được chọn
     }
 
+    // ViewModel cho form cập nhật bài tập
+    public class CapNhatBaiTapViewModel
+    {
+        public int BaiTapId { get; set; }
+        public string TieuDe { get; set; } = string.Empty;
+        public string? MoTa { get; set; }
+        public DateTime? ThoiGianBatDau { get; set; }
+        public DateTime? ThoiGianKetThuc { get; set; }
+        public bool ChoPhepNopTre { get; set; }
+        public decimal? DiemToiDa { get; set; } = 10;
+    }
 }
 

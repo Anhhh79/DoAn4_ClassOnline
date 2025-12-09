@@ -82,9 +82,7 @@ function renderDanhSachBaiTap(danhSach) {
 
                     <div class="text-end">
                         <button class="btn btn-outline-secondary btn-sm me-2" 
-                                onclick="editBaiTap(${baiTap.baiTapId})"
-                                data-bs-toggle="modal" 
-                                data-bs-target="#editBaiTapModal">
+                                onclick="moModalSuaBaiTap(${baiTap.baiTapId})">
                             <i class="bi bi-pencil"></i> Sửa
                         </button>
                         <button class="btn btn-outline-danger btn-sm" 
@@ -547,3 +545,279 @@ function resetFormTaoBaiTap() {
     // Enable lại button nếu bị disabled
     $("#btnLuuBaiTap").prop("disabled", false).html("Lưu bài tập");
 }
+
+// Hàm xóa bài tập
+async function deleteBaiTap(baiTapId) {
+    const result = await showDeleteConfirm_tc("Bạn có chắc chắn muốn xóa tất cả dữ liệu của bài tập này?");
+
+    if (!result.isConfirmed) return;
+
+    try {
+        const response = await fetch('/Teacher/BaiTap/XoaBaiTap', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(baiTapId)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showSuccess_tc(data.message);
+            loadDanhSachBaiTap($('#khoaHocId_ChiTiet').val());
+        } else {
+            showError_tc(data.message);
+        }
+
+    } catch (error) {
+        showError_tc("Lỗi kết nối server!");
+        console.error(error);
+    }
+}
+
+async function moModalSuaBaiTap(baiTapId) {
+    try {
+        const response = await fetch(`/Teacher/BaiTap/GetBaiTapById?baiTapId=${baiTapId}`);
+        const result = await response.json();
+        if (result.success) {
+            const data = result.data;
+
+            // Điền dữ liệu vào form
+            document.getElementById('editBaiTapId').value = data.baiTapId;
+            document.getElementById('editKhoaHocId').value = data.khoaHocId;
+            document.getElementById('editTieuDe').value = data.tieuDe;
+            document.getElementById('editMoTa').value = data.moTa || '';
+            document.getElementById('editThoiGianBatDau').value = data.thoiGianBatDau?.slice(0, 16) || '';
+            document.getElementById('editThoiGianKetThuc').value = data.thoiGianKetThuc?.slice(0, 16) || '';
+
+            // Render danh sách file
+            hienThiDanhSachFile(data.danhSachFile);
+            resetLoiEditBaiTap();
+            // Mở modal
+            openModal('editBaiTapModal');
+        } else {
+            showError_tc(result.message);
+        }
+    } catch (error) {
+        console.error('Lỗi:', error);
+        showError_tc('Có lỗi xảy ra khi tải dữ liệu bài tập!');
+    }
+}
+
+function hienThiDanhSachFile(files) {
+    const container = document.getElementById("currentFilesBaiTap");
+    container.innerHTML = ""; // Xóa file cũ trước khi render
+
+    if (!files || files.length === 0) {
+        container.innerHTML = "<p class='text-muted small'>Không có file đính kèm.</p>";
+        return;
+    }
+
+    files.forEach(file => {
+        const item = document.createElement("div");
+        item.className = "file-item d-flex justify-content-between align-items-center border rounded-2 p-2 mb-1 bg-white";
+
+        item.id = `file-item-${file.fileId}`;
+
+        item.innerHTML = `
+            <div class="d-flex align-items-center">
+                <i class="bi bi-file-earmark text-primary fs-5 me-2"></i>
+                <a href="${file.duongDan}" target="_blank" class="text-decoration-none text-dark">
+                    ${file.tenFile}
+                </a>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="xoaFileBaiTap(${file.fileId})">
+                <i class="bi bi-trash"></i>
+            </button>
+        `;
+
+        container.appendChild(item);
+    });
+}
+
+// Hàm xóa file bài tập
+async function xoaFileBaiTap(fileId) {
+    const result = await showDeleteConfirm_tc("Bạn có chắc chắn muốn xóa file này?");
+
+    if (!result.isConfirmed) return;
+
+    try {
+        const response = await fetch('/Teacher/BaiTap/XoaFileBaiTap', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(fileId)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            // Thông báo thành công
+            showSuccess_tc(result.message);
+
+            // Xóa file khỏi danh sách hiển thị
+            $(`#file-item-${fileId}`).fadeOut(300, function () {
+                $(this).remove();
+            });
+            loadDanhSachBaiTap($('#khoaHocId_ChiTiet').val());
+        } else {
+            showError_tc(result.message);
+        }
+    } catch (error) {
+        console.error('Lỗi:', error);
+        showError_tc('Có lỗi xảy ra khi xóa file!');
+    }
+}
+
+
+// Hàm submit form cập nhật bài tập
+async function capNhatBaiTap() {
+    if (!validateEditBaiTap()) {
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('BaiTapId', document.getElementById('editBaiTapId').value);
+    formData.append('TieuDe', document.getElementById('editTieuDe').value);
+    formData.append('MoTa', document.getElementById('editMoTa').value);
+    formData.append('ThoiGianBatDau', document.getElementById('editThoiGianBatDau').value);
+    formData.append('ThoiGianKetThuc', document.getElementById('editThoiGianKetThuc').value);
+
+    // Thêm files mới
+    const fileInput = document.getElementById('editFiles');
+    if (fileInput && fileInput.files.length > 0) {
+        for (let i = 0; i < fileInput.files.length; i++) {
+            formData.append("Files", fileInput.files[i]);
+        }
+    }
+
+    try {
+        const response = await fetch('/Teacher/BaiTap/CapNhatBaiTap', {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showSuccess_tc(result.message || 'Cập nhật bài tập thành công!');
+            closeModal('editBaiTapModal');
+            loadDanhSachBaiTap($('#khoaHocId_ChiTiet').val());
+        } else {
+            showError_tc(result.message || 'Cập nhật bài tập thất bại!');
+        }
+
+    } catch (error) {
+        console.error('Lỗi:', error);
+        showError_tc('Có lỗi xảy ra khi cập nhật bài tập!');
+    }
+}
+
+function validateEditBaiTap() {
+    let isValid = true;
+    let errors = [];
+
+    // Lấy dữ liệu
+    const tieuDe = document.getElementById('editTieuDe');
+    const moTa = document.getElementById('editMoTa');
+    const batDau = document.getElementById('editThoiGianBatDau');
+    const ketThuc = document.getElementById('editThoiGianKetThuc');
+    const files = document.getElementById('editFiles');
+
+    // Reset toàn bộ lỗi trước khi validate
+    resetLoiEditBaiTap();
+
+    // ==============================
+    // 1. Kiểm tra tiêu đề
+    // ==============================
+    if (!tieuDe.value.trim()) {
+        isValid = false;
+        hienThiLoi(tieuDe, "Tiêu đề không được để trống.");
+    }
+
+    // ==============================
+    // 2. Kiểm tra mô tả
+    // ==============================
+    if (!moTa.value.trim()) {
+        isValid = false;
+        hienThiLoi(moTa, "Mô tả không được để trống.");
+    }
+
+    // ==============================
+    // 3. Kiểm tra thời gian hợp lệ
+    // ==============================
+    const now = new Date();
+
+    if (!batDau.value) {
+        isValid = false;
+        hienThiLoi(batDau, "Vui lòng chọn thời gian bắt đầu.");
+    } else {
+        const start = new Date(batDau.value);
+    }
+
+    if (!ketThuc.value) {
+        isValid = false;
+        hienThiLoi(ketThuc, "Vui lòng chọn thời gian kết thúc.");
+    } else {
+        const start = new Date(batDau.value);
+        const end = new Date(ketThuc.value);
+
+        // 3.2 Kết thúc phải sau bắt đầu
+        if (batDau.value && end <= start) {
+            isValid = false;
+            hienThiLoi(ketThuc, "Thời gian kết thúc phải sau thời gian bắt đầu.");
+        }
+    }
+
+    // ==============================
+    // 4. Kiểm tra file mới (nếu có)
+    // ==============================
+    const allowed = ["pdf", "doc", "docx", "png", "jpg", "jpeg", "ppt", "pptx", "xlsx"];
+
+    if (files.files.length > 0) {
+        for (let f of files.files) {
+            let ext = f.name.split('.').pop().toLowerCase();
+            if (!allowed.includes(ext)) {
+                isValid = false;
+                hienThiLoi(files, `File "${f.name}" không đúng định dạng cho phép.`);
+            }
+        }
+    }
+
+    // ==============================
+    // 5. Nếu đã xóa hết file cũ → phải chọn ít nhất 1 file mới
+    // ==============================
+    const currentFileItems = document.querySelectorAll("#currentFilesBaiTap .file-item");
+
+    if (currentFileItems.length === 0 && files.files.length === 0) {
+        isValid = false;
+        hienThiLoi(files, "Bạn cần có ít nhất 1 file.");
+    }
+
+    // ==============================
+    // 6. Nếu có lỗi → hiện Swal
+    // ==============================
+
+    return isValid;
+}
+
+
+function resetLoiEditBaiTap() {
+    document.querySelectorAll(".invalid-feedback-edit").forEach(el => el.remove());
+    document.querySelectorAll("#editBaiTapModal .is-invalid").forEach(el => {
+        el.classList.remove("is-invalid");
+    });
+}
+
+function hienThiLoi(input, message) {
+    input.classList.add("is-invalid");
+
+    const errorDiv = document.createElement("div");
+    errorDiv.className = "invalid-feedback-edit text-danger small mt-1";
+    errorDiv.innerText = message;
+
+    input.parentElement.appendChild(errorDiv);
+}
+
