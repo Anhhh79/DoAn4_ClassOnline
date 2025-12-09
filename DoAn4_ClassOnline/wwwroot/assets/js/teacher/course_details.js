@@ -88,6 +88,12 @@ document.addEventListener("DOMContentLoaded", () => {
         btnTaiLieu.addEventListener("click", function (e) {
             e.preventDefault();
             loadNoiDung_Tc('/Teacher/Course/TaiLieu');
+            if (khoaHocId) {
+                loadTaiLieu_ChiTiet(khoaHocId);
+            } else {
+                console.error('khoaHocId is null');
+                showError_tc('Lỗi: Không xác định được ID khóa học!');
+            }
             setActiveButton(this);
         });
     }
@@ -130,27 +136,25 @@ document.addEventListener("DOMContentLoaded", () => {
 // tạo phòng học — không cần bind nếu gọi từ onclick trên button trong modal
 window.startMeeting = async function () {
     try {
-        // Lấy phần tử input
         const linkEl = document.getElementById("meetLink");
         if (!linkEl) {
-            console.error("Không tìm thấy phần tử #meetLink trên trang.");
-            alert("Lỗi: Không tìm thấy ô nhập link Meet trên trang này.");
+            showError_tc("Lỗi: Không tìm thấy ô nhập link Meet.");
             return;
         }
 
         const link = linkEl.value.trim();
         if (!link) {
-            alert("Vui lòng nhập link Google Meet.");
+            showWarning_tc("Vui lòng nhập link Google Meet.");
             return;
         }
 
-        // Kiểm tra định dạng đơn giản (bắt đầu bằng http:// hoặc https://)
-        if (!/^https?:\/\//i.test(link)) {
-            alert("Vui lòng nhập link hợp lệ, bắt đầu bằng http:// hoặc https://");
+        // Kiểm tra link chính xác
+        if (!isValidGoogleMeet(link)) {
+            showWarning_tc("Vui lòng nhập link Google Meet hợp lệ (ví dụ: https://meet.google.com/abc-defg-hij).");
             return;
         }
 
-        // Thử kiểm tra thiết bị (camera/micro) — nếu không có sẽ cảnh báo nhưng vẫn cho phép tiếp tục
+        // Kiểm tra camera/micro (như cũ)
         try {
             if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
                 const devices = await navigator.mediaDevices.enumerateDevices();
@@ -158,36 +162,42 @@ window.startMeeting = async function () {
                 const hasAudio = devices.some(d => d.kind === "audioinput");
 
                 if (!hasVideo && !hasAudio) {
-                    const proceed = confirm("Không phát hiện camera/micro. Bạn vẫn có thể vào Meet nhưng sẽ không lên hình/âm thanh.\n\nBạn có muốn tiếp tục?");
-                    if (!proceed) return;
+                    const result = await window.showConfirm_tc(
+                        "Không phát hiện camera/micro. Bạn vẫn có thể vào Meet nhưng sẽ không lên hình/âm thanh.\n\nBạn có muốn tiếp tục?"
+                    );
+                    if (!result.isConfirmed) return;
                 } else if (!hasVideo) {
-                    const proceed = confirm("Không phát hiện camera. Bạn vẫn có thể tham gia Meet nhưng sẽ không lên hình.\n\nBạn có muốn tiếp tục?");
-                    if (!proceed) return;
+                    const result = await window.showConfirm_tc(
+                        "Không phát hiện camera. Bạn vẫn có thể tham gia Meet nhưng sẽ không lên hình.\n\nBạn có muốn tiếp tục?"
+                    );
+                    if (!result.isConfirmed) return;
                 } else if (!hasAudio) {
-                    const proceed = confirm("Không phát hiện micro. Bạn vẫn có thể tham gia Meet nhưng sẽ không có âm thanh.\n\nBạn có muốn tiếp tục?");
-                    if (!proceed) return;
+                    const result = await window.showConfirm_tc(
+                        "Không phát hiện micro. Bạn vẫn có thể tham gia Meet nhưng sẽ không có âm thanh.\n\nBạn có muốn tiếp tục?"
+                    );
+                    if (!result.isConfirmed) return;
                 }
             }
-        } catch (devErr) {
-            // Nếu enumerateDevices lỗi (quyền bị chặn hoặc trình duyệt cũ) — chỉ log và cho phép tiếp tục
-            console.warn("Không thể kiểm tra thiết bị (enumerateDevices):", devErr);
-        }
+        } catch (devErr) { console.warn(devErr); }
 
-        // Mở link trong tab mới (an toàn)
-        const newWin = window.open(link, "_blank", "noopener,noreferrer");
-       
+        window.open(link, "_blank", "noopener,noreferrer");
 
-        // Nếu dùng Bootstrap modal, đóng modal sau khi mở
         const modalEl = document.getElementById("joinMeetModal");
         if (modalEl && window.bootstrap) {
-            // Lấy instance nếu đã tồn tại, nếu không thì tạo mới rồi close
             let instance = bootstrap.Modal.getInstance(modalEl);
             if (!instance) instance = new bootstrap.Modal(modalEl);
-            try { instance.hide(); } catch (e) { /* ignore */ }
+            try { instance.hide(); } catch (e) { }
         }
 
     } catch (err) {
-        console.error("Lỗi khi mở Google Meet:", err);
-        alert("Đã xảy ra lỗi khi mở link. Kiểm tra console để biết chi tiết.");
+        console.error(err);
+        showError_tc("Đã xảy ra lỗi khi mở link Meet.");
     }
 };
+
+function isValidGoogleMeet(link) {
+    // Regex chuẩn Google Meet: https://meet.google.com/xxx-xxxx-xxx
+    const meetRegex = /^https:\/\/meet\.google\.com\/[a-zA-Z0-9-]{3,}(-[a-zA-Z0-9-]{3,}){1,2}$/;
+    return meetRegex.test(link);
+}
+

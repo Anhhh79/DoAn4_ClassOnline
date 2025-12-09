@@ -21,6 +21,7 @@ builder.Services.AddSession(options =>
     options.Cookie.SameSite = SameSiteMode.Lax;
 });
 
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
@@ -36,7 +37,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseStaticFiles();
 app.UseSession(); // Chỉ dùng Session
 
 // ⭐ XÓA app.UseAuthentication() VÀ app.UseAuthorization() ⭐
