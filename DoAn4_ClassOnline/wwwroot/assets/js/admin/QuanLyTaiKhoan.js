@@ -169,4 +169,177 @@ $(document).ready(function () {
             }
         });
     });
+
+    // =====================================================
+    // ⭐ XỬ LÝ PREVIEW ẢNH KHI CHỌN FILE
+    // =====================================================
+    $('#avatarInput').change(function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // Kiểm tra định dạng
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            if (!allowedTypes.includes(file.type)) {
+                toastr.error('Chỉ chấp nhận file ảnh (jpg, jpeg, png, gif)!', 'Lỗi');
+                $(this).val('');
+                return;
+            }
+
+            // Kiểm tra kích thước (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                toastr.error('Kích thước ảnh không được vượt quá 5MB!', 'Lỗi');
+                $(this).val('');
+                return;
+            }
+
+            // Preview ảnh
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                $('#avatarPreview').attr('src', e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // =====================================================
+    // ⭐ HIỂN THỊ PREVIEW MÃ SỐ KHI CHỌN CHỨC VỤ
+    // =====================================================
+    $('#roleId').change(function() {
+        const selectedOption = $(this).find('option:selected');
+        const roleName = selectedOption.data('role-name');
+        
+        if (roleName) {
+            let prefix = '';
+            
+            if (roleName === 'Student') {
+                prefix = 'SV';
+            } else if (roleName === 'Teacher') {
+                prefix = 'GV';
+            } else if (roleName === 'Admin') {
+                prefix = 'AD';
+            }
+            
+            if (prefix) {
+               console.log("")
+            } else {
+                $('#maSoPreview').slideUp();
+            }
+        } else {
+            $('#maSoPreview').slideUp();
+        }
+    });
+
+    // =====================================================
+    // ⭐ THÊM TÀI KHOẢN MỚI (CÓ UPLOAD ẢNH)
+    // =====================================================
+    $('#btnThem').click(function () {
+        // Reset errors
+        $('.text-danger').text('');
+        
+        // Lấy dữ liệu
+        const fullName = $('#fullName').val().trim();
+        const email = $('#email').val().trim();
+        const phoneNumber = $('#phoneNumber').val().trim();
+        const ngaySinhStr = $('#ngaySinh').val();
+        const gioiTinh = $('#gioiTinh').val();
+        const khoaId = parseInt($('#khoaId').val());
+        const roleId = parseInt($('#roleId').val());
+        const avatarFile = $('#avatarInput')[0].files[0];
+
+        // Validate
+        let isValid = true;
+
+        if (!fullName) {
+            $('#errorFullName').text('Vui lòng nhập họ và tên!');
+            isValid = false;
+        }
+
+        if (!email) {
+            $('#errorEmail').text('Vui lòng nhập email!');
+            isValid = false;
+        } else if (!validateEmail(email)) {
+            $('#errorEmail').text('Email không hợp lệ!');
+            isValid = false;
+        }
+
+        if (!khoaId || khoaId <= 0) {
+            $('#errorKhoa').text('Vui lòng chọn khoa!');
+            isValid = false;
+        }
+
+        if (!roleId || roleId <= 0) {
+            $('#errorRole').text('Vui lòng chọn chức vụ!');
+            isValid = false;
+        }
+
+        if (!isValid) return;
+
+        // ⭐ TẠO FORMDATA ĐỂ UPLOAD FILE
+        const formData = new FormData();
+        formData.append('FullName', fullName);
+        formData.append('Email', email);
+        formData.append('PhoneNumber', phoneNumber || '');
+        formData.append('GioiTinh', gioiTinh || '');
+        formData.append('NgaySinh', ngaySinhStr || '');
+        formData.append('KhoaId', khoaId);
+        formData.append('RoleId', roleId);
+        
+        // Thêm file ảnh nếu có
+        if (avatarFile) {
+            formData.append('Avatar', avatarFile);
+        }
+
+        // Gọi API
+        $.ajax({
+            url: '/Admin/QuanLyTaiKhoan/CreateUser',
+            type: 'POST',
+            data: formData,
+            processData: false,  // ⭐ QUAN TRỌNG: Không xử lý data
+            contentType: false,   // ⭐ QUAN TRỌNG: Để browser tự set Content-Type
+            success: function (response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Thêm tài khoản thành công!',
+                        html: `<p>${response.message}</p>`,
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        $('#them').modal('hide');
+                        resetForm();
+                        location.reload();
+                    });
+                } else {
+                    toastr.error(response.message, '');
+                }
+            },
+            error: function () {
+                toastr.error('Có lỗi xảy ra khi thêm tài khoản!', 'Lỗi');
+            }
+        });
+    });
+
+    // Reset form khi đóng modal
+    $('#them').on('hidden.bs.modal', function () {
+        resetForm();
+    });
+
+    function resetForm() {
+        $('#fullName').val('');
+        $('#email').val('');
+        $('#phoneNumber').val('');
+        $('#ngaySinh').val('');
+        $('#gioiTinh').val('');
+        $('#khoaId').val('');
+        $('#roleId').val('');
+        $('#avatarInput').val('');
+        $('#avatarPreview').attr('src', '/assets/image/tải xuống.jpg');
+        $('#maSoPreview').hide();
+        $('.text-danger').text('');
+    }
+
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+
+    // ... Phần code còn lại giữ nguyên (Live Search, Chi tiết, Khóa/Mở)
 });
