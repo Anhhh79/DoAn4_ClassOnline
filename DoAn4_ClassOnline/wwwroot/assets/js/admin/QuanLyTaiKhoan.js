@@ -248,8 +248,12 @@ $(document).ready(function () {
         // Validate
         let isValid = true;
 
+        // ⭐ KIỂM TRA HỌ VÀ TÊN - KHÔNG CHỨA KÝ TỰ ĐẶC BIỆT
         if (!fullName) {
             $('#errorFullName').text('Vui lòng nhập họ và tên!');
+            isValid = false;
+        } else if (!validateFullName(fullName)) {
+            $('#errorFullName').text('Họ và tên không được chứa ký tự đặc biệt!');
             isValid = false;
         }
 
@@ -258,6 +262,20 @@ $(document).ready(function () {
             isValid = false;
         } else if (!validateEmail(email)) {
             $('#errorEmail').text('Email không hợp lệ!');
+            isValid = false;
+        }
+
+        // ⭐ KIỂM TRA SỐ ĐIỆN THOẠI - PHẢI LÀ SỐ VÀ ĐỦ 10 CHỮ SỐ
+        if (!phoneNumber) {
+            $('#errorPhoneNumber').text('Vui lòng nhập số điện thoại!');
+            isValid = false;
+        } else if (!validatePhoneNumber(phoneNumber)) {
+            $('#errorPhoneNumber').text('Số điện thoại phải là 10 chữ số!');
+            isValid = false;
+        }
+
+        if (!gioiTinh || gioiTinh.trim() === '') {
+            $('#errorGioiTinh').text('Vui lòng chọn giới tính!');
             isValid = false;
         }
 
@@ -336,10 +354,23 @@ $(document).ready(function () {
         $('.text-danger').text('');
     }
 
+    // ⭐ HÀM VALIDATE EMAIL
     function validateEmail(email) {
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return re.test(email);
     }
 
+    // ⭐ HÀM VALIDATE HỌ VÀ TÊN - CHỈ CHO PHÉP CHỮ CÁI VÀ KHOẢNG TRẮNG
+    function validateFullName(fullName) {
+        // Cho phép chữ cái tiếng Việt có dấu, chữ cái tiếng Anh và khoảng trắng
+        const re = /^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s]+$/;
+        return re.test(fullName);
+    }
+
+    // ⭐ HÀM VALIDATE SỐ ĐIỆN THOẠI - PHẢI LÀ 10 CHỮ SỐ
+    function validatePhoneNumber(phone) {
+        const re = /^[0-9]{10}$/;
+        return re.test(phone);
+    }
     // ... Phần code còn lại giữ nguyên (Live Search, Chi tiết, Khóa/Mở)
 });

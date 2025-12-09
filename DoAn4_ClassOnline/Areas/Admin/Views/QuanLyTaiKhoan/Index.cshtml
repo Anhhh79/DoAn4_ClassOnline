@@ -182,6 +182,7 @@
                             <div class="col-md-6">
                                 <label for="phoneNumber" class="ms-1 mb-1 label-modal">Số điện thoại</label>
                                 <input type="tel" id="phoneNumber" class="form-control" placeholder="Nhập số điện thoại">
+                                <span id="errorPhoneNumber" class="text-danger"></span>
                             </div>
                             <div class="col-md-6">
                                 <label for="ngaySinh" class="ms-1 mb-1 label-modal">Ngày sinh</label>
@@ -199,6 +200,7 @@
                                     <option value="Nữ">Nữ</option>
                                     <option value="Khác">Khác</option>
                                 </select>
+                                <span id="errorGioiTinh" class="text-danger"></span>
                             </div>
                             <div class="col-md-6">
                                 <label class="mb-1 ms-1 label-modal">Chức vụ <span class="text-danger">*</span></label>
@@ -206,11 +208,16 @@
                                     <option value="">Chọn chức vụ</option>
                                     @foreach (var role in ViewBag.Roles)
                                     {
+                                        // ⭐ BỎ QUA ROLE ADMIN - KHÔNG CHO CHỌN ⭐
+                                        if (role.RoleName == "Admin")
+                                        {
+                                            continue;
+                                        }
+
                                         var roleDisplay = role.RoleName switch
                                         {
                                             "Teacher" => "Giảng viên",
                                             "Student" => "Sinh viên",
-                                            "Admin" => "Quản trị viên",
                                             _ => role.RoleName
                                         };
                                         <option value="@role.RoleId" data-role-name="@role.RoleName">@roleDisplay</option>
