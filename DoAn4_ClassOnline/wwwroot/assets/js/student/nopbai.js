@@ -45,7 +45,6 @@
                 <div class="text-start">
                     <p class="mb-2"><strong>File:</strong> ${fileInput.files[0].name}</p>
                     <p class="mb-2"><strong>Kích thước:</strong> ${(fileInput.files[0].size / 1024 / 1024).toFixed(2)} MB</p>
-                    <p class="text-muted small mb-0">Bạn có chắc chắn muốn nộp bài này không?</p>
                 </div>
             `,
             icon: 'question',
@@ -56,7 +55,7 @@
             cancelButtonText: '<i class="bi bi-x-circle me-1"></i> Hủy',
             reverseButtons: true,
             customClass: {
-                confirmButton: 'btn btn-success px-4',
+                confirmButton: 'btn btn-success px-4 ms-2',
                 cancelButton: 'btn btn-secondary px-4'
             },
             buttonsStyling: false
@@ -88,7 +87,7 @@
                                         <div class="mb-3">
                                             <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
                                         </div>
-                                        <p class="text-muted small mb-0">Trang sẽ tự động tải lại sau 2 giây...</p>
+                                        <p class="text-muted small mb-0">Giao diện sẽ tự động cập nhật...</p>
                                     </div>
                                 `,
                                 showConfirmButton: false,
@@ -99,7 +98,8 @@
                                     Swal.getHtmlContainer().querySelector('.bi-check-circle-fill').classList.add('animate__animated', 'animate__bounceIn');
                                 }
                             }).then(() => {
-                                location.reload();
+                                // ⭐ CẬP NHẬT GIAO DIỆN ĐỘNG THAY VÌ RELOAD ⭐
+                                updateUIAfterSubmit(baiTapId, response.data);
                             });
                         } else {
                             Swal.fire({
@@ -143,18 +143,12 @@
 
         var btn = $(this);
         var baiNopId = btn.data('bainop-id');
+        var baiTapId = btn.closest('.collapse').find('.upload-form').data('baitap-id');
 
         // ⭐ XÁC NHẬN HỦY BÀI ĐẸP ⭐
         Swal.fire({
             title: 'Xác nhận hủy bài nộp',
             html: `
-                <div class="text-start">
-                    <p class="mb-2">Bạn có chắc chắn muốn hủy bài nộp này không?</p>
-                    <ul class="text-muted small mb-0">
-                        <li>File đã nộp sẽ bị xóa hoàn toàn</li>
-                        <li>Bạn sẽ phải nộp lại từ đầu</li>
-                    </ul>
-                </div>
             `,
             icon: 'warning',
             showCancelButton: true,
@@ -164,7 +158,7 @@
             cancelButtonText: '<i class="bi bi-x-circle me-1"></i> Không hủy',
             reverseButtons: true,
             customClass: {
-                confirmButton: 'btn btn-danger px-4',
+                confirmButton: 'btn btn-danger px-4 ms-2',
                 cancelButton: 'btn btn-secondary px-4'
             },
             buttonsStyling: false
@@ -187,7 +181,7 @@
                                         <div class="mb-3">
                                             <i class="bi bi-trash-fill text-success" style="font-size: 4rem;"></i>
                                         </div>
-                                        <p class="text-muted small mb-0">Trang sẽ tự động tải lại sau 2 giây...</p>
+                                        <p class="text-muted small mb-0">Giao diện sẽ tự động cập nhật...</p>
                                     </div>
                                 `,
                                 showConfirmButton: false,
@@ -198,7 +192,8 @@
                                     Swal.getHtmlContainer().querySelector('.bi-trash-fill').classList.add('animate__animated', 'animate__fadeIn');
                                 }
                             }).then(() => {
-                                location.reload();
+                                // ⭐ CẬP NHẬT GIAO DIỆN ĐỘNG THAY VÌ RELOAD ⭐
+                                updateUIAfterCancel(baiTapId);
                             });
                         } else {
                             Swal.fire({
@@ -231,4 +226,125 @@
 
         return false;
     });
+
+    // ⭐ HÀM CẬP NHẬT GIAO DIỆN SAU KHI NỘP BÀI ⭐
+    function updateUIAfterSubmit(baiTapId, data) {
+        // Tìm collapse container của bài tập
+        var collapseId = `#collapseBaiTap${baiTapId}`;
+        var $collapse = $(collapseId);
+
+        if ($collapse.length === 0) {
+            console.error('Không tìm thấy collapse element');
+            location.reload(); // Fallback
+            return;
+        }
+
+        // Lấy thông tin từ response
+        var fileName = data.fileName || 'File đã nộp';
+        var fileIcon = getFileIcon(data.fileExtension || '.pdf');
+        var filePath = data.filePath || '#';
+        var ngayNop = data.ngayNop || new Date().toLocaleString('vi-VN');
+
+        // Tạo HTML mới cho trạng thái "Đã nộp - Chờ chấm"
+        var newHTML = `
+            <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
+                <p>
+                    <strong>Trạng thái:</strong>
+                    <span class="badge bg-secondary">
+                        <i class="bi bi-check-circle me-1"></i> Đã nộp - Chờ chấm
+                    </span>
+                </p>
+
+                <p class="mb-2"><strong>Điểm:</strong> -- / 10</p>
+
+                <p class="mb-1">
+                    <strong>Tệp đã nộp:</strong>
+                    <a href="${filePath}" download="${fileName}"
+                       class="text-decoration-underline text-dark ms-1">
+                        <i class="bi ${fileIcon} me-1 text-primary"></i>
+                        ${fileName}
+                    </a>
+                </p>
+
+                <p class="mb-3 text-muted small">
+                    <i class="bi bi-clock me-1"></i> Nộp lúc: ${ngayNop}
+                </p>
+
+                <div class="d-flex flex-wrap gap-2 mt-2">
+                    <form class="upload-form" data-baitap-id="${baiTapId}">
+                        <div class="input-group input-group-sm" style="width:300px;">
+                            <input type="file" name="file" class="form-control" accept=".zip,.rar,.pdf,.docx" required>
+                            <button class="btn btn-success" style="color:white;" type="submit">
+                                <i class="bi bi-upload me-1"></i> Nộp lại
+                            </button>
+                        </div>
+                    </form>
+                    <button class="btn btn-sm btn-outline-danger btn-huy-bai" data-bainop-id="${data.baiNopId}">
+                        <i class="bi bi-x-circle me-1"></i> Hủy bài nộp
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // Cập nhật HTML với hiệu ứng fade
+        $collapse.fadeOut(300, function () {
+            $(this).html(newHTML).fadeIn(300);
+        });
+
+        console.log('✅ Đã cập nhật giao diện sau khi nộp bài');
+    }
+
+    // ⭐ HÀM CẬP NHẬT GIAO DIỆN SAU KHI HỦY BÀI ⭐
+    function updateUIAfterCancel(baiTapId) {
+        // Tìm collapse container của bài tập
+        var collapseId = `#collapseBaiTap${baiTapId}`;
+        var $collapse = $(collapseId);
+
+        if ($collapse.length === 0) {
+            console.error('Không tìm thấy collapse element');
+            location.reload(); // Fallback
+            return;
+        }
+
+        // Tạo HTML mới cho trạng thái "Chưa nộp"
+        var newHTML = `
+            <div class="p-3 border rounded-3 mb-3" style="background-color:rgba(243,246,248);">
+                <p>
+                    <strong>Trạng thái:</strong> 
+                    <span class="badge bg-warning text-dark">
+                        <i class="bi bi-hourglass-split me-1"></i> Chưa nộp
+                    </span>
+                </p>
+
+                <form class="mt-2 upload-form" data-baitap-id="${baiTapId}">
+                    <div class="input-group input-group-sm" style="width:300px;">
+                        <input type="file" name="file" class="form-control" accept=".zip,.rar,.pdf,.docx" required>
+                        <button class="btn btn-success" style="color:white;" type="submit">
+                            <i class="bi bi-upload me-1"></i> Nộp bài
+                        </button>
+                    </div>
+                </form>
+            </div>
+        `;
+
+        // Cập nhật HTML với hiệu ứng fade
+        $collapse.fadeOut(300, function () {
+            $(this).html(newHTML).fadeIn(300);
+        });
+
+        console.log('✅ Đã cập nhật giao diện sau khi hủy bài');
+    }
+
+    // ⭐ HÀM NHẬN ICON DỰA VÀO LOẠI FILE ⭐
+    function getFileIcon(extension) {
+        extension = extension.toLowerCase();
+
+        if (extension.includes('doc')) return 'bi-file-earmark-word';
+        if (extension.includes('xls')) return 'bi-file-earmark-excel';
+        if (extension.includes('pdf')) return 'bi-file-earmark-pdf';
+        if (extension.includes('ppt')) return 'bi-file-earmark-ppt';
+        if (extension.includes('zip') || extension.includes('rar')) return 'bi-file-earmark-zip';
+
+        return 'bi-file-earmark';
+    }
 });

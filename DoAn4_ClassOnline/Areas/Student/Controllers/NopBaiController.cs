@@ -136,7 +136,20 @@ namespace DoAn4_ClassOnline.Areas.Student.Controllers
 				_context.BaiTapNopFiles.Add(baiTapNopFile);
 				await _context.SaveChangesAsync();
 
-				return Json(new { success = true, message = "Nộp bài thành công!" });
+				// ⭐ TRẢ VỀ DỮ LIỆU ĐẦY ĐỦ ĐỂ CẬP NHẬT UI ⭐
+				return Json(new 
+				{ 
+					success = true, 
+					message = "Nộp bài thành công!",
+					data = new 
+					{
+						baiNopId = baiNop.BaiNopId,
+						fileName = file.FileName,
+						filePath = "/assets/baitapnop/" + newFileName,
+						fileExtension = ext,
+						ngayNop = DateTime.Now.ToString("dd/MM/yyyy - HH:mm")
+					}
+				});
 			}
 			catch (Exception ex)
 			{
