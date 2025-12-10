@@ -114,30 +114,40 @@
     <!-- 8. Custom JS cho Quản Lý Khoa -->
     <script src="~/assets/js/admin/Js_QuanLyKhoa.js"></script>
 
-    <!-- 9. Flatpickr Initialization -->
+    @* <!-- 9. Flatpickr Initialization -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            // Sử dụng altInput để hiển thị định dạng đẹp cho user
+            // nhưng value thực tế là yyyy-MM-dd
             flatpickr("#batDau_Them", {
-                dateFormat: "d/m/Y",
+                dateFormat: "Y-m-d",        // Format gửi đi: yyyy-MM-dd
+                altInput: true,
+                altFormat: "d/m/Y",         // Format hiển thị: dd/mm/yyyy
                 allowInput: true
             });
 
             flatpickr("#ketThuc_Them", {
-                dateFormat: "d/m/Y",
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "d/m/Y",
                 allowInput: true
             });
 
             flatpickr("#batDau_Sua", {
-                dateFormat: "d/m/Y",
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "d/m/Y",
                 allowInput: true
             });
 
             flatpickr("#ketThuc_Sua", {
-                dateFormat: "d/m/Y",
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "d/m/Y",
                 allowInput: true
             });
         });
-    </script>
+    </script> *@
 
     <!-- ⭐ 10. RENDER SCRIPTS TỪ VIEWS - PHẢI Ở CUỐI CÙNG ⭐ -->
     @RenderSection("Scripts", required: false)
