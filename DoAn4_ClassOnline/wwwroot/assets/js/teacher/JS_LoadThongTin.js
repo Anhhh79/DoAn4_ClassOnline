@@ -37,11 +37,11 @@ async function loadUserProfile() {
             populateProfileData(data.user);
         } else {
             console.error('Lỗi:', data.message);
-            showNotification('Không thể tải thông tin người dùng', 'error');
+            toastr.error('Không thể tải thông tin người dùng');
         }
     } catch (error) {
         console.error('Lỗi khi load profile:', error);
-        showNotification('Không thể kết nối đến server', 'error');
+        toastr.error('Không thể kết nối đến server');
     }
 }
 
@@ -95,7 +95,7 @@ function populateProfileData(user) {
     setInputValue('MSSV_InforGiaoVien', user.maSo);
     setInputValue('diaChi_InforGiaoVien', user.diaChi);
     
-    // ⭐ THÊM TÊN KHOA VÀO INPUT READONLY ⭐
+    // Thêm tên khoa vào input readonly
     setInputValue('khoaName_InforGiaoVien', user.tenKhoa || 'Chưa có khoa');
 
     // Giới tính
@@ -107,11 +107,33 @@ function populateProfileData(user) {
     }
 }
 
-// Helper function để set value an toàn
+// Helper function để set value an toàn VÀ KÍCH HOẠT EVENTS
 function setInputValue(id, value) {
     const element = document.getElementById(id);
     if (element && value) {
         element.value = value;
+        
+        // ⭐ KÍCH HOẠT SỰ KIỆN ĐỂ FLATPICKR VÀ BOOTSTRAP NHẬN BIẾT ⭐
+        // Trigger change event cho Flatpickr
+        const changeEvent = new Event('change', { bubbles: true });
+        element.dispatchEvent(changeEvent);
+        
+        // Trigger input event cho Bootstrap form-floating
+        const inputEvent = new Event('input', { bubbles: true });
+        element.dispatchEvent(inputEvent);
+        
+        // ⭐ ĐẶC BIỆT CHO FLATPICKR: Set giá trị trực tiếp vào instance ⭐
+        if (id === 'dob_GiaoVien' && element._flatpickr) {
+            // Parse date từ format d/m/Y
+            const dateParts = value.split('/');
+            if (dateParts.length === 3) {
+                const day = parseInt(dateParts[0]);
+                const month = parseInt(dateParts[1]) - 1; // Month is 0-indexed
+                const year = parseInt(dateParts[2]);
+                const dateObj = new Date(year, month, day);
+                element._flatpickr.setDate(dateObj, true); // true = trigger change event
+            }
+        }
     }
 }
 
@@ -127,13 +149,13 @@ function initAvatarUpload() {
 
             // Validate file
             if (!file.type.match('image.*')) {
-                showNotification('Vui lòng chọn file ảnh!', 'error');
+                toastr.error('Vui lòng chọn file ảnh!');
                 return;
             }
 
             // Kiểm tra kích thước (max 5MB)
             if (file.size > 5 * 1024 * 1024) {
-                showNotification('File ảnh không được vượt quá 5MB!', 'error');
+                toastr.error('File ảnh không được vượt quá 5MB!');
                 return;
             }
 
@@ -181,13 +203,13 @@ async function updateUserProfile() {
 
     // Validate
     if (!formData.fullName) {
-        showNotification('Vui lòng nhập họ tên!', 'error');
+        toastr.warning('Vui lòng nhập họ tên!');
         document.getElementById('firstName_InforGiaoVien')?.focus();
         return;
     }
 
     if (!formData.email) {
-        showNotification('Vui lòng nhập email!', 'error');
+        toastr.warning('Vui lòng nhập email!');
         document.getElementById('email_InforGiaoVien')?.focus();
         return;
     }
@@ -195,7 +217,7 @@ async function updateUserProfile() {
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-        showNotification('Email không đúng định dạng!', 'error');
+        toastr.warning('Email không đúng định dạng!');
         document.getElementById('email_InforGiaoVien')?.focus();
         return;
     }
@@ -220,12 +242,13 @@ async function updateUserProfile() {
         const result = await response.json();
 
         if (result.success) {
-            showNotification('✓ Cập nhật thành công!', 'success');
+            // ⭐ THÔNG BÁO THÀNH CÔNG BẰNG TOASTR ⭐
+            showSuccess_tc('Cập nhật thông tin thành công!', 'Thành công');
 
             // Cập nhật lại thông tin profile
             await loadUserProfile();
 
-            // ⭐ TRIGGER EVENT ĐỂ CẬP NHẬT DANH SÁCH KHÓA HỌC ⭐
+            // Trigger event để cập nhật danh sách khóa học
             const profileUpdatedEvent = new CustomEvent('profileUpdated', {
                 detail: {
                     userInfo: result.user,
@@ -234,42 +257,23 @@ async function updateUserProfile() {
             });
             document.dispatchEvent(profileUpdatedEvent);
 
-            // Đóng modal sau 1 giây
+            // Đóng modal sau 1.5 giây
             setTimeout(() => {
                 const modal = bootstrap.Modal.getInstance(document.getElementById('profileModal'));
                 if (modal) modal.hide();
-            }, 1000);
+            }, 1500);
         } else {
-            showNotification('Lỗi: ' + (result.message || 'Không thể cập nhật'), 'error');
+            toastr.error(result.message || 'Không thể cập nhật thông tin', 'Lỗi');
         }
     } catch (error) {
         console.error('Error:', error);
-        showNotification('Có lỗi xảy ra khi cập nhật thông tin!', 'error');
+        toastr.error('Có lỗi xảy ra khi cập nhật thông tin!', 'Lỗi');
     } finally {
         // Restore button
         if (saveBtn) {
             saveBtn.disabled = false;
             saveBtn.textContent = originalText || 'Cập nhật';
         }
-    }
-}
-
-// Hiển thị thông báo
-function showNotification(message, type = 'success') {
-    const saveStatus = document.getElementById('saveStatus');
-    if (saveStatus) {
-        saveStatus.textContent = message;
-        saveStatus.style.display = 'block';
-        saveStatus.classList.remove('text-success', 'text-danger');
-        saveStatus.classList.add(type === 'success' ? 'text-success' : 'text-danger');
-
-        // Ẩn sau 3 giây
-        setTimeout(() => {
-            saveStatus.style.display = 'none';
-        }, 3000);
-    } else {
-        // Fallback to alert
-        alert(message);
     }
 }
 
@@ -288,10 +292,12 @@ async function uploadAvatar(file) {
 
         if (result.success) {
             console.log('Upload avatar thành công:', result.avatarUrl);
+            toastr.success('Cập nhật ảnh đại diện thành công!');
+            
             // Cập nhật avatar URL trong session
             await loadUserProfile();
 
-            // ⭐ TRIGGER EVENT CŨNG CHO UPLOAD AVATAR ⭐
+            // Trigger event cũng cho upload avatar
             const profileUpdatedEvent = new CustomEvent('profileUpdated', {
                 detail: {
                     userInfo: result.user,
@@ -302,10 +308,10 @@ async function uploadAvatar(file) {
             document.dispatchEvent(profileUpdatedEvent);
         } else {
             console.error('Upload avatar thất bại:', result.message);
-            showNotification('Upload avatar thất bại', 'error');
+            toastr.error('Upload avatar thất bại', 'Lỗi');
         }
     } catch (error) {
         console.error('Lỗi upload avatar:', error);
-        showNotification('Lỗi khi upload avatar', 'error');
+        toastr.error('Lỗi khi upload avatar', 'Lỗi');
     }
 }
