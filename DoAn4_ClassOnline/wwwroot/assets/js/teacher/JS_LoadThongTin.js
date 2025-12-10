@@ -107,11 +107,33 @@ function populateProfileData(user) {
     }
 }
 
-// Helper function để set value an toàn
+// Helper function để set value an toàn VÀ KÍCH HOẠT EVENTS
 function setInputValue(id, value) {
     const element = document.getElementById(id);
     if (element && value) {
         element.value = value;
+        
+        // ⭐ KÍCH HOẠT SỰ KIỆN ĐỂ FLATPICKR VÀ BOOTSTRAP NHẬN BIẾT ⭐
+        // Trigger change event cho Flatpickr
+        const changeEvent = new Event('change', { bubbles: true });
+        element.dispatchEvent(changeEvent);
+        
+        // Trigger input event cho Bootstrap form-floating
+        const inputEvent = new Event('input', { bubbles: true });
+        element.dispatchEvent(inputEvent);
+        
+        // ⭐ ĐẶC BIỆT CHO FLATPICKR: Set giá trị trực tiếp vào instance ⭐
+        if (id === 'dob_GiaoVien' && element._flatpickr) {
+            // Parse date từ format d/m/Y
+            const dateParts = value.split('/');
+            if (dateParts.length === 3) {
+                const day = parseInt(dateParts[0]);
+                const month = parseInt(dateParts[1]) - 1; // Month is 0-indexed
+                const year = parseInt(dateParts[2]);
+                const dateObj = new Date(year, month, day);
+                element._flatpickr.setDate(dateObj, true); // true = trigger change event
+            }
+        }
     }
 }
 

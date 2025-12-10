@@ -61,6 +61,20 @@
 			z-index: 9999 !important;
 			box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 		}
+
+		/* Đảm bảo input flatpickr hiển thị bình thường */
+		.flatpickr-input.form-control {
+			display: block !important;
+			opacity: 1 !important;
+		}
+
+		/* ⭐ HỖ TRỢ BOOTSTRAP FORM-FLOATING ⭐ */
+		.form-floating > .flatpickr-input:focus ~ label,
+		.form-floating > .flatpickr-input:not(:placeholder-shown) ~ label,
+		.form-floating > .flatpickr-input[data-has-value] ~ label {
+			opacity: 0.65;
+			transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+		}
 	</style>
 
 </head>
@@ -402,14 +416,21 @@
 		const dobInput = document.getElementById('dob_GiaoVien');
 		
 		if (dobInput) {
-			flatpickr(dobInput, {
-				dateFormat: "d/m/Y",        // Định dạng dd/mm/yyyy
-				maxDate: "today",           // Không cho chọn ngày tương lai
-				locale: "vn",               // Tiếng Việt
-				allowInput: true,           // Cho phép nhập tay
-				altInput: true,             // Hiển thị định dạng đẹp hơn
-				altFormat: "d/m/Y",
-				disableMobile: false        // Bật mobile-friendly picker
+			const fp = flatpickr(dobInput, {
+				dateFormat: "d/m/Y",
+				maxDate: "today",
+				locale: "vn",
+				allowInput: true,
+				altInput: false,
+				disableMobile: false,
+				onChange: function(selectedDates, dateStr, instance) {
+					// Kích hoạt label floating Bootstrap khi có giá trị
+					if (dateStr) {
+						dobInput.setAttribute('data-has-value', 'true');
+					} else {
+						dobInput.removeAttribute('data-has-value');
+					}
+				}
 			});
 			
 			console.log('✅ Flatpickr đã được khởi tạo thành công!');
